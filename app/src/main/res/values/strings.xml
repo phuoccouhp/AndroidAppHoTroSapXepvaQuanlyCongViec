@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Pro-Do</string>
+    <string-array name="inspirational_quotes">
+        <item>Stay Organized, Stay Ahead</item>
+        <item>Plan your work and work your plan.</item>
+        <item>A goal without a plan is just a wish.</item>
+        <item>The key is not to prioritize what\'s on your schedule, but to schedule your priorities.</item>
+        <item>Productivity is never an accident.</item>
+    </string-array>
+
+    <string name="default_web_client_id">1:504588279751:android:e7f9d95af7e52ddc1f83e2</string>
+
+</resources>

@@ -19,7 +19,7 @@
         android:layout_height="wrap_content"
         android:text="Congratulations !"
         android:textColor="@color/black"
-        android:textSize="30sp"
+        android:textSize="25sp"
         android:textStyle="bold"
         android:layout_marginTop="25dp"/>
 
@@ -28,7 +28,7 @@
         android:layout_height="wrap_content"
         android:text="Password Reset successful\nYou'll be redirected to the\nlogin screen now"
         android:textColor="@android:color/darker_gray"
-        android:textSize="17sp"
+        android:textSize="15sp"
         android:textAlignment="center"
         android:layout_marginTop="10dp"/>
 

@@ -46,4 +46,13 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+    implementation("com.android.volley:volley:1.2.1")
+    implementation ( "com.google.firebase:firebase-firestore")
+    implementation ("com.google.firebase:firebase-bom:33.1.2")
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation("de.hdodenhof:circleimageview:3.1.0")
+
+
+
+
 }

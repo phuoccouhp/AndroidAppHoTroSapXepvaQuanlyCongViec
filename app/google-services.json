@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "504588279751",
+    "firebase_url": "https://login-3f2b3-default-rtdb.firebaseio.com",
     "project_id": "login-3f2b3",
     "storage_bucket": "login-3f2b3.firebasestorage.app"
   },
@@ -12,7 +13,28 @@
           "package_name": "com.example.login_signup"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "504588279751-nldpmtov24ljt16j0hqaduiin7hp2lhu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.login_signup",
+            "certificate_hash": "5a3528c9c78849c9546d85df8039e97ab7dbe858"
+          }
+        },
+        {
+          "client_id": "504588279751-rrq6gb3h9j2kpdnvpbiukvtaoqgqsnpr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.login_signup",
+            "certificate_hash": "5819c81b6c6790942ef4a02c1c52067b20cce622"
+          }
+        },
+        {
+          "client_id": "504588279751-e4vg11i72dfujhjpa3s40aejdgsj5a4i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyB3HQIJ9rDWBtcnFU-bWwEHcSyo0vPiUn0"
@@ -20,7 +42,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "504588279751-e4vg11i72dfujhjpa3s40aejdgsj5a4i.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
+import android.widget.ImageButton; // SỬA: Đổi từ android.widget.ImageView
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,7 +34,7 @@ public class Sign_up extends AppCompatActivity {
     private EditText nameEditText, emailEditText, passwordEditText, confirmPasswordEditText;
     private Button signUpButton;
     private TextView loginTextView;
-    private ImageView googleSignInButton;
+    private ImageButton googleSignInButton; // SỬA: Đổi từ ImageView sang ImageButton
 
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
@@ -44,6 +44,7 @@ public class Sign_up extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // SỬA: Đổi tên layout cho khớp với tên class (ví dụ: Sign_up -> activity_sign_up)
         setContentView(R.layout.activity_signup);
 
         mAuth = FirebaseAuth.getInstance();
@@ -123,7 +124,9 @@ public class Sign_up extends AppCompatActivity {
                     navigateToHomeActivity();
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(Sign_up.this, "Lưu thông tin thất bại!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Sign_up.this, "Lưu thông tin thất bại! Lỗi: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    // Thêm log để gỡ lỗi Firestore
+                    android.util.Log.w("FirestoreError", "Lưu thông tin thất bại", e);
                 });
     }
 
@@ -148,6 +151,7 @@ public class Sign_up extends AppCompatActivity {
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
                         FirebaseUser user = mAuth.getCurrentUser();
+                        // Kiểm tra nếu là người dùng mới VÀ user không bị null
                         if (task.getResult().getAdditionalUserInfo().isNewUser() && user != null) {
                             saveAdditionalUserInfo(user.getDisplayName(), user.getEmail());
                         } else {

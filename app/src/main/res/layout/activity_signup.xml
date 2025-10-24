@@ -25,7 +25,7 @@
                 android:id="@+id/lb_sign_up"
                 android:layout_width="300dp"
                 android:layout_height="70dp"
-                android:layout_margin="70dp"
+                android:layout_margin="40dp"
                 android:fontFamily="@font/bebasneue_regular"
                 android:shadowColor="#80000000"
                 android:shadowDx="4"
@@ -44,7 +44,6 @@
                 android:id="@+id/lb_welcome"
                 android:layout_width="250dp"
                 android:layout_height="30dp"
-                android:layout_margin="10dp"
                 android:fontFamily="@font/smoochsans_medium"
                 android:text="Welcome On Board"
                 android:textAlignment="center"
@@ -59,7 +58,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="30dp"
                 android:layout_marginStart="50dp"
-                android:layout_marginTop="50dp"
+                android:layout_marginTop="40dp"
                 android:fontFamily="@font/smoochsans_bold"
                 android:text="Your name"
                 android:textColor="@color/dark_blue"
@@ -80,7 +79,7 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/text_name_layout"
                 android:layout_width="350dp"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:layout_margin="10dp"
                 app:boxBackgroundMode="none"
                 app:hintEnabled="false"
@@ -91,7 +90,7 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/text_name"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:background="@drawable/edit_text"
                     android:padding="5dp" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -122,7 +121,7 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/text_email_layout"
                 android:layout_width="350dp"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:layout_margin="10dp"
                 app:boxBackgroundMode="none"
                 app:hintEnabled="false"
@@ -133,7 +132,7 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/text_email"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:background="@drawable/edit_text"
                     android:inputType="textEmailAddress"
                     android:padding="5dp" />
@@ -165,7 +164,7 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/text_password"
                 android:layout_width="350dp"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:layout_margin="10dp"
                 app:boxBackgroundMode="none"
                 app:hintEnabled="false"
@@ -177,7 +176,7 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/password_edit_text"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:background="@drawable/edit_text"
                     android:inputType="textPassword"
                     android:padding="5dp" />
@@ -209,7 +208,7 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/text_confirm_pass"
                 android:layout_width="350dp"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:layout_margin="10dp"
                 app:boxBackgroundMode="none"
                 app:hintEnabled="false"
@@ -221,7 +220,7 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/confirm_pass_edit_text"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:background="@drawable/edit_text"
                     android:inputType="textPassword"
                     android:padding="5dp" />
@@ -245,7 +244,7 @@
                 android:id="@+id/layout_login"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="30dp"
+                android:layout_marginTop="40dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 app:layout_constraintLeft_toLeftOf="parent"
@@ -289,7 +288,6 @@
                 android:id="@+id/text_continue"
                 android:layout_width="wrap_content"
                 android:layout_height="30dp"
-                android:layout_margin="5dp"
                 android:fontFamily="@font/smoochsans_medium"
                 android:text="CONTINUE WITH"
                 android:textAlignment="center"
@@ -310,5 +308,4 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

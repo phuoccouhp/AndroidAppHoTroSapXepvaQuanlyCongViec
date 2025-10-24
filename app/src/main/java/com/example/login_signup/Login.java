@@ -43,8 +43,6 @@ public class Login extends AppCompatActivity {
     private GoogleSignInClient mGoogleSignInClient;
     private ActivityResultLauncher<Intent> googleSignInLauncher;
 
-
-
     @Override
     protected void onStart() {
         super.onStart();

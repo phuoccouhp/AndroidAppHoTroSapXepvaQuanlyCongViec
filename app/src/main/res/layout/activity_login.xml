@@ -19,11 +19,13 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="50dp">  <TextView
+            android:paddingBottom="50dp">
+
+            <TextView
             android:id="@+id/lb_sign_up"
             android:layout_width="300dp"
             android:layout_height="70dp"
-            android:layout_margin="80dp"
+            android:layout_margin="40dp"
             android:fontFamily="@font/bebasneue_regular"
             android:shadowColor="#80000000"
             android:shadowDx="4"
@@ -42,7 +44,6 @@
                 android:id="@+id/lb_welcome"
                 android:layout_width="250dp"
                 android:layout_height="30dp"
-                android:layout_margin="10dp"
                 android:fontFamily="@font/smoochsans_medium"
                 android:text="Welcome back"
                 android:textAlignment="center"
@@ -56,7 +57,7 @@
                 android:id="@+id/image_login"
                 android:layout_width="200dp"
                 android:layout_height="200dp"
-                android:layout_margin="15dp"
+                android:layout_margin="10dp"
                 android:background="@drawable/image_login"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
@@ -88,7 +89,7 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/text_email_layout"
                 android:layout_width="350dp"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:layout_margin="10dp"
                 app:boxBackgroundMode="none"
                 app:hintEnabled="false"
@@ -99,7 +100,7 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/text_email"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:background="@drawable/edit_text"
                     android:inputType="textEmailAddress"
                     android:padding="5dp" />
@@ -130,7 +131,7 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/text_password"
                 android:layout_width="350dp"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:layout_margin="10dp"
                 app:boxBackgroundMode="none"
                 app:hintEnabled="false"
@@ -142,7 +143,7 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/password_edit_text"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:background="@drawable/edit_text"
                     android:inputType="textPassword"
                     android:padding="5dp" />
@@ -152,7 +153,7 @@
                 android:id="@+id/btn_login"
                 android:layout_width="250dp"
                 android:layout_height="60dp"
-                android:layout_margin="20dp"
+                android:layout_margin="40dp"
                 android:background="@drawable/btn_background"
                 android:fontFamily="@font/smoochsans_semibold"
                 android:text="Login"
@@ -166,7 +167,7 @@
                 android:id="@+id/lb_forget_pass"
                 android:layout_width="250dp"
                 android:layout_height="30dp"
-                android:layout_margin="20dp"
+                android:layout_margin="10dp"
                 android:clickable="true"
                 android:focusable="true"
                 android:fontFamily="@font/smoochsans_semibold"
@@ -192,7 +193,7 @@
                     android:id="@+id/text_already"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/smoochsans_medium"
+                    android:fontFamily= "@font/smoochsans_medium"
                     android:text="DON'T HAVE AN ACCOUNT? "
                     android:textSize="19sp" />
 
@@ -225,7 +226,6 @@
                 android:id="@+id/text_continue"
                 android:layout_width="wrap_content"
                 android:layout_height="30dp"
-                android:layout_margin="5dp"
                 android:fontFamily="@font/smoochsans_medium"
                 android:text="CONTINUE WITH"
                 android:textAlignment="center"
@@ -246,5 +246,4 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

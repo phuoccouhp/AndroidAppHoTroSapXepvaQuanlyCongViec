@@ -21,8 +21,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
         app:strokeColor="@color/dark_blue"
-        app:strokeWidth="2dp"
-        />
+        app:strokeWidth="2dp" />
 
     <TextView
         android:id="@+id/lb_yourname"
@@ -35,8 +34,7 @@
         android:textColor="@color/dark_blue"
         android:textSize="24sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/image_avatar"
-        />
+        app:layout_constraintTop_toBottomOf="@id/image_avatar" />
 
     <TextView
         android:id="@+id/tv_name"
@@ -51,8 +49,7 @@
         app:layout_constraintBaseline_toBaselineOf="@id/lb_yourname"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/lb_yourname"
-        tools:text="Nguyen Van A"
-        />
+        tools:text="Nguyen Van A" />
 
     <TextView
         android:id="@+id/lb_youremail"
@@ -64,8 +61,7 @@
         android:textColor="@color/dark_blue"
         android:textSize="24sp"
         app:layout_constraintStart_toStartOf="@id/lb_yourname"
-        app:layout_constraintTop_toBottomOf="@id/lb_yourname"
-        />
+        app:layout_constraintTop_toBottomOf="@id/lb_yourname" />
 
     <TextView
         android:id="@+id/tv_email"
@@ -79,8 +75,7 @@
         app:layout_constraintBaseline_toBaselineOf="@id/lb_youremail"
         app:layout_constraintEnd_toEndOf="@id/tv_name"
         app:layout_constraintStart_toEndOf="@id/lb_youremail"
-        tools:text="nguyenvana@email.com"
-        />
+        tools:text="nguyenvana@email.com" />
 
     <TextView
         android:id="@+id/lb_yourpass"
@@ -92,8 +87,7 @@
         android:textColor="@color/dark_blue"
         android:textSize="24sp"
         app:layout_constraintStart_toStartOf="@id/lb_youremail"
-        app:layout_constraintTop_toBottomOf="@id/lb_youremail"
-        />
+        app:layout_constraintTop_toBottomOf="@id/lb_youremail" />
 
     <TextView
         android:id="@+id/tv_change_password"
@@ -107,8 +101,7 @@
         android:textSize="24sp"
         android:background="?attr/selectableItemBackground"
         app:layout_constraintBaseline_toBaselineOf="@id/lb_yourpass"
-        app:layout_constraintEnd_toEndOf="@id/tv_email"
-        />
+        app:layout_constraintEnd_toEndOf="@id/tv_email" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btn_logout"
@@ -122,8 +115,7 @@
         android:textSize="30sp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/lb_yourpass"
-        />
+        app:layout_constraintTop_toBottomOf="@id/lb_yourpass" />
 
     <LinearLayout
         android:id="@+id/bottom_nav_container"
@@ -132,8 +124,7 @@
         android:orientation="vertical"
         android:paddingHorizontal="16dp"
         android:paddingBottom="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        >
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottom_nav"

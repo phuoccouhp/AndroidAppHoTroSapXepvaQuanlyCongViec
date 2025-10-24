@@ -26,8 +26,8 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_margin="100dp"
-        />
+        android:layout_margin="100dp" />
+
     <ImageView
         android:id="@+id/image_business"
         android:layout_width="260dp"
@@ -36,8 +36,7 @@
         android:background="@drawable/main"
         app:layout_constraintTop_toBottomOf="@id/lb_todo"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        />
+        app:layout_constraintLeft_toLeftOf="parent" />
 
     <TextView
         android:id="@+id/text_welcome"
@@ -52,9 +51,7 @@
         android:textStyle="bold"
         app:layout_constraintTop_toBottomOf="@id/image_business"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-       />
-
+        app:layout_constraintRight_toRightOf="parent" />
 
     <TextView
         android:id="@+id/text_quote"
@@ -71,6 +68,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         />
+    
     <ProgressBar
         android:id="@+id/progressBar"
         style="?android:attr/progressBarStyle"
@@ -81,7 +79,4 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/text_quote" />
-
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>

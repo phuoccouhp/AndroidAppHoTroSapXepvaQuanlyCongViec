@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background"
+    tools:context=".HomeFragment">
+
+    <TextView
+        android:id="@+id/lb_todo"
+        android:layout_width="300dp"
+        android:layout_height="90dp"
+        android:layout_margin="70dp"
+        android:fontFamily="@font/bebasneue_regular"
+        android:shadowColor="#80000000"
+        android:shadowDx="4"
+        android:shadowDy="4"
+        android:shadowRadius="6"
+        android:text="TASKIFY"
+        android:textAlignment="center"
+        android:textColor="@color/pastel_deep_blue_violet"
+        android:textSize="90sp"
+        android:textStyle="bold"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/image_business"
+        android:layout_width="300dp"
+        android:layout_height="250dp"
+        android:layout_margin="30dp"
+        android:background="@drawable/home_activity"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/lb_todo" />
+
+    <TextView
+        android:id="@+id/text_welcome"
+        android:layout_width="300dp"
+        android:layout_height="50dp"
+        android:layout_margin="20dp"
+        android:fontFamily="@font/smoochsans_medium"
+        android:text="Welcome to Taskify"
+        android:textAlignment="center"
+        android:textColor="@color/oxford_blue"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/image_business" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -45,7 +45,7 @@
         android:layout_height="60dp"
         android:layout_margin="35dp"
         android:fontFamily="@font/smoochsans_medium"
-        android:text="Welcome to pro-do"
+        android:text="Welcome to Taskify"
         android:textAlignment="center"
         android:textColor="@color/oxford_blue"
         android:textSize="40sp"

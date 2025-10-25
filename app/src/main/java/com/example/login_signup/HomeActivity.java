@@ -2,55 +2,65 @@ package com.example.login_signup;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.MenuItem; // Thêm import này
 import android.view.View;
-
-import androidx.activity.EdgeToEdge;
-import androidx.annotation.NonNull; // Thêm import này
+import android.widget.ImageButton;
+// import androidx.activity.EdgeToEdge; // Bỏ dòng này đi
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.navigation.NavigationBarView;
-
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 public class HomeActivity extends AppCompatActivity {
 
-
-    private BottomNavigationView bottomNav;
+    // Đây là file HomeActivity.java của bạn
+    private ImageButton homeButton, calendarButton, documentsButton, settingsButton;
+    private FloatingActionButton fabAddTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_home);
 
-        bottomNav = findViewById(R.id.bottom_nav);
+        // Ánh xạ các nút từ file KHUNG (activity_home.xml)
+        homeButton = findViewById(R.id.nav_home_button);
+        calendarButton = findViewById(R.id.nav_calendar_button);
+        documentsButton = findViewById(R.id.nav_documents_button);
+        settingsButton = findViewById(R.id.nav_settings_button); // Nút thứ 4
+        fabAddTask = findViewById(R.id.fab_add_task);
 
-        bottomNav.setSelectedItemId(R.id.nav_home);
+        // Load HomeFragment làm mặc định
+        if (savedInstanceState == null) {
+            loadFragment(new HomeFragment());
+        }
 
-        bottomNav.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        // --- CÁC NÚT BẤM ---
 
-                if (item.getItemId() == R.id.nav_settings) {
+        homeButton.setOnClickListener(v -> loadFragment(new HomeFragment()));
 
-                    Intent intent = new Intent(HomeActivity.this, Profile.class);
-                    startActivity(intent);
-                    return true;
-                } else if (item.getItemId() == R.id.nav_home) {
-                    return true;
-                }
+        documentsButton.setOnClickListener(v -> loadFragment(new DocumentsFragment()));
 
-                return false;
-            }
+        // (Nút calendar...)
+        calendarButton.setOnClickListener(v -> {
+            // loadFragment(new CalendarFragment());
         });
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
+        // ============ THÊM ĐOẠN NÀY ============
+        // Khi nhấn nút thứ 4 (Settings) -> Load ProfileFragment
+        settingsButton.setOnClickListener(v -> loadFragment(new ProfileFragment()));
+        // =======================================
+
+        fabAddTask.setOnClickListener(v -> {
+            Intent intent = new Intent(HomeActivity.this, AddTaskActivity.class);
+            startActivity(intent);
         });
+    }
+
+    // Hàm helper để thay đổi Fragment (bạn đã có)
+    private void loadFragment(Fragment fragment) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_container, fragment);
+        fragmentTransaction.commit();
     }
 }

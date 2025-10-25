@@ -15,6 +15,9 @@
             android:name=".HomeActivity"
             android:exported="false" />
         <activity
+            android:name=".AddTaskActivity"
+            android:exported="false" />
+        <activity
             android:name=".Change_password"
             android:exported="false" />
         <activity

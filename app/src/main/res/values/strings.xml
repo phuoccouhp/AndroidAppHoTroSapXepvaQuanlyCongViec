@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Pro-Do</string>
+    <string name="app_name">Taskify</string>
     <string-array name="inspirational_quotes">
         <item>Stay Organized, Stay Ahead</item>
         <item>Plan your work and work your plan.</item>

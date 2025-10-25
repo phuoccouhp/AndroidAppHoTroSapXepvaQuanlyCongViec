@@ -13,7 +13,7 @@
         android:id="@+id/lb_todo"
         android:layout_width="300dp"
         android:layout_height="90dp"
-        android:text="PRO-DO"
+        android:text="TASKIFY"
         android:fontFamily="@font/bebasneue_regular"
         android:shadowColor="#80000000"
         android:shadowDx="4"

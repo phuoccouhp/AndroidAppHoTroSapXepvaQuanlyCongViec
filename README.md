@@ -1,4 +1,4 @@
-# Nhom5-NT118.Q11 #
+# Nhóm 5-NT118.Q11- Phát triển ứng dụng trên thiết bị di động #
 Thành viên nhóm:                                                                                                                                                                        
 23521228	Bùi Lê Huy Phước                                                                                                                                                                                         
 23520541	Trần Nguyễn Việt Hoàng                                                                                                                

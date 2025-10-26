@@ -1,24 +1,19 @@
 package com.example.login_signup;
 
 public class Task {
+    private String id;
     private String title;
     private String category;
     private String time;
     private boolean completed;
-    private String date; // 🔹 thêm trường date (định dạng yyyy-MM-dd hoặc yyyyMMdd)
+    private String date;
+    private String note; // ✅ thêm trường note
 
-    public Task() {
-        // Bắt buộc có constructor rỗng để Firestore có thể map dữ liệu
-    }
+    public Task() {}
 
-    public Task(String title, String category, String time, boolean completed) {
-        this.title = title;
-        this.category = category;
-        this.time = time;
-        this.completed = completed;
-    }
-
-    public Task(String title, String category, String time, boolean completed, String date) {
+    public Task(String id, String title, String category, String time,
+                boolean completed, String date) {
+        this.id = id;
         this.title = title;
         this.category = category;
         this.time = time;
@@ -26,43 +21,32 @@ public class Task {
         this.date = date;
     }
 
-    public String getTitle() {
-        return title;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public String getTime() {
-        return time;
-    }
-
-    public boolean isCompleted() {
-        return completed;
-    }
-
-    public String getDate() { // ✅ thêm getter này để DocumentsFragment dùng
-        return date;
-    }
-
-    public void setTitle(String title) {
+    // ✅ constructor mới có thêm note
+    public Task(String id, String title, String category, String time,
+                boolean completed, String date, String note) {
+        this.id = id;
         this.title = title;
-    }
-
-    public void setCategory(String category) {
         this.category = category;
-    }
-
-    public void setTime(String time) {
         this.time = time;
-    }
-
-    public void setCompleted(boolean completed) {
         this.completed = completed;
+        this.date = date;
+        this.note = note;
     }
 
-    public void setDate(String date) {
-        this.date = date;
+    // getter + setter cho note
+    public String getNote() {
+        return note;
     }
+
+    public void setNote(String note) {
+        this.note = note;
+    }
+
+    // getter + setter khác (giữ nguyên)
+    public String getId() { return id; }
+    public String getTitle() { return title; }
+    public String getCategory() { return category; }
+    public String getTime() { return time; }
+    public boolean isCompleted() { return completed; }
+    public String getDate() { return date; }
 }

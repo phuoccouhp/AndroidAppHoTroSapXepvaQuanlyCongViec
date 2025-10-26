@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.*;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -130,19 +131,35 @@ public class DocumentsFragment extends Fragment {
         todayTasks.clear();
         futureTasks.clear();
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        String todayStr = sdf.format(new Date());
+        // Chuẩn hóa ngày hiện tại
+        Calendar calToday = Calendar.getInstance();
+        calToday.set(Calendar.HOUR_OF_DAY, 0);
+        calToday.set(Calendar.MINUTE, 0);
+        calToday.set(Calendar.SECOND, 0);
+        calToday.set(Calendar.MILLISECOND, 0);
 
         for (Task t : allTasks) {
             if (selectedCategory == null || t.getCategory().equals(selectedCategory)) {
-                if (t.getDate().equals(todayStr))
-                    todayTasks.add(t);
-                else
-                    futureTasks.add(t);
+                try {
+                    Date taskDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).parse(t.getDate());
+                    if (taskDate != null) {
+                        if (isSameDay(taskDate, calToday.getTime()))
+                            todayTasks.add(t);
+                        else if (taskDate.after(calToday.getTime()))
+                            futureTasks.add(t);
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
             }
         }
 
         adapterToday.notifyDataSetChanged();
         adapterFuture.notifyDataSetChanged();
+    }
+
+    private boolean isSameDay(Date d1, Date d2) {
+        SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
+        return fmt.format(d1).equals(fmt.format(d2));
     }
 }

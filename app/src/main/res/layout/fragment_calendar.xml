@@ -12,14 +12,17 @@
         android:id="@+id/tvCalendarTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="📅 Lịch công việc của bạn"
+        android:text="Your Calendar"
+        android:textAlignment="center"
+        android:gravity="center"
         android:textColor="#1E293B"
         android:textSize="22sp"
         android:fontFamily="@font/smoochsans_bold"
-        android:layout_marginStart="20dp"
         android:layout_marginTop="32dp"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent" />
+
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardCalendar"
@@ -48,7 +51,7 @@
         android:id="@+id/tvTaskListLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Công việc trong ngày"
+        android:text="Your Task for Today"
         android:textColor="#334155"
         android:textSize="18sp"
         android:fontFamily="@font/smoochsans_bold"

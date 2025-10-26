@@ -2,18 +2,15 @@ package com.example.login_signup;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.ImageButton;
-// import androidx.activity.EdgeToEdge; // Bỏ dòng này đi
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 public class HomeActivity extends AppCompatActivity {
 
-    // Đây là file HomeActivity.java của bạn
     private ImageButton homeButton, calendarButton, documentsButton, settingsButton;
     private FloatingActionButton fabAddTask;
 
@@ -22,41 +19,38 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        // Ánh xạ các nút từ file KHUNG (activity_home.xml)
+        // Ánh xạ view từ layout
         homeButton = findViewById(R.id.nav_home_button);
         calendarButton = findViewById(R.id.nav_calendar_button);
         documentsButton = findViewById(R.id.nav_documents_button);
-        settingsButton = findViewById(R.id.nav_settings_button); // Nút thứ 4
+        settingsButton = findViewById(R.id.nav_settings_button);
         fabAddTask = findViewById(R.id.fab_add_task);
 
-        // Load HomeFragment làm mặc định
+        // Mặc định hiển thị HomeFragment
         if (savedInstanceState == null) {
             loadFragment(new HomeFragment());
         }
 
-        // --- CÁC NÚT BẤM ---
-
+        // ================== XỬ LÝ CÁC NÚT ==================
         homeButton.setOnClickListener(v -> loadFragment(new HomeFragment()));
 
+        // Nút thứ 2: hiển thị CalendarFragment
+        calendarButton.setOnClickListener(v -> loadFragment(new CalendarFragment()));
+
+        // Nút thứ 3: DocumentsFragment
         documentsButton.setOnClickListener(v -> loadFragment(new DocumentsFragment()));
 
-        // (Nút calendar...)
-        calendarButton.setOnClickListener(v -> {
-            // loadFragment(new CalendarFragment());
-        });
-
-        // ============ THÊM ĐOẠN NÀY ============
-        // Khi nhấn nút thứ 4 (Settings) -> Load ProfileFragment
+        // Nút thứ 4: ProfileFragment (settings)
         settingsButton.setOnClickListener(v -> loadFragment(new ProfileFragment()));
-        // =======================================
 
+        // Nút FloatingActionButton thêm task
         fabAddTask.setOnClickListener(v -> {
             Intent intent = new Intent(HomeActivity.this, AddTaskActivity.class);
             startActivity(intent);
         });
     }
 
-    // Hàm helper để thay đổi Fragment (bạn đã có)
+    // Hàm load fragment chung
     private void loadFragment(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();

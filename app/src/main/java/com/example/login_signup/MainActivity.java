@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
     private void startSplashScreen() {
         progressBar.setVisibility(View.VISIBLE);
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            Intent intent = new Intent(MainActivity.this, Sign_up.class);
+            Intent intent = new Intent(MainActivity.this, Login.class);
             startActivity(intent);
             finish();
         }, SPLASH_TIME_OUT);

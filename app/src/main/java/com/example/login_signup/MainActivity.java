@@ -20,7 +20,6 @@ public class MainActivity extends AppCompatActivity {
     ImageView imageBusiness;
     ProgressBar progressBar;
 
-
     private void Init() {
         lbTodo = findViewById(R.id.lb_todo);
         textWelcome = findViewById(R.id.text_welcome);
@@ -52,7 +51,6 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }, SPLASH_TIME_OUT);
     }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

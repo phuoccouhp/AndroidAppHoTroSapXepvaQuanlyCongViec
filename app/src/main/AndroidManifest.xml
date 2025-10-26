@@ -18,37 +18,33 @@
             android:name=".AddTaskActivity"
             android:exported="false" />
         <activity
-            android:name=".Change_password"
+            android:name=".ChangePassword"
             android:exported="false" />
         <activity
             android:name=".Profile"
             android:exported="false" />
         <activity
-            android:name=".Verify_2"
-            android:exported="false" />
-        <activity
-            android:name=".Verify_1"
-            android:exported="false" />
-        <activity
             android:name=".ForgetPassword"
+            android:exported="false" />
+        <activity
+            android:name=".NewPassword"
             android:exported="false" />
         <activity
             android:name=".Login"
             android:exported="false" />
         <activity
-            android:name=".Sign_up"
+            android:name=".SignUp"
+            android:exported="false" />
+        <activity
+            android:name=".Register"
             android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="true">
-
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
     </application>
-
 </manifest>

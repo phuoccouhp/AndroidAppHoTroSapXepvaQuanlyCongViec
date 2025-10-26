@@ -23,7 +23,7 @@ public class CalendarFragment extends Fragment {
     private List<Task> taskList = new ArrayList<>();
     private FirebaseFirestore db;
     private FirebaseAuth auth;
-    private Date selectedDate = new Date(); // 🟢 lưu ngày đang chọn để reload
+    private Date selectedDate = new Date();
 
     @Nullable
     @Override
@@ -39,20 +39,18 @@ public class CalendarFragment extends Fragment {
                 new TaskAdapter.OnItemClickListener() {
                     @Override
                     public void onItemClick(Task task) {
-                        // ✅ Khi nhấn vào task -> mở TaskDetailFragment
                         TaskDetailFragment detailFragment = TaskDetailFragment.newInstance(task);
 
                         requireActivity().getSupportFragmentManager()
                                 .beginTransaction()
                                 .replace(R.id.fragment_container, detailFragment)
-                                .addToBackStack(null) // cho phép quay lại
+                                .addToBackStack(null)
                                 .commit();
                     }
                 },
                 new TaskAdapter.OnItemLongClickListener() {
                     @Override
                     public void onItemLongClick(Task task) {
-                        // Có thể thêm chức năng xoá nếu cần
                     }
                 }
         );
@@ -62,26 +60,23 @@ public class CalendarFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
 
-        // 🟢 Lắng nghe kết quả từ TaskDetailFragment
         getParentFragmentManager().setFragmentResultListener(
                 "task_updated_result",
                 this,
                 (requestKey, result) -> {
                     if (result.getBoolean("task_updated", false)) {
-                        loadTasksForDate(selectedDate); // reload dữ liệu khi task thay đổi
+                        loadTasksForDate(selectedDate);
                     }
                 }
         );
 
-        // 🟢 Khi người dùng chọn ngày
         calendarView.setOnDateChangeListener((view, year, month, dayOfMonth) -> {
             Calendar c = Calendar.getInstance();
             c.set(year, month, dayOfMonth, 0, 0, 0);
-            selectedDate = c.getTime(); // lưu lại ngày đang chọn
+            selectedDate = c.getTime();
             loadTasksForDate(selectedDate);
         });
 
-        // 🟢 Mặc định tải task hôm nay
         loadTasksForDate(selectedDate);
         return v;
     }
@@ -114,7 +109,6 @@ public class CalendarFragment extends Fragment {
                                     boolean completed = doc.getBoolean("completed") != null && doc.getBoolean("completed");
                                     String timeStr = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(taskDate);
 
-                                    // ✅ Gán id + note vào Task
                                     taskList.add(new Task(id, title, category, timeStr, completed, taskDay, note));
                                 }
                             }

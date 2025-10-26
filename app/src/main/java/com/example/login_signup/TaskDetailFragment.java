@@ -43,7 +43,6 @@ public class TaskDetailFragment extends Fragment {
 
     public TaskDetailFragment() {}
 
-    // ✅ Dùng để nhận dữ liệu từ CalendarFragment hoặc DocumentFragment
     public static TaskDetailFragment newInstance(Task task) {
         TaskDetailFragment fragment = new TaskDetailFragment();
         Bundle args = new Bundle();
@@ -77,14 +76,12 @@ public class TaskDetailFragment extends Fragment {
         auth = FirebaseAuth.getInstance();
         selectedDateTime = Calendar.getInstance();
 
-        // ✅ Gán các category đúng như yêu cầu
         String[] categories = {"Work", "Personal", "Health", "Shopping", "Habit"};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(),
                 android.R.layout.simple_spinner_item, categories);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerCategories.setAdapter(adapter);
 
-        // ✅ Lấy dữ liệu từ arguments
         Bundle args = getArguments();
         if (args != null) {
             taskId = args.getString("taskId");
@@ -97,7 +94,6 @@ public class TaskDetailFragment extends Fragment {
                 if (pos >= 0) spinnerCategories.setSelection(pos);
             }
 
-            // Cập nhật ngày giờ nếu có
             String dateStr = args.getString("date");
             String timeStr = args.getString("time");
             if (dateStr != null && timeStr != null) {
@@ -110,7 +106,6 @@ public class TaskDetailFragment extends Fragment {
             }
         }
 
-        // 📅 Chọn ngày
         btnPickDate.setOnClickListener(view -> {
             int y = selectedDateTime.get(Calendar.YEAR);
             int m = selectedDateTime.get(Calendar.MONTH);
@@ -123,7 +118,6 @@ public class TaskDetailFragment extends Fragment {
             }, y, m, d).show();
         });
 
-        // ⏰ Chọn giờ
         btnPickTime.setOnClickListener(view -> {
             int h = selectedDateTime.get(Calendar.HOUR_OF_DAY);
             int min = selectedDateTime.get(Calendar.MINUTE);
@@ -134,12 +128,10 @@ public class TaskDetailFragment extends Fragment {
             }, h, min, true).show();
         });
 
-        // ❌ Thoát (quay lại màn trước)
         btnCancelTask.setOnClickListener(view ->
                 requireActivity().getSupportFragmentManager().popBackStack()
         );
 
-        // ✅ Lưu thay đổi lên Firestore
         btnConfirmTask.setOnClickListener(view -> saveTaskChanges());
 
         return v;

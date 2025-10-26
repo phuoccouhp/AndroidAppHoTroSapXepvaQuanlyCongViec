@@ -32,25 +32,22 @@ import com.google.firebase.auth.GoogleAuthProvider;
 public class Login extends AppCompatActivity {
 
     // Khai báo các thành phần UI
-    private EditText emailEditText;
-    private EditText passwordEditText;
-    private Button loginButton;
-    private TextView forgotPasswordTextView;
-    private TextView signUpTextView;
-    private ImageButton googleSignInButton;
+    private EditText etEmail;
+    private EditText etOldPass;
+    private Button btnLogin;
+    private TextView tvForgetPass;
+    private TextView tvSignUp;
+    private ImageButton btnGoogle;
 
     private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
     private ActivityResultLauncher<Intent> googleSignInLauncher;
-
-
 
     @Override
     protected void onStart() {
         super.onStart();
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
-            // Nếu có người dùng đã đăng nhập, chuyển thẳng vào HomeActivity
             Toast.makeText(this, "Đã tự động đăng nhập!", Toast.LENGTH_SHORT).show();
             navigateToHomeActivity();
         }
@@ -63,12 +60,12 @@ public class Login extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
 
-        emailEditText = findViewById(R.id.text_email);
-        passwordEditText = findViewById(R.id.password_edit_text);
-        loginButton = findViewById(R.id.btn_login);
-        forgotPasswordTextView = findViewById(R.id.lb_forget_pass);
-        signUpTextView = findViewById(R.id.text_signup);
-        googleSignInButton = findViewById(R.id.image_gg);
+        etEmail = findViewById(R.id.etEmail);
+        etOldPass = findViewById(R.id.etOldPass);
+        btnLogin = findViewById(R.id.btnLogin);
+        tvForgetPass = findViewById(R.id.tvForgetPass);
+        tvSignUp = findViewById(R.id.tvSignUp);
+        btnGoogle = findViewById(R.id.btnGoogle);
 
         createGoogleSignInRequest();
         googleSignInLauncher = registerForActivityResult(
@@ -85,16 +82,16 @@ public class Login extends AppCompatActivity {
                     }
                 });
 
-        loginButton.setOnClickListener(v -> handleLogin());
-        forgotPasswordTextView.setOnClickListener(v -> {
+        btnLogin.setOnClickListener(v -> handleLogin());
+        tvForgetPass.setOnClickListener(v -> {
             Intent intent = new Intent(Login.this, ForgetPassword.class);
             startActivity(intent);
         });
-        signUpTextView.setOnClickListener(v -> {
-            Intent intent = new Intent(Login.this, Sign_up.class);
+        tvSignUp.setOnClickListener(v -> {
+            Intent intent = new Intent(Login.this, SignUp.class);
             startActivity(intent);
         });
-        googleSignInButton.setOnClickListener(v -> signInWithGoogle());
+        btnGoogle.setOnClickListener(v -> signInWithGoogle());
     }
 
     @Override
@@ -132,8 +129,8 @@ public class Login extends AppCompatActivity {
     }
 
     private void handleLogin() {
-        String email = emailEditText.getText().toString().trim();
-        String password = passwordEditText.getText().toString();
+        String email = etEmail.getText().toString().trim();
+        String password = etOldPass.getText().toString();
 
         if (email.isEmpty() || password.isEmpty()) {
             Toast.makeText(this, "Vui lòng nhập email và mật khẩu", Toast.LENGTH_SHORT).show();

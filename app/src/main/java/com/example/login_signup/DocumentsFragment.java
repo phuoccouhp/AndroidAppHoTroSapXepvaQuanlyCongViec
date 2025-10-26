@@ -131,7 +131,6 @@ public class DocumentsFragment extends Fragment {
         todayTasks.clear();
         futureTasks.clear();
 
-        // Chuẩn hóa ngày hiện tại
         Calendar calToday = Calendar.getInstance();
         calToday.set(Calendar.HOUR_OF_DAY, 0);
         calToday.set(Calendar.MINUTE, 0);

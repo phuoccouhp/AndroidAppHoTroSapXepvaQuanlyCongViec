@@ -5,7 +5,8 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background">
+    android:background="@drawable/background"
+    tools:context=".Register">
 
     <ScrollView
         android:id="@+id/scroll"
@@ -20,8 +21,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="48dp"
-            android:background="@drawable/background">
+            android:paddingBottom="48dp">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/toolbar"
@@ -36,13 +36,12 @@
                     android:id="@+id/btnBack"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
                     android:src="@drawable/outline_arrow_back_24"
+                    android:layout_marginStart="16dp"
                     android:background="@android:color/transparent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent" />
-
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -57,30 +56,63 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <TextView
-                android:id="@+id/tvChangePass"
+                android:id="@+id/tvRegister"
                 android:layout_width="400dp"
                 android:layout_height="70dp"
                 android:layout_margin="10dp"
-                android:text="Change password"
+                android:text="Register"
                 android:textSize="50sp"
                 android:textAlignment="center"
                 android:textColor="@color/dark_blue"
                 android:fontFamily="@font/smoochsans_extrabold"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/toolbar" />
-            <TextView
-                android:id="@+id/tvOldPass"
-                android:layout_width="200dp"
+                app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+
+            <ImageView
+                android:id="@+id/imgName"
+                android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="60dp"
+                android:layout_marginStart="50dp"
+                android:src="@drawable/outline_familiar_face_and_zone_24"
+                app:layout_constraintBottom_toBottomOf="@+id/tvYourName"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/tvYourName" />
+
+            <TextView
+                android:id="@+id/tvYourName"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="50dp"
                 android:fontFamily="@font/smoochsans_bold"
-                android:text="Old Password"
+                android:text="Your name"
                 android:textColor="@color/dark_blue"
                 android:textSize="25sp"
-                app:layout_constraintLeft_toRightOf="@+id/imgOldPass"
-                app:layout_constraintTop_toBottomOf="@id/tvChangePass" />
+                app:layout_constraintLeft_toRightOf="@+id/imgName"
+                app:layout_constraintTop_toBottomOf="@id/tvRegister" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/layoutName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="50dp"
+                android:layout_marginEnd="50dp"
+                app:boxBackgroundMode="none"
+                app:hintEnabled="false"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvYourName"
+                app:endIconMode="clear_text">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/edit_text"
+                    android:paddingVertical="12dp"
+                    android:textColor="@android:color/black" /> </com.google.android.material.textfield.TextInputLayout>
 
             <ImageView
                 android:id="@+id/imgOldPass"
@@ -88,10 +120,24 @@
                 android:layout_height="30dp"
                 android:layout_marginStart="50dp"
                 android:src="@drawable/outline_edit_square_24"
+                app:layout_constraintBottom_toBottomOf="@+id/tvPassword"
                 app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/tvOldPass" />
-            <com.google.android.material.textfield.TextInputLayout
+                app:layout_constraintTop_toTopOf="@+id/tvPassword" />
 
+            <TextView
+                android:id="@+id/tvPassword"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="30dp"
+                android:fontFamily="@font/smoochsans_bold"
+                android:text="Password"
+                android:textColor="@color/dark_blue"
+                android:textSize="25sp"
+                app:layout_constraintLeft_toRightOf="@+id/imgOldPass"
+                app:layout_constraintTop_toBottomOf="@id/layoutName" />
+
+            <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/layoutOldPass"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -100,77 +146,19 @@
                 android:layout_marginEnd="50dp"
                 app:boxBackgroundMode="none"
                 app:hintEnabled="false"
-                app:passwordToggleEnabled="true"
-                app:layout_constraintTop_toBottomOf="@id/tvOldPass"
                 app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent">
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvPassword"
+                app:passwordToggleEnabled="true">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etOldPass"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/edit_text"
                     android:inputType="textPassword"
                     android:paddingVertical="12dp"
-                    android:background="@drawable/edit_text" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <TextView
-                android:id="@+id/tvNewPass"
-                android:layout_width="200dp"
-                android:layout_height="30dp"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="20dp"
-                android:fontFamily="@font/smoochsans_bold"
-                android:text="New Password"
-                android:textColor="@color/dark_blue"
-                android:textSize="25sp"
-                app:layout_constraintLeft_toRightOf="@id/imgNewPass"
-                app:layout_constraintTop_toBottomOf="@id/layoutOldPass" />
-
-            <ImageView
-                android:id="@+id/imgNewPass"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_marginStart="50dp"
-                android:src="@drawable/outline_edit_square_24"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/tvNewPass" />
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/layoutNewPass"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:layout_marginStart="50dp"
-                android:layout_marginEnd="50dp"
-                app:boxBackgroundMode="none"
-                app:hintEnabled="false"
-                app:passwordToggleEnabled="true"
-                app:layout_constraintTop_toBottomOf="@id/tvNewPass"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etNewPass"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:inputType="textPassword"
-                    android:paddingVertical="12dp"
-                    android:background="@drawable/edit_text" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <TextView
-                android:id="@+id/tvConfirm"
-                android:layout_width="200dp"
-                android:layout_height="30dp"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="20dp"
-                android:fontFamily="@font/smoochsans_bold"
-                android:text="Confirm New Password"
-                android:textColor="@color/dark_blue"
-                android:textSize="25sp"
-                app:layout_constraintLeft_toRightOf="@id/imgConfirm"
-                app:layout_constraintTop_toBottomOf="@id/layoutNewPass" />
+                    android:textColor="@android:color/black" /> </com.google.android.material.textfield.TextInputLayout>
 
             <ImageView
                 android:id="@+id/imgConfirm"
@@ -178,8 +166,22 @@
                 android:layout_height="30dp"
                 android:layout_marginStart="50dp"
                 android:src="@drawable/outline_check_box_24"
+                app:layout_constraintBottom_toBottomOf="@+id/tvConfirm"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/tvConfirm" />
+
+            <TextView
+                android:id="@+id/tvConfirm"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="30dp"
+                android:fontFamily="@font/smoochsans_bold"
+                android:text="Confirm Password"
+                android:textColor="@color/dark_blue"
+                android:textSize="25sp"
+                app:layout_constraintLeft_toRightOf="@+id/imgConfirm"
+                app:layout_constraintTop_toBottomOf="@id/layoutOldPass" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/layoutConfirm"
@@ -190,33 +192,34 @@
                 android:layout_marginEnd="50dp"
                 app:boxBackgroundMode="none"
                 app:hintEnabled="false"
-                app:passwordToggleEnabled="true"
-                app:layout_constraintTop_toBottomOf="@id/tvConfirm"
                 app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent">
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvConfirm"
+                app:passwordToggleEnabled="true">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etConfirm"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/edit_text"
                     android:inputType="textPassword"
                     android:paddingVertical="12dp"
-                    android:background="@drawable/edit_text" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:textColor="@android:color/black" /> </com.google.android.material.textfield.TextInputLayout>
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnConfirm"
                 android:layout_width="250dp"
                 android:layout_height="60dp"
                 android:layout_margin="60dp"
-                android:text="Confirm"
-                android:textSize="30sp"
-                android:textColor="@color/white"
-                android:fontFamily="@font/smoochsans_semibold"
                 android:background="@drawable/btn_background"
-                app:layout_constraintTop_toBottomOf="@+id/layoutConfirm"
+                android:fontFamily="@font/smoochsans_semibold"
+                android:text="Confirm"
+                android:textColor="@color/white"
+                android:textSize="30sp"
+                app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintLeft_toLeftOf="parent" />
+                app:layout_constraintTop_toBottomOf="@id/layoutConfirm" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

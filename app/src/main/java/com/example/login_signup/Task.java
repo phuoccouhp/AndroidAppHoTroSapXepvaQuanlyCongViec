@@ -7,7 +7,7 @@ public class Task {
     private String time;
     private boolean completed;
     private String date;
-    private String note; // ✅ thêm trường note
+    private String note;
 
     public Task() {}
 
@@ -21,7 +21,6 @@ public class Task {
         this.date = date;
     }
 
-    // ✅ constructor mới có thêm note
     public Task(String id, String title, String category, String time,
                 boolean completed, String date, String note) {
         this.id = id;
@@ -33,7 +32,6 @@ public class Task {
         this.note = note;
     }
 
-    // getter + setter cho note
     public String getNote() {
         return note;
     }
@@ -42,7 +40,6 @@ public class Task {
         this.note = note;
     }
 
-    // getter + setter khác (giữ nguyên)
     public String getId() { return id; }
     public String getTitle() { return title; }
     public String getCategory() { return category; }

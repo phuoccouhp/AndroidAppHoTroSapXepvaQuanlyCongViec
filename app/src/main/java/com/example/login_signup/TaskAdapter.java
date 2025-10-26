@@ -81,7 +81,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
                         });
             } else {
                 Toast.makeText(v.getContext(),
-                        "❌ Không tìm thấy ID công việc để xoá!",
+                        "Không tìm thấy ID công việc để xoá!",
                         Toast.LENGTH_SHORT).show();
             }
         });

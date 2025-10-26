@@ -96,6 +96,16 @@ public class SignUp extends AppCompatActivity {
                 });
 
         btnGoogle.setOnClickListener(v -> googlePicker.launch(googleClient.getSignInIntent()));
+        // Thêm code này vào cuối phương thức onCreate(), sau các đoạn findViewById khác
+
+        findViewById(R.id.tvLogin).setOnClickListener(v -> {
+            // Tạo Intent để chuyển từ SignUp sang Login
+            Intent intent = new Intent(this, Login.class);
+            startActivity(intent);
+
+            // (Tùy chọn) Kết thúc Activity SignUp để người dùng không thể quay lại bằng nút back
+            // finish();
+        });
     }
 
 //    private void sendSignInLink(String email) {

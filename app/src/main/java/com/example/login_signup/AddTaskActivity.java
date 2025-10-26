@@ -42,13 +42,13 @@ public class AddTaskActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
 
-        // Spinner dữ liệu
+        // ✅ Spinner dữ liệu giống bên Document Fragment
+        String[] categories = {"Work", "Personal", "Health", "Shopping", "Habit"};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_dropdown_item,
-                new String[]{"Work", "Personal", "Study", "Other"});
+                android.R.layout.simple_spinner_dropdown_item, categories);
         spinnerCategories.setAdapter(adapter);
 
-        // Chọn ngày
+        // 📅 Chọn ngày
         btnSetDueDate.setOnClickListener(v -> {
             Calendar c = Calendar.getInstance();
             new DatePickerDialog(this, (view, year, month, day) -> {
@@ -57,7 +57,7 @@ public class AddTaskActivity extends AppCompatActivity {
             }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH)).show();
         });
 
-        // Chọn giờ
+        // ⏰ Chọn giờ
         btnSetTime.setOnClickListener(v -> {
             Calendar c = Calendar.getInstance();
             new TimePickerDialog(this, (view, hour, minute) -> {
@@ -66,13 +66,13 @@ public class AddTaskActivity extends AppCompatActivity {
             }, c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), true).show();
         });
 
-        // Bật/Tắt nhắc nhở
+        // 🔔 Bật/Tắt nhắc nhở
         btnSetReminder.setOnClickListener(v -> {
             reminderOn = !reminderOn;
             btnSetReminder.setText(reminderOn ? "Reminder ON" : "Reminder OFF");
         });
 
-        // Lưu Task
+        // 💾 Lưu Task
         fabSaveTask.setOnClickListener(v -> saveTask());
     }
 
@@ -96,7 +96,7 @@ public class AddTaskActivity extends AppCompatActivity {
         taskData.put("reminder", reminderOn);
         taskData.put("completed", false);
 
-        // Lưu thời gian
+        // 🕒 Lưu thời gian
         Calendar c = Calendar.getInstance();
         if (!dueDate.isEmpty() && !dueTime.isEmpty()) {
             try {

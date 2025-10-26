@@ -8,8 +8,10 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.*;
+
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -31,17 +33,38 @@ public class CalendarFragment extends Fragment {
         calendarView = v.findViewById(R.id.calendarView);
         recyclerView = v.findViewById(R.id.recyclerViewTasks);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new TaskAdapter(taskList);
+
+        // ✅ Adapter có cả click và long click
+        adapter = new TaskAdapter(
+                taskList,
+                new TaskAdapter.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(Task task) {
+                        Toast.makeText(getContext(), "Chọn: " + task.getTitle(), Toast.LENGTH_SHORT).show();
+                    }
+                },
+                new TaskAdapter.OnItemLongClickListener() {
+                    @Override
+                    public void onItemLongClick(Task task) {
+                        Toast.makeText(getContext(), "Giữ vào: " + task.getTitle(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
+
         recyclerView.setAdapter(adapter);
 
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
 
-        calendarView.setOnDateChangeListener((view, year, month, day) -> {
-            Calendar c = Calendar.getInstance();
-            c.set(year, month, day);
-            loadTasksForDate(c.getTime());
+        // ✅ Sửa lại listener chuẩn cú pháp
+        calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+            public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
+                Calendar c = Calendar.getInstance();
+                c.set(year, month, dayOfMonth);
+                loadTasksForDate(c.getTime());
+            }
         });
+
 
         loadTasksForDate(new Date());
         return v;
@@ -79,6 +102,8 @@ public class CalendarFragment extends Fragment {
                         }
 
                         adapter.notifyDataSetChanged();
+                    } else {
+                        Toast.makeText(getContext(), "Lỗi tải dữ liệu", Toast.LENGTH_SHORT).show();
                     }
                 });
     }

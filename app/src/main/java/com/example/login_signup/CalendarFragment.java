@@ -23,6 +23,7 @@ public class CalendarFragment extends Fragment {
     private List<Task> taskList = new ArrayList<>();
     private FirebaseFirestore db;
     private FirebaseAuth auth;
+    private Date selectedDate = new Date(); // 🟢 lưu ngày đang chọn để reload
 
     @Nullable
     @Override
@@ -34,19 +35,24 @@ public class CalendarFragment extends Fragment {
         recyclerView = v.findViewById(R.id.recyclerViewTasks);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        // ✅ Adapter có cả click và long click
-        adapter = new TaskAdapter(
-                taskList,
+        adapter = new TaskAdapter(taskList,
                 new TaskAdapter.OnItemClickListener() {
                     @Override
                     public void onItemClick(Task task) {
-                        Toast.makeText(getContext(), "Chọn: " + task.getTitle(), Toast.LENGTH_SHORT).show();
+                        // ✅ Khi nhấn vào task -> mở TaskDetailFragment
+                        TaskDetailFragment detailFragment = TaskDetailFragment.newInstance(task);
+
+                        requireActivity().getSupportFragmentManager()
+                                .beginTransaction()
+                                .replace(R.id.fragment_container, detailFragment)
+                                .addToBackStack(null) // cho phép quay lại
+                                .commit();
                     }
                 },
                 new TaskAdapter.OnItemLongClickListener() {
                     @Override
                     public void onItemLongClick(Task task) {
-                        Toast.makeText(getContext(), "Giữ vào: " + task.getTitle(), Toast.LENGTH_SHORT).show();
+                        // Có thể thêm chức năng xoá nếu cần
                     }
                 }
         );
@@ -56,17 +62,27 @@ public class CalendarFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
 
-        // ✅ Sửa lại listener chuẩn cú pháp
-        calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
-            public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
-                Calendar c = Calendar.getInstance();
-                c.set(year, month, dayOfMonth);
-                loadTasksForDate(c.getTime());
-            }
+        // 🟢 Lắng nghe kết quả từ TaskDetailFragment
+        getParentFragmentManager().setFragmentResultListener(
+                "task_updated_result",
+                this,
+                (requestKey, result) -> {
+                    if (result.getBoolean("task_updated", false)) {
+                        loadTasksForDate(selectedDate); // reload dữ liệu khi task thay đổi
+                    }
+                }
+        );
+
+        // 🟢 Khi người dùng chọn ngày
+        calendarView.setOnDateChangeListener((view, year, month, dayOfMonth) -> {
+            Calendar c = Calendar.getInstance();
+            c.set(year, month, dayOfMonth, 0, 0, 0);
+            selectedDate = c.getTime(); // lưu lại ngày đang chọn
+            loadTasksForDate(selectedDate);
         });
 
-
-        loadTasksForDate(new Date());
+        // 🟢 Mặc định tải task hôm nay
+        loadTasksForDate(selectedDate);
         return v;
     }
 
@@ -91,12 +107,15 @@ public class CalendarFragment extends Fragment {
                                 String taskDay = sdfDay.format(taskDate);
 
                                 if (taskDay.equals(selectedDay)) {
+                                    String id = doc.getId();
                                     String title = doc.getString("title");
                                     String category = doc.getString("category");
-                                    String timeStr = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(taskDate);
+                                    String note = doc.getString("note");
                                     boolean completed = doc.getBoolean("completed") != null && doc.getBoolean("completed");
+                                    String timeStr = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(taskDate);
 
-                                    taskList.add(new Task(title, category, timeStr, completed));
+                                    // ✅ Gán id + note vào Task
+                                    taskList.add(new Task(id, title, category, timeStr, completed, taskDay, note));
                                 }
                             }
                         }

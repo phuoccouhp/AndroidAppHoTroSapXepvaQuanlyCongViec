@@ -1,12 +1,8 @@
 package com.example.login_signup;
 
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageButton;
-import android.widget.Toast;
-
+import android.view.*;
+import android.widget.*;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -14,14 +10,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.*;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 public class DocumentsFragment extends Fragment {
 
@@ -34,7 +26,6 @@ public class DocumentsFragment extends Fragment {
     private FirebaseAuth auth;
     private String selectedCategory = null;
 
-    // Đổi LinearLayout -> ImageButton (đúng với file XML)
     private ImageButton btnWork, btnPersonal, btnHealth, btnShopping, btnHabit;
 
     @Nullable
@@ -46,21 +37,26 @@ public class DocumentsFragment extends Fragment {
 
         recyclerViewToday = v.findViewById(R.id.recyclerViewTasksToday);
         recyclerViewFuture = v.findViewById(R.id.recyclerViewTasksFuture);
-
         recyclerViewToday.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerViewFuture.setLayoutManager(new LinearLayoutManager(getContext()));
 
         adapterToday = new TaskAdapter(todayTasks, task -> {
-            Toast.makeText(getContext(), "Chọn: " + task.getTitle(), Toast.LENGTH_SHORT).show();
-        }, task -> {
-            Toast.makeText(getContext(), "Giữ vào: " + task.getTitle(), Toast.LENGTH_SHORT).show();
-        });
+            TaskDetailFragment detailFragment = TaskDetailFragment.newInstance(task);
+            requireActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, detailFragment)
+                    .addToBackStack(null)
+                    .commit();
+        }, task -> {});
 
         adapterFuture = new TaskAdapter(futureTasks, task -> {
-            Toast.makeText(getContext(), "Chọn: " + task.getTitle(), Toast.LENGTH_SHORT).show();
-        }, task -> {
-            Toast.makeText(getContext(), "Giữ vào: " + task.getTitle(), Toast.LENGTH_SHORT).show();
-        });
+            TaskDetailFragment detailFragment = TaskDetailFragment.newInstance(task);
+            requireActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, detailFragment)
+                    .addToBackStack(null)
+                    .commit();
+        }, task -> {});
 
         recyclerViewToday.setAdapter(adapterToday);
         recyclerViewFuture.setAdapter(adapterFuture);
@@ -68,14 +64,12 @@ public class DocumentsFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
 
-        // 🔹 Đồng bộ đúng ID trong XML
         btnWork = v.findViewById(R.id.btn_work);
         btnPersonal = v.findViewById(R.id.btn_personal);
         btnHealth = v.findViewById(R.id.btn_health);
         btnShopping = v.findViewById(R.id.btn_shopping);
         btnHabit = v.findViewById(R.id.btn_habit);
 
-        // Gán sự kiện click
         setCategoryClick(btnWork, "Work");
         setCategoryClick(btnPersonal, "Personal");
         setCategoryClick(btnHealth, "Health");
@@ -90,15 +84,12 @@ public class DocumentsFragment extends Fragment {
         button.setOnClickListener(v -> {
             selectedCategory = category;
             filterTasks();
-            Toast.makeText(getContext(), "Hiển thị: " + category, Toast.LENGTH_SHORT).show();
 
-            // 🔹 Thêm hiệu ứng nhấn nhẹ (scale nhỏ + bóng)
             v.animate().scaleX(0.9f).scaleY(0.9f).setDuration(100)
-                    .withEndAction(() ->
-                            v.animate().scaleX(1f).scaleY(1f).setDuration(100)
-                    ).start();
+                    .withEndAction(() -> v.animate().scaleX(1f).scaleY(1f).setDuration(100))
+                    .start();
 
-            v.setElevation(12f); // bóng nhẹ khi nhấn
+            v.setElevation(12f);
             v.postDelayed(() -> v.setElevation(0f), 200);
         });
     }
@@ -109,35 +100,29 @@ public class DocumentsFragment extends Fragment {
 
         db.collection("tasks")
                 .whereEqualTo("uid", uid)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        allTasks.clear();
-                        SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-                        Date today = new Date();
+                .addSnapshotListener((value, error) -> {
+                    if (error != null || value == null) return;
 
-                        for (QueryDocumentSnapshot doc : task.getResult()) {
-                            Object rawDate = doc.get("taskDate");
-                            String title = doc.getString("title");
-                            String category = doc.getString("category");
-                            boolean completed = doc.getBoolean("completed") != null && doc.getBoolean("completed");
+                    allTasks.clear();
+                    SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
-                            String timeStr = "";
-                            String dateStr = "";
+                    for (QueryDocumentSnapshot doc : value) {
+                        Object rawDate = doc.get("taskDate");
+                        if (!(rawDate instanceof com.google.firebase.Timestamp)) continue;
 
-                            if (rawDate instanceof com.google.firebase.Timestamp) {
-                                Date taskDate = ((com.google.firebase.Timestamp) rawDate).toDate();
-                                timeStr = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(taskDate);
-                                dateStr = sdfDate.format(taskDate);
-                            }
+                        Date taskDate = ((com.google.firebase.Timestamp) rawDate).toDate();
+                        String id = doc.getId();
+                        String title = doc.getString("title");
+                        String category = doc.getString("category");
+                        String note = doc.getString("note");
+                        boolean completed = doc.getBoolean("completed") != null && doc.getBoolean("completed");
+                        String timeStr = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(taskDate);
+                        String dateStr = sdfDate.format(taskDate);
 
-                            allTasks.add(new Task(title, category, timeStr, completed, dateStr));
-                        }
-
-                        filterTasks();
-                    } else {
-                        Toast.makeText(getContext(), "Lỗi tải dữ liệu", Toast.LENGTH_SHORT).show();
+                        allTasks.add(new Task(id, title, category, timeStr, completed, dateStr, note));
                     }
+
+                    filterTasks();
                 });
     }
 

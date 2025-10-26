@@ -8,7 +8,6 @@
     android:background="#F6F8FB"
     tools:context=".CalendarFragment">
 
-    <!-- Tiêu đề -->
     <TextView
         android:id="@+id/tvCalendarTitle"
         android:layout_width="wrap_content"
@@ -22,7 +21,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Calendar card -->
     <androidx.cardview.widget.CardView
         android:id="@+id/cardCalendar"
         android:layout_width="0dp"
@@ -43,10 +41,9 @@
             android:dateTextAppearance="@android:style/TextAppearance.Material.Body1"
             android:weekSeparatorLineColor="@android:color/transparent"
             android:firstDayOfWeek="2"
-            android:layout_margin="8dp" />
-    </androidx.cardview.widget.CardView>
+            android:layout_margin="8dp"
+            android:theme="@style/MyCalendarTheme" /> </androidx.cardview.widget.CardView>
 
-    <!-- Label danh sách -->
     <TextView
         android:id="@+id/tvTaskListLabel"
         android:layout_width="wrap_content"
@@ -60,7 +57,6 @@
         app:layout_constraintTop_toBottomOf="@id/cardCalendar"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <!-- Danh sách task -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewTasks"
         android:layout_width="0dp"

@@ -8,6 +8,7 @@
     android:background="@drawable/background"
     tools:context=".HomeActivity">
 
+    <!-- Khung chứa fragment -->
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_container"
         android:layout_width="0dp"
@@ -17,6 +18,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- Thanh navigation -->
     <androidx.cardview.widget.CardView
         android:id="@+id/bottom_nav_card"
         android:layout_width="wrap_content"
@@ -44,7 +46,7 @@
                 android:background="@drawable/custom_ripple"
                 app:tint="@color/navy_blue"
                 android:padding="8dp"
-                android:contentDescription="Home"/>
+                android:contentDescription="Home" />
 
             <ImageButton
                 android:id="@+id/nav_calendar_button"
@@ -55,7 +57,7 @@
                 app:tint="@color/navy_blue"
                 android:padding="8dp"
                 android:layout_marginStart="36dp"
-                android:contentDescription="Calendar"/>
+                android:contentDescription="Calendar" />
 
             <ImageButton
                 android:id="@+id/nav_documents_button"
@@ -66,7 +68,7 @@
                 app:tint="@color/navy_blue"
                 android:padding="8dp"
                 android:layout_marginStart="36dp"
-                android:contentDescription="Documents"/>
+                android:contentDescription="Documents" />
 
             <ImageButton
                 android:id="@+id/nav_settings_button"
@@ -77,37 +79,7 @@
                 app:tint="@color/navy_blue"
                 android:padding="8dp"
                 android:layout_marginStart="36dp"
-                android:contentDescription="Settings"/>
+                android:contentDescription="Settings" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
-    <TextView
-        android:id="@+id/tv_tooltip"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/tooltip_bubble_bg"
-        android:elevation="4dp"
-        android:padding="12dp"
-        android:text="Click here to add your first task"
-        android:textColor="@android:color/black"
-
-        android:layout_marginEnd="12dp"
-        app:layout_constraintEnd_toStartOf="@id/fab_add_task"
-        app:layout_constraintTop_toTopOf="@id/fab_add_task"
-        app:layout_constraintBottom_toBottomOf="@id/fab_add_task" />
-
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_add_task"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/outline_add_circle_24"
-        app:tint="@color/white"
-        app:backgroundTint="@color/pastel_blue_dark"
-        android:contentDescription="Add new task"
-
-        app:layout_constraintBottom_toTopOf="@id/bottom_nav_card"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginEnd="32dp"
-        android:layout_marginBottom="16dp" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

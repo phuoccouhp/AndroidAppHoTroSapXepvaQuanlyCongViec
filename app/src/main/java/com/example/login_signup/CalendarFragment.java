@@ -25,40 +25,41 @@ public class CalendarFragment extends Fragment {
     private FirebaseAuth auth;
     private Date selectedDate = new Date();
 
+    private TextView tvTaskListLabel; // Thêm biến cho TextView tiêu đề
+    private String todayDateString;   // Chuỗi ngày hôm nay
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_calendar, container, false);
 
+        todayDateString = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+
         calendarView = v.findViewById(R.id.calendarView);
         recyclerView = v.findViewById(R.id.recyclerViewTasks);
+        tvTaskListLabel = v.findViewById(R.id.tvTaskListLabel); // Lấy TextView
+
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        adapter = new TaskAdapter(taskList,
-                new TaskAdapter.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(Task task) {
-                        TaskDetailFragment detailFragment = TaskDetailFragment.newInstance(task);
+        db = FirebaseFirestore.getInstance();
+        auth = FirebaseAuth.getInstance();
 
-                        requireActivity().getSupportFragmentManager()
-                                .beginTransaction()
-                                .replace(R.id.fragment_container, detailFragment)
-                                .addToBackStack(null)
-                                .commit();
-                    }
+        adapter = new TaskAdapter(taskList,
+                task -> {
+                    TaskDetailFragment detailFragment = TaskDetailFragment.newInstance(task);
+                    requireActivity().getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.fragment_container, detailFragment)
+                            .addToBackStack(null)
+                            .commit();
                 },
-                new TaskAdapter.OnItemLongClickListener() {
-                    @Override
-                    public void onItemLongClick(Task task) {
-                    }
+                task -> {
+                    deleteTaskFromFirestore(task);
                 }
         );
 
         recyclerView.setAdapter(adapter);
-
-        db = FirebaseFirestore.getInstance();
-        auth = FirebaseAuth.getInstance();
 
         getParentFragmentManager().setFragmentResultListener(
                 "task_updated_result",
@@ -81,9 +82,18 @@ public class CalendarFragment extends Fragment {
         return v;
     }
 
-    private void loadTasksForDate(Date selectedDate) {
+    private void loadTasksForDate(Date dateToLoad) {
         String uid = auth.getCurrentUser() != null ? auth.getCurrentUser().getUid() : null;
         if (uid == null) return;
+
+        SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        String selectedDayString = sdfDate.format(dateToLoad);
+        if (selectedDayString.equals(todayDateString)) {
+            tvTaskListLabel.setText("Your Task for Today");
+        } else {
+            SimpleDateFormat sdfDisplay = new SimpleDateFormat("dd MMMM, yyyy", Locale.getDefault());
+            tvTaskListLabel.setText("Task for " + sdfDisplay.format(dateToLoad));
+        }
 
         db.collection("tasks")
                 .whereEqualTo("uid", uid)
@@ -91,32 +101,55 @@ public class CalendarFragment extends Fragment {
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         taskList.clear();
-                        SimpleDateFormat sdfDay = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
-                        String selectedDay = sdfDay.format(selectedDate);
+
+                        SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm", Locale.getDefault());
 
                         for (QueryDocumentSnapshot doc : task.getResult()) {
                             Object rawDate = doc.get("taskDate");
+                            if (!(rawDate instanceof com.google.firebase.Timestamp)) continue;
 
-                            if (rawDate instanceof com.google.firebase.Timestamp) {
-                                Date taskDate = ((com.google.firebase.Timestamp) rawDate).toDate();
-                                String taskDay = sdfDay.format(taskDate);
+                            Date taskDate = ((com.google.firebase.Timestamp) rawDate).toDate();
+                            String taskDayString = sdfDate.format(taskDate);
 
-                                if (taskDay.equals(selectedDay)) {
-                                    String id = doc.getId();
-                                    String title = doc.getString("title");
-                                    String category = doc.getString("category");
-                                    String note = doc.getString("note");
-                                    boolean completed = doc.getBoolean("completed") != null && doc.getBoolean("completed");
-                                    String timeStr = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(taskDate);
+                            if (taskDayString.equals(selectedDayString)) {
+                                String id = doc.getId();
+                                String title = doc.getString("title");
+                                String category = doc.getString("category");
+                                String note = doc.getString("note");
+                                boolean completed = doc.getBoolean("completed") != null && doc.getBoolean("completed");
+                                String timeStr = sdfTime.format(taskDate);
+                                String dateStr = sdfDate.format(taskDate);
 
-                                    taskList.add(new Task(id, title, category, timeStr, completed, taskDay, note));
-                                }
+                                taskList.add(new Task(id, title, category, timeStr, completed, dateStr, note));
                             }
                         }
-
                         adapter.notifyDataSetChanged();
                     } else {
-                        Toast.makeText(getContext(), "Lỗi tải dữ liệu", Toast.LENGTH_SHORT).show();
+                        if (getContext() != null) {
+                            Toast.makeText(getContext(), "Lỗi tải dữ liệu", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
+    private void deleteTaskFromFirestore(Task task) {
+        if (task.getId() == null || task.getId().isEmpty()) {
+            if (getContext() != null) {
+                Toast.makeText(getContext(), "Error: Task ID is missing", Toast.LENGTH_SHORT).show();
+            }
+            return;
+        }
+
+        db.collection("tasks").document(task.getId())
+                .delete()
+                .addOnSuccessListener(aVoid -> {
+                    if (getContext() != null) {
+                        Toast.makeText(getContext(), "Task deleted", Toast.LENGTH_SHORT).show();
+                    }
+                    loadTasksForDate(selectedDate);
+                })
+                .addOnFailureListener(e -> {
+                    if (getContext() != null) {
+                        Toast.makeText(getContext(), "Error deleting task: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
     }

@@ -77,7 +77,8 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Manage your\ntime here"
+                        android:text="Manage your
+time here"
                         android:textSize="20sp"
                         android:textColor="@color/oxford_blue"
                         android:fontFamily="@font/smoochsans_bold"
@@ -106,21 +107,42 @@
                 android:layout_marginTop="24dp"/>
 
             <!-- Dòng icon category -->
-            <!-- Dòng icon category -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginTop="8dp"
-                android:gravity="center">
+                android:baselineAligned="false">
+
+                <!-- All -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
+                    <ImageButton
+                        android:id="@+id/btn_all"
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:src="@drawable/baseline_apps_24"
+                        android:background="@drawable/bg_dialog_rounded"
+                        android:backgroundTint="@color/white"
+                        app:tint="#000000" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="All"
+                        android:maxLines="1"/>
+                </LinearLayout>
 
                 <!-- Work -->
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:orientation="vertical"
-                    android:gravity="center"
-                    android:layout_marginHorizontal="8dp">
+                    android:gravity="center">
                     <ImageButton
                         android:id="@+id/btn_work"
                         android:layout_width="56dp"
@@ -132,16 +154,17 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Work"/>
+                        android:text="Work"
+                        android:maxLines="1"/>
                 </LinearLayout>
 
                 <!-- Personal -->
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:orientation="vertical"
-                    android:gravity="center"
-                    android:layout_marginHorizontal="8dp">
+                    android:gravity="center">
                     <ImageButton
                         android:id="@+id/btn_personal"
                         android:layout_width="56dp"
@@ -153,16 +176,17 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Personal"/>
+                        android:text="Personal"
+                        android:maxLines="1"/>
                 </LinearLayout>
 
                 <!-- Health -->
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:orientation="vertical"
-                    android:gravity="center"
-                    android:layout_marginHorizontal="8dp">
+                    android:gravity="center">
                     <ImageButton
                         android:id="@+id/btn_health"
                         android:layout_width="56dp"
@@ -174,16 +198,17 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Health"/>
+                        android:text="Health"
+                        android:maxLines="1"/>
                 </LinearLayout>
 
                 <!-- Shopping -->
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:orientation="vertical"
-                    android:gravity="center"
-                    android:layout_marginHorizontal="8dp">
+                    android:gravity="center">
                     <ImageButton
                         android:id="@+id/btn_shopping"
                         android:layout_width="56dp"
@@ -195,28 +220,8 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Shopping"/>
-                </LinearLayout>
-
-                <!-- Habit -->
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:gravity="center"
-                    android:layout_marginHorizontal="8dp">
-                    <ImageButton
-                        android:id="@+id/btn_habit"
-                        android:layout_width="56dp"
-                        android:layout_height="56dp"
-                        android:src="@drawable/baseline_search_24"
-                        android:background="@drawable/bg_dialog_rounded"
-                        android:backgroundTint="@color/white"
-                        app:tint="#673AB7"/>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Habit"/>
+                        android:text="Shopping"
+                        android:maxLines="1"/>
                 </LinearLayout>
 
             </LinearLayout>

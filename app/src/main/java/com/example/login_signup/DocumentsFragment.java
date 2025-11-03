@@ -27,7 +27,7 @@ public class DocumentsFragment extends Fragment {
     private FirebaseFirestore db;
     private FirebaseAuth auth;
     private String selectedCategory = null;
-    private ImageButton btnWork, btnPersonal, btnHealth, btnShopping, btnHabit;
+    private ImageButton btnAll, btnWork, btnPersonal, btnHealth, btnShopping;
 
     private String todayDateString;
 
@@ -73,17 +73,24 @@ public class DocumentsFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
 
+        btnAll = v.findViewById(R.id.btn_all);
         btnWork = v.findViewById(R.id.btn_work);
         btnPersonal = v.findViewById(R.id.btn_personal);
         btnHealth = v.findViewById(R.id.btn_health);
         btnShopping = v.findViewById(R.id.btn_shopping);
-        btnHabit = v.findViewById(R.id.btn_habit);
+
+        btnAll.setOnClickListener(view -> {
+            selectedCategory = null;
+            filterTasks();
+            view.animate().scaleX(0.9f).scaleY(0.9f).setDuration(100)
+                    .withEndAction(() -> view.animate().scaleX(1f).scaleY(1f).setDuration(100))
+                    .start();
+        });
 
         setCategoryClick(btnWork, "Work");
         setCategoryClick(btnPersonal, "Personal");
         setCategoryClick(btnHealth, "Health");
         setCategoryClick(btnShopping, "Shopping");
-        setCategoryClick(btnHabit, "Habit");
 
         loadAllTasks();
         return v;

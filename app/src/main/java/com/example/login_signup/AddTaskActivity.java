@@ -42,7 +42,7 @@ public class AddTaskActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
 
-        String[] categories = {"Work", "Personal", "Health", "Shopping", "Habit"};
+        String[] categories = {"Work", "Personal", "Health", "Shopping"};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_dropdown_item, categories);
         spinnerCategories.setAdapter(adapter);

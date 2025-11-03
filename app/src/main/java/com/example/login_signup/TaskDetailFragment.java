@@ -76,7 +76,7 @@ public class TaskDetailFragment extends Fragment {
         auth = FirebaseAuth.getInstance();
         selectedDateTime = Calendar.getInstance();
 
-        String[] categories = {"Work", "Personal", "Health", "Shopping", "Habit"};
+        String[] categories = {"Work", "Personal", "Health", "Shopping"};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(),
                 android.R.layout.simple_spinner_item, categories);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

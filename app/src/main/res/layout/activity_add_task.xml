@@ -142,6 +142,57 @@
         />
 
     <TextView
+        android:id="@+id/tv_vibration_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Vibration"
+        android:textSize="22sp"
+        android:fontFamily="@font/smoochsans_bold"
+        android:textColor="@color/oxford_blue"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btn_set_reminder" />
+
+    <Spinner
+        android:id="@+id/spinner_vibration"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_dialog_rounded"
+        android:backgroundTint="@color/white"
+        android:padding="16dp"
+        app:layout_constraintTop_toBottomOf="@id/tv_vibration_title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <TextView
+        android:id="@+id/tv_sound_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Sound"
+        android:textSize="22sp"
+        android:fontFamily="@font/smoochsans_bold"
+        android:textColor="@color/oxford_blue"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/spinner_vibration" />
+
+    <Button
+        android:id="@+id/btn_select_ringtone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Select Ringtone"
+        android:backgroundTint="@color/white"
+        android:textColor="@color/oxford_blue"
+        app:layout_constraintTop_toBottomOf="@id/tv_sound_title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        style="?attr/materialButtonOutlinedStyle"
+        app:cornerRadius="16dp"
+        />
+
+    <TextView
         android:id="@+id/tv_notes_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -151,7 +202,7 @@
         android:fontFamily="@font/smoochsans_bold"
         android:textColor="@color/oxford_blue"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btn_set_reminder" />
+        app:layout_constraintTop_toBottomOf="@id/btn_select_ringtone" />
 
     <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/et_notes"

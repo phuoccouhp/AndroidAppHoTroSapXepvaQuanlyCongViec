@@ -1,48 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginVertical="6dp"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="4dp"
-    app:strokeColor="#E2E8F0"
-    app:strokeWidth="1dp"
-    app:cardBackgroundColor="#FFFFFF">
+    android:layout_marginHorizontal="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="1.5dp"
+    app:cardUseCompatPadding="true"
+    app:cardBackgroundColor="@android:color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:orientation="horizontal"
+        android:padding="14dp"
+        android:gravity="center_vertical">
 
-        <TextView
-            android:id="@+id/tvTaskTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Học tiếng Anh"
-            android:textColor="#1E293B"
-            android:textSize="16sp"
-            android:fontFamily="@font/smoochsans_bold" />
+        <ImageView
+            android:id="@+id/img_check"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/baseline_radio_button_unchecked_24"
+            android:tint="@color/pastel_blue_dark" />
 
-        <TextView
-            android:id="@+id/tvTaskCategory"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="Study"
-            android:textColor="#6366F1"
-            android:textSize="14sp"
-            android:fontFamily="@font/smoochsans_bold"
-            android:layout_marginTop="4dp" />
+            android:layout_marginStart="12dp">
+
+            <TextView
+                android:id="@+id/tvTaskTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Task title"
+                android:textSize="16sp"
+                android:textColor="@color/oxford_blue"
+                android:fontFamily="@font/smoochsans_bold" />
+
+            <TextView
+                android:id="@+id/tvTaskCategory"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Category"
+                android:textSize="13sp"
+                android:textColor="#64748B"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/tvTaskTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="07:30"
-            android:textColor="#64748B"
-            android:textSize="13sp"
-            android:layout_marginTop="4dp"
-            android:fontFamily="@font/smoochsans_bold" />
+            android:text="08:00"
+            android:textSize="14sp"
+            android:textColor="@color/pastel_blue_dark"
+            android:layout_marginEnd="8dp"/>
+
+        <!-- 🗑️ Nút xóa -->
+        <ImageButton
+            android:id="@+id/btnDeleteTask"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/baseline_delete_24"
+            android:tint="@color/black"
+            android:contentDescription="Xóa công việc" />
+
     </LinearLayout>
-</com.google.android.material.card.MaterialCardView>
+</androidx.cardview.widget.CardView>

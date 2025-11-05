@@ -1,8 +1,8 @@
 package com.example.login_signup;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.widget.Button;
+import android.text.TextUtils;
+import android.util.Patterns;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -12,48 +12,40 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class ForgetPassword extends AppCompatActivity {
 
-
-    private EditText editTextEmail;
-    private Button buttonNext;
+    private EditText etEmail;
     private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_forget_password);
 
+        etEmail = findViewById(R.id.etEmail);
         mAuth = FirebaseAuth.getInstance();
-        editTextEmail = findViewById(R.id.etEmail);
-        buttonNext = findViewById(R.id.btn_next);
 
-        buttonNext.setOnClickListener(v -> handleNextButtonClick());
+        findViewById(R.id.btnNext).setOnClickListener(v -> sendResetEmail());
+        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
     }
 
+    private void sendResetEmail() {
+        String email = etEmail.getText() != null ? etEmail.getText().toString().trim() : "";
 
-    private void handleNextButtonClick() {
-        String email = editTextEmail.getText().toString().trim();
-
-        if (!email.isEmpty()) {
-            sendPasswordResetLinkToEmail(email);
-        } else {
-            Toast.makeText(this, "Vui lòng nhập email của bạn", Toast.LENGTH_SHORT).show();
+        if (TextUtils.isEmpty(email) || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            etEmail.setError("Email không hợp lệ");
+            etEmail.requestFocus();
+            return;
         }
-    }
 
-
-    private void sendPasswordResetLinkToEmail(String email) {
         mAuth.sendPasswordResetEmail(email)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        Toast.makeText(ForgetPassword.this, "Đã gửi link, vui lòng kiểm tra email và quay lại sau khi đổi mật khẩu!", Toast.LENGTH_LONG).show();
-                        SharedPreferences prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE);
-                        SharedPreferences.Editor editor = prefs.edit();
-                        editor.putBoolean("passwordResetViaEmail", true);
-                        editor.apply(); // Lưu thay đổi
-                    } else {
-                        Toast.makeText(ForgetPassword.this, "Gửi link thất bại: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
-                    }
-                });
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this,
+                            "Đã gửi liên kết đặt lại mật khẩu đến " + email + ". Vui lòng kiểm tra hộp thư.",
+                            Toast.LENGTH_LONG).show();
+                    finish();
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(this,
+                                "Gửi email thất bại: " + e.getMessage(),
+                                Toast.LENGTH_LONG).show());
     }
 }

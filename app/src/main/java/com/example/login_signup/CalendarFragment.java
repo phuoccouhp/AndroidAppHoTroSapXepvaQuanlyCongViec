@@ -25,8 +25,8 @@ public class CalendarFragment extends Fragment {
     private FirebaseAuth auth;
     private Date selectedDate = new Date();
 
-    private TextView tvTaskListLabel; // Thêm biến cho TextView tiêu đề
-    private String todayDateString;   // Chuỗi ngày hôm nay
+    private TextView tvTaskListLabel;
+    private String todayDateString;
 
     @Nullable
     @Override
@@ -38,7 +38,7 @@ public class CalendarFragment extends Fragment {
 
         calendarView = v.findViewById(R.id.calendarView);
         recyclerView = v.findViewById(R.id.recyclerViewTasks);
-        tvTaskListLabel = v.findViewById(R.id.tvTaskListLabel); // Lấy TextView
+        tvTaskListLabel = v.findViewById(R.id.tvTaskListLabel);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -47,7 +47,7 @@ public class CalendarFragment extends Fragment {
 
         adapter = new TaskAdapter(taskList,
                 task -> {
-                    TaskDetailFragment detailFragment = TaskDetailFragment.newInstance(task);
+                    TaskDetailFragment detailFragment = TaskDetailFragment.newInstance(task.getId());
                     requireActivity().getSupportFragmentManager()
                             .beginTransaction()
                             .replace(R.id.fragment_container, detailFragment)
@@ -115,12 +115,18 @@ public class CalendarFragment extends Fragment {
                                 String id = doc.getId();
                                 String title = doc.getString("title");
                                 String category = doc.getString("category");
-                                String note = doc.getString("note");
+
+                                // FIX: Handle both "note" and "notes" for backward compatibility
+                                String noteContent = doc.getString("note");
+                                if (noteContent == null) {
+                                    noteContent = doc.getString("notes");
+                                }
+
                                 boolean completed = doc.getBoolean("completed") != null && doc.getBoolean("completed");
                                 String timeStr = sdfTime.format(taskDate);
                                 String dateStr = sdfDate.format(taskDate);
 
-                                taskList.add(new Task(id, title, category, timeStr, completed, dateStr, note));
+                                taskList.add(new Task(id, title, category, timeStr, completed, dateStr, noteContent));
                             }
                         }
                         adapter.notifyDataSetChanged();

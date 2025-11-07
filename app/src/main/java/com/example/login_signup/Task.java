@@ -11,7 +11,7 @@ public class Task implements Serializable {
     private String uid;
     private String title;
     private String category;
-    private String note; // Changed from 'notes'
+    private String note; // The only field for task description
     private boolean reminder;
     private boolean completed;
     private Date taskDate;
@@ -26,7 +26,7 @@ public class Task implements Serializable {
         // Needed for Firestore
     }
 
-    // Constructor used in DocumentsFragment
+    // Constructor without 'detail'
     public Task(String id, String title, String category, String time, boolean completed, String date, String note) {
         this.id = id;
         this.title = title;

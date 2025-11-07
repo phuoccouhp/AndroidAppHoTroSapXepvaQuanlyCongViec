@@ -46,7 +46,7 @@ public class DocumentsFragment extends Fragment {
         recyclerViewFuture.setLayoutManager(new LinearLayoutManager(getContext()));
 
         adapterToday = new TaskAdapter(todayTasks, task -> {
-            TaskDetailFragment detailFragment = TaskDetailFragment.newInstance(task);
+            TaskDetailFragment detailFragment = TaskDetailFragment.newInstance(task.getId());
             requireActivity().getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.fragment_container, detailFragment)
@@ -57,7 +57,7 @@ public class DocumentsFragment extends Fragment {
         });
 
         adapterFuture = new TaskAdapter(futureTasks, task -> {
-            TaskDetailFragment detailFragment = TaskDetailFragment.newInstance(task);
+            TaskDetailFragment detailFragment = TaskDetailFragment.newInstance(task.getId());
             requireActivity().getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.fragment_container, detailFragment)
@@ -137,12 +137,18 @@ public class DocumentsFragment extends Fragment {
                         String id = doc.getId();
                         String title = doc.getString("title");
                         String category = doc.getString("category");
-                        String note = doc.getString("note");
+
+                        // FIX: Handle both "note" and "notes" for backward compatibility
+                        String noteContent = doc.getString("note");
+                        if (noteContent == null) {
+                            noteContent = doc.getString("notes");
+                        }
+
                         boolean completed = doc.getBoolean("completed") != null && doc.getBoolean("completed");
                         String timeStr = sdfTime.format(taskDate);
                         String dateStr = sdfDate.format(taskDate);
 
-                        allTasks.add(new Task(id, title, category, timeStr, completed, dateStr, note));
+                        allTasks.add(new Task(id, title, category, timeStr, completed, dateStr, noteContent));
                     }
 
                     todayDateString = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());

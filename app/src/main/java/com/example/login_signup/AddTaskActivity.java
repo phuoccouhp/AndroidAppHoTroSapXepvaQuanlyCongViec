@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.DocumentReference;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -41,7 +42,11 @@ public class AddTaskActivity extends AppCompatActivity {
                     Uri uri = result.getData().getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
                     if (uri != null) {
                         selectedRingtoneUri = uri;
-                        btnSelectRingtone.setText(RingtoneManager.getRingtone(this, uri).getTitle(this));
+                        try {
+                            btnSelectRingtone.setText(RingtoneManager.getRingtone(this, uri).getTitle(this));
+                        } catch (Exception e) {
+                            btnSelectRingtone.setText("Select Sound");
+                        }
                     }
                 }
             });
@@ -51,8 +56,15 @@ public class AddTaskActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_task);
 
-        NotificationHelper.createNotificationChannels(this);
+        db = FirebaseFirestore.getInstance();
+        auth = FirebaseAuth.getInstance();
 
+        initViews();
+        setupSpinners();
+        setupListeners();
+    }
+
+    private void initViews() {
         etTaskName = findViewById(R.id.et_task_name);
         etNotes = findViewById(R.id.et_notes);
         spinnerCategories = findViewById(R.id.spinner_categories);
@@ -62,10 +74,9 @@ public class AddTaskActivity extends AppCompatActivity {
         btnSetReminder = findViewById(R.id.btn_set_reminder);
         btnSelectRingtone = findViewById(R.id.btn_select_ringtone);
         fabSaveTask = findViewById(R.id.fab_save_task);
+    }
 
-        db = FirebaseFirestore.getInstance();
-        auth = FirebaseAuth.getInstance();
-
+    private void setupSpinners() {
         String[] categories = {"Work", "Personal", "Health", "Shopping"};
         ArrayAdapter<String> categoriesAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_dropdown_item, categories);
@@ -75,14 +86,16 @@ public class AddTaskActivity extends AppCompatActivity {
         ArrayAdapter<String> vibrationsAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_dropdown_item, vibrations);
         spinnerVibration.setAdapter(vibrationsAdapter);
+    }
 
+    private void setupListeners() {
         btnSetDueDate.setOnClickListener(v -> {
             Calendar c = Calendar.getInstance();
             new DatePickerDialog(this, (view, year, month, day) -> {
                 dueDateTime.set(Calendar.YEAR, year);
                 dueDateTime.set(Calendar.MONTH, month);
                 dueDateTime.set(Calendar.DAY_OF_MONTH, day);
-                btnSetDueDate.setText(day + "/" + (month + 1) + "/" + year);
+                updateDateAndTimeButtons();
             }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH)).show();
         });
 
@@ -91,13 +104,13 @@ public class AddTaskActivity extends AppCompatActivity {
             new TimePickerDialog(this, (view, hour, minute) -> {
                 dueDateTime.set(Calendar.HOUR_OF_DAY, hour);
                 dueDateTime.set(Calendar.MINUTE, minute);
-                btnSetTime.setText(String.format(Locale.getDefault(), "%02d:%02d", hour, minute));
+                updateDateAndTimeButtons();
             }, c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), true).show();
         });
 
         btnSetReminder.setOnClickListener(v -> {
             reminderOn = !reminderOn;
-            btnSetReminder.setText(reminderOn ? "Reminder ON" : "Reminder OFF");
+            updateReminderButton();
         });
 
         btnSelectRingtone.setOnClickListener(v -> {
@@ -108,85 +121,148 @@ public class AddTaskActivity extends AppCompatActivity {
             ringtonePickerLauncher.launch(intent);
         });
 
-        fabSaveTask.setOnClickListener(v -> saveTask());
+        fabSaveTask.setOnClickListener(v -> saveNewTask());
     }
 
-    private void saveTask() {
-        String name = etTaskName.getText().toString().trim();
-        String category = spinnerCategories.getSelectedItem().toString();
-        String vibration = spinnerVibration.getSelectedItem().toString();
-        String notes = etNotes.getText().toString().trim();
+    private void updateDateAndTimeButtons() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        btnSetDueDate.setText(dateFormat.format(dueDateTime.getTime()));
 
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+        btnSetTime.setText(timeFormat.format(dueDateTime.getTime()));
+    }
+
+    private void updateReminderButton() {
+        btnSetReminder.setText(reminderOn ? "Reminder ON" : "Reminder OFF");
+    }
+
+    private void saveNewTask() {
+        String name = etTaskName.getText().toString().trim();
         if (name.isEmpty()) {
             Toast.makeText(this, "Please enter task name", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        String userId = auth.getCurrentUser() != null ? auth.getCurrentUser().getUid() : "anonymous";
-        Map<String, Object> taskData = new HashMap<>();
+        // Đảm bảo thời gian due date là ở tương lai
+        if (dueDateTime.getTimeInMillis() <= System.currentTimeMillis()) {
+            Toast.makeText(this, "Please select a due date in the future", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
+        String noteContent = (etNotes != null && etNotes.getText() != null) ? etNotes.getText().toString().trim() : "";
+        String userId = auth.getCurrentUser() != null ? auth.getCurrentUser().getUid() : "anonymous";
+
+        Map<String, Object> taskData = new HashMap<>();
         taskData.put("uid", userId);
         taskData.put("title", name);
-        taskData.put("category", category);
-        taskData.put("notes", notes);
+        taskData.put("category", spinnerCategories.getSelectedItem().toString());
+        taskData.put("note", noteContent);
         taskData.put("reminder", reminderOn);
         taskData.put("completed", false);
         taskData.put("taskDate", dueDateTime.getTime());
-        taskData.put("vibration", vibration);
+        taskData.put("vibration", spinnerVibration.getSelectedItem().toString());
         if (selectedRingtoneUri != null) {
             taskData.put("ringtone", selectedRingtoneUri.toString());
         }
 
-        db.collection("tasks")
-                .add(taskData)
-                .addOnSuccessListener(doc -> {
-                    if (reminderOn) {
-                        scheduleAlarms(doc.getId(), name, notes, category, dueDateTime.getTimeInMillis());
-                    }
+        db.collection("tasks").add(taskData)
+                .addOnSuccessListener(documentReference -> {
                     Toast.makeText(this, "Task saved", Toast.LENGTH_SHORT).show();
+                    if (reminderOn) {
+                        // Create a temporary Task object to pass to the scheduling method
+                        Task taskToSchedule = new Task();
+                        taskToSchedule.setId(documentReference.getId());
+                        taskToSchedule.setTitle(name);
+                        taskToSchedule.setNote(noteContent);
+                        taskToSchedule.setCategory(spinnerCategories.getSelectedItem().toString());
+                        taskToSchedule.setTaskDate(dueDateTime.getTime());
+                        taskToSchedule.setVibration(spinnerVibration.getSelectedItem().toString());
+                        if(selectedRingtoneUri != null) taskToSchedule.setRingtone(selectedRingtoneUri.toString());
+
+                        scheduleAlarmsForTask(this, taskToSchedule);
+                    }
                     finish();
                 })
-                .addOnFailureListener(e -> Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                .addOnFailureListener(e -> Toast.makeText(this, "Error saving task", Toast.LENGTH_SHORT).show());
     }
 
-    private void scheduleAlarms(String taskId, String title, String note, String category, long dueTime) {
-        // Schedule the main due-time alarm
-        scheduleNotification(taskId, title, note, category, dueTime, false);
-
-        // Schedule the advance notification
+    /**
+     * =================================================================
+     * HÀM NÀY CHỨA LOGIC MÀ BẠN YÊU CẦU
+     * =================================================================
+     */
+    private void scheduleAlarmsForTask(Context context, Task task) {
+        long dueTime = task.getTaskDate().getTime();
+        long currentTime = System.currentTimeMillis();
         long twentyFourHoursInMillis = 24 * 60 * 60 * 1000;
-        long advanceTime = dueTime - twentyFourHoursInMillis;
-        if (dueTime > System.currentTimeMillis() + twentyFourHoursInMillis) {
-            // Due more than 24 hours from now: schedule for 24h before.
-            scheduleNotification(taskId + "_advance", title, note, category, advanceTime, true);
-        } else if (dueTime > System.currentTimeMillis()) {
-            // Due in less than 24 hours (but in the future): show notification immediately.
-            String taskInfo = "Title: " + title + "\nCategory: " + category + "\nNote: " + note;
-            NotificationHelper.showAdvanceNotification(this, title, taskInfo, (taskId + "_advance").hashCode());
+
+        // 1. Luôn lên lịch cho thông báo CHÍNH (vào đúng giờ)
+        // (Đây là thông báo kiểu báo thức, toàn màn hình)
+        if (dueTime > currentTime) {
+            scheduleNotification(context, task, dueTime, false); // isAdvance = false
         }
+
+        // 2. Xử lý logic cho thông báo "BÁO TRƯỚC" (advance)
+        long timeDifference = dueTime - currentTime;
+
+        // Định dạng thời gian để hiển thị trên thông báo
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm 'ngày' dd/MM", Locale.getDefault());
+        String taskInfo = task.getTitle() + "\n" +
+                "Vào lúc: " + sdf.format(task.getTaskDate());
+
+        // Tạo một ID riêng cho thông báo advance (khác với thông báo chính)
+        int advanceNotificationId = task.getId().hashCode() + 1;
+
+        if (timeDifference > 0 && timeDifference < twentyFourHoursInMillis) {
+            // --- KỊCH BẢN 1: Task diễn ra TRONG VÒNG 24 GIỜ TỚI ---
+            // Hiển thị một thông báo advance (loại thường) NGAY LẬP TỨC
+
+            NotificationHelper.showAdvanceNotification(
+                    context,
+                    "Công việc sắp tới!", // taskTitle
+                    taskInfo,              // taskInfo
+                    advanceNotificationId
+            );
+
+        } else if (timeDifference >= twentyFourHoursInMillis) {
+            // --- KỊCH BẢN 2: Task diễn ra SAU HƠN 24 GIỜ ---
+            // Lên lịch một thông báo advance (loại thường) để bắn vào lúc T-24 giờ
+            long advanceTime = dueTime - twentyFourHoursInMillis;
+            scheduleNotification(context, task, advanceTime, true); // isAdvance = true
+        }
+        // Nếu timeDifference <= 0 (task ở quá khứ), không làm gì cả.
     }
 
-    private void scheduleNotification(String taskId, String title, String note, String category, long time, boolean isAdvance) {
-        Intent intent = new Intent(this, TaskReminderReceiver.class);
+
+    /**
+     * Hàm này gửi Intent đến TaskReminderReceiver để lên lịch
+     */
+    private void scheduleNotification(Context context, Task task, long time, boolean isAdvance) {
+        String taskId = isAdvance ? task.getId() + "_advance" : task.getId();
+
+        Intent intent = new Intent(context, TaskReminderReceiver.class); // USE THE CORRECT RECEIVER
         intent.putExtra("taskId", taskId);
-        intent.putExtra("title", title);
-        intent.putExtra("note", note);
-        intent.putExtra("category", category);
+        intent.putExtra("title", task.getTitle());
+        intent.putExtra("note", task.getNote());
+        intent.putExtra("category", task.getCategory());
         intent.putExtra("isAdvance", isAdvance);
-        if(selectedRingtoneUri != null) {
-            intent.putExtra("ringtone", selectedRingtoneUri.toString());
+        if (task.getRingtone() != null) {
+            intent.putExtra("ringtone", task.getRingtone());
         }
-        intent.putExtra("vibration", spinnerVibration.getSelectedItem().toString());
+        if (task.getVibration() != null) {
+            intent.putExtra("vibration", task.getVibration());
+        }
 
         int requestCode = taskId.hashCode();
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this,
-                requestCode,
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
-        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         if (alarmManager != null) {
-            alarmManager.setExact(AlarmManager.RTC_WAKEUP, time, pendingIntent);
+            try {
+                alarmManager.setExact(AlarmManager.RTC_WAKEUP, time, pendingIntent);
+            } catch (SecurityException se) {
+                Toast.makeText(context, "Permission to schedule alarms not granted.", Toast.LENGTH_LONG).show();
+            }
         }
     }
 }

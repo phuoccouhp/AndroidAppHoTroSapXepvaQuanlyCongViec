@@ -44,7 +44,7 @@
                 android:layout_height="wrap_content"
                 android:src="@drawable/sharp_home_24"
                 android:background="@drawable/custom_ripple"
-                app:tint="@color/navy_blue"
+                app:tint="@color/nav_icon_tint_selector" 
                 android:padding="8dp"
                 android:contentDescription="Home" />
 
@@ -54,7 +54,7 @@
                 android:layout_height="wrap_content"
                 android:src="@drawable/outline_calendar_month_24"
                 android:background="@drawable/custom_ripple"
-                app:tint="@color/navy_blue"
+                app:tint="@color/nav_icon_tint_selector"
                 android:padding="8dp"
                 android:layout_marginStart="36dp"
                 android:contentDescription="Calendar" />
@@ -65,7 +65,7 @@
                 android:layout_height="wrap_content"
                 android:src="@drawable/outline_edit_document_24"
                 android:background="@drawable/custom_ripple"
-                app:tint="@color/navy_blue"
+                app:tint="@color/nav_icon_tint_selector"
                 android:padding="8dp"
                 android:layout_marginStart="36dp"
                 android:contentDescription="Documents" />
@@ -76,7 +76,7 @@
                 android:layout_height="wrap_content"
                 android:src="@drawable/baseline_manage_accounts_24"
                 android:background="@drawable/custom_ripple"
-                app:tint="@color/navy_blue"
+                app:tint="@color/nav_icon_tint_selector"
                 android:padding="8dp"
                 android:layout_marginStart="36dp"
                 android:contentDescription="Settings" />

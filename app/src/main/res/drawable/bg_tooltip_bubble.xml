@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- The main speech bubble body. A rounded rectangle. -->
+    <!-- A margin on the right leaves space for the pointer. -->
+    <item android:right="8dp">
+        <shape android:shape="rectangle">
+            <solid android:color="@android:color/white" />
+            <corners android:radius="8dp" />
+        </shape>
+    </item>
+
+    <!-- The triangle pointer, created by rotating a square. -->
+    <!-- It's placed on the right edge, in the space left by the margin. -->
+    <item
+        android:width="16dp"
+        android:height="16dp"
+        android:gravity="center_vertical|right">
+        <rotate
+            android:fromDegrees="45"
+            android:pivotX="100%"
+            android:pivotY="50%">
+            <shape android:shape="rectangle">
+                <solid android:color="@android:color/white" />
+            </shape>
+        </rotate>
+    </item>
+
+</layer-list>

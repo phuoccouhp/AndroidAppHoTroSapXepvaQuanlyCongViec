@@ -36,6 +36,14 @@
             android:theme="@style/Theme.AppCompat.NoActionBar" />
 
         <activity
+            android:name=".ChatHistoryActivity"
+            android:exported="false" />
+            
+        <activity
+            android:name=".ChatActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".HomeActivity"
             android:exported="false" />
         <activity

@@ -9,23 +9,33 @@ import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.widget.*;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class AddTaskActivity extends AppCompatActivity {
+
+    public static final String EXTRA_TASK_NAME = "taskName";
+    public static final String EXTRA_TASK_TYPE = "taskType";
+    public static final String EXTRA_TASK_NOTE = "taskNote";
+    public static final String EXTRA_TASK_REMINDER = "taskReminder";
 
     private EditText etTaskName, etNotes;
     private Spinner spinnerCategories, spinnerVibration;
     private Button btnSetDueDate, btnSetTime, btnSetReminder, btnSelectRingtone;
     private FloatingActionButton fabSaveTask;
+    private Toolbar toolbar;
 
     private Calendar dueDateTime = Calendar.getInstance();
     private boolean reminderOn = false;
@@ -33,6 +43,8 @@ public class AddTaskActivity extends AppCompatActivity {
 
     private FirebaseFirestore db;
     private FirebaseAuth auth;
+
+    private String[] categories = {"Work", "Personal", "Health", "Shopping"};
 
     private final ActivityResultLauncher<Intent> ringtonePickerLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -51,8 +63,31 @@ public class AddTaskActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_task);
 
-        NotificationHelper.createNotificationChannels(this);
+        // Toolbar and UI Initialization
+        setupUI();
 
+        // Database and Auth Initialization
+        db = FirebaseFirestore.getInstance();
+        auth = FirebaseAuth.getInstance();
+
+        // Setup Spinners
+        setupSpinners();
+
+        // Handle incoming data from ChatActivity
+        handleIntentData();
+
+        // Setup Listeners
+        setupListeners();
+    }
+
+    private void setupUI() {
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+        }
+        NotificationHelper.createNotificationChannels(this);
         etTaskName = findViewById(R.id.et_task_name);
         etNotes = findViewById(R.id.et_notes);
         spinnerCategories = findViewById(R.id.spinner_categories);
@@ -62,20 +97,85 @@ public class AddTaskActivity extends AppCompatActivity {
         btnSetReminder = findViewById(R.id.btn_set_reminder);
         btnSelectRingtone = findViewById(R.id.btn_select_ringtone);
         fabSaveTask = findViewById(R.id.fab_save_task);
+    }
 
-        db = FirebaseFirestore.getInstance();
-        auth = FirebaseAuth.getInstance();
-
-        String[] categories = {"Work", "Personal", "Health", "Shopping"};
-        ArrayAdapter<String> categoriesAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_dropdown_item, categories);
+    private void setupSpinners() {
+        ArrayAdapter<String> categoriesAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, categories);
         spinnerCategories.setAdapter(categoriesAdapter);
-
         String[] vibrations = {"Default", "Short", "Long", "Heartbeat"};
-        ArrayAdapter<String> vibrationsAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_dropdown_item, vibrations);
+        ArrayAdapter<String> vibrationsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, vibrations);
         spinnerVibration.setAdapter(vibrationsAdapter);
+    }
 
+    private void handleIntentData() {
+        Intent intent = getIntent();
+        if (intent != null) {
+            String name = intent.getStringExtra(EXTRA_TASK_NAME);
+            if (name != null && !name.isEmpty()) etTaskName.setText(name);
+
+            String note = intent.getStringExtra(EXTRA_TASK_NOTE);
+            if (note != null && !note.isEmpty()) etNotes.setText(note);
+
+            String type = intent.getStringExtra(EXTRA_TASK_TYPE);
+            if (type != null && !type.isEmpty()) {
+                for (int i = 0; i < categories.length; i++) {
+                    if (categories[i].equalsIgnoreCase(type)) {
+                        spinnerCategories.setSelection(i);
+                        break;
+                    }
+                }
+            }
+
+            String reminderString = intent.getStringExtra(EXTRA_TASK_REMINDER);
+            if (reminderString != null && !reminderString.isEmpty()) {
+                parseAndSetReminder(reminderString);
+            }
+        }
+    }
+
+    private void parseAndSetReminder(String reminderString) {
+        // This is a simplified parser for common phrases.
+        Calendar parsedCalendar = Calendar.getInstance();
+
+        if (reminderString.toLowerCase().contains("tomorrow")) {
+            parsedCalendar.add(Calendar.DAY_OF_YEAR, 1);
+        }
+
+        // Regex to find time patterns like "5pm", "10 am", "14:30"
+        Pattern timePattern = Pattern.compile("(\\d{1,2})(:(\\d{2}))?\\s*(am|pm)?", Pattern.CASE_INSENSITIVE);
+        Matcher matcher = timePattern.matcher(reminderString);
+
+        if (matcher.find()) {
+            try {
+                int hour = Integer.parseInt(matcher.group(1));
+                int minute = (matcher.group(3) != null) ? Integer.parseInt(matcher.group(3)) : 0;
+                String ampm = matcher.group(4);
+
+                if (ampm != null && ampm.equalsIgnoreCase("pm") && hour < 12) hour += 12;
+                if (ampm != null && ampm.equalsIgnoreCase("am") && hour == 12) hour = 0;
+
+                parsedCalendar.set(Calendar.HOUR_OF_DAY, hour);
+                parsedCalendar.set(Calendar.MINUTE, minute);
+                parsedCalendar.set(Calendar.SECOND, 0);
+
+                this.dueDateTime = parsedCalendar;
+
+                reminderOn = true;
+                btnSetReminder.setText("Reminder ON");
+
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                btnSetDueDate.setText(dateFormat.format(dueDateTime.getTime()));
+
+                SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                btnSetTime.setText(timeFormat.format(dueDateTime.getTime()));
+
+            } catch (NumberFormatException e) {
+                // Parsing failed, do nothing.
+            }
+        }
+    }
+
+    private void setupListeners() {
         btnSetDueDate.setOnClickListener(v -> {
             Calendar c = Calendar.getInstance();
             new DatePickerDialog(this, (view, year, month, day) -> {
@@ -111,20 +211,28 @@ public class AddTaskActivity extends AppCompatActivity {
         fabSaveTask.setOnClickListener(v -> saveTask());
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     private void saveTask() {
         String name = etTaskName.getText().toString().trim();
-        String category = spinnerCategories.getSelectedItem().toString();
-        String vibration = spinnerVibration.getSelectedItem().toString();
-        String notes = etNotes.getText().toString().trim();
-
         if (name.isEmpty()) {
             Toast.makeText(this, "Please enter task name", Toast.LENGTH_SHORT).show();
             return;
         }
 
+        String category = spinnerCategories.getSelectedItem().toString();
+        String vibration = spinnerVibration.getSelectedItem().toString();
+        String notes = etNotes.getText().toString().trim();
         String userId = auth.getCurrentUser() != null ? auth.getCurrentUser().getUid() : "anonymous";
-        Map<String, Object> taskData = new HashMap<>();
 
+        Map<String, Object> taskData = new HashMap<>();
         taskData.put("uid", userId);
         taskData.put("title", name);
         taskData.put("category", category);
@@ -137,8 +245,7 @@ public class AddTaskActivity extends AppCompatActivity {
             taskData.put("ringtone", selectedRingtoneUri.toString());
         }
 
-        db.collection("tasks")
-                .add(taskData)
+        db.collection("tasks").add(taskData)
                 .addOnSuccessListener(doc -> {
                     if (reminderOn) {
                         scheduleAlarms(doc.getId(), name, notes, category, dueDateTime.getTimeInMillis());
@@ -150,17 +257,12 @@ public class AddTaskActivity extends AppCompatActivity {
     }
 
     private void scheduleAlarms(String taskId, String title, String note, String category, long dueTime) {
-        // Schedule the main due-time alarm
         scheduleNotification(taskId, title, note, category, dueTime, false);
-
-        // Schedule the advance notification
         long twentyFourHoursInMillis = 24 * 60 * 60 * 1000;
         long advanceTime = dueTime - twentyFourHoursInMillis;
         if (dueTime > System.currentTimeMillis() + twentyFourHoursInMillis) {
-            // Due more than 24 hours from now: schedule for 24h before.
             scheduleNotification(taskId + "_advance", title, note, category, advanceTime, true);
         } else if (dueTime > System.currentTimeMillis()) {
-            // Due in less than 24 hours (but in the future): show notification immediately.
             String taskInfo = "Title: " + title + "\nCategory: " + category + "\nNote: " + note;
             NotificationHelper.showAdvanceNotification(this, title, taskInfo, (taskId + "_advance").hashCode());
         }
@@ -179,10 +281,7 @@ public class AddTaskActivity extends AppCompatActivity {
         intent.putExtra("vibration", spinnerVibration.getSelectedItem().toString());
 
         int requestCode = taskId.hashCode();
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this,
-                requestCode,
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         if (alarmManager != null) {

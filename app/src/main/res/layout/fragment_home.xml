@@ -66,15 +66,28 @@
         app:layout_constraintTop_toTopOf="@id/fab_add_task"
         app:layout_constraintBottom_toBottomOf="@id/fab_add_task" />
 
-    <!-- Floating Action Button -->
+    <!-- Floating Action Buttons -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add_task"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="16dp"
         android:src="@drawable/outline_add_circle_24"
         app:tint="@color/white"
         app:backgroundTint="@color/pastel_blue_dark"
         android:contentDescription="Add new task"
+        app:layout_constraintBottom_toTopOf="@id/fab_chat_ai"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_chat_ai"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/baseline_chat_24"
+        app:tint="@color/white"
+        app:backgroundTint="@color/pastel_blue_dark"
+        android:contentDescription="Chat with AI"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginEnd="32dp"

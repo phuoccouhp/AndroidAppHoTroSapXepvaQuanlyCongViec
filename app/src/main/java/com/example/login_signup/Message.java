@@ -1,6 +1,7 @@
 package com.example.login_signup;
 
 public class Message {
+
     private String text;
     private boolean isUser;
 

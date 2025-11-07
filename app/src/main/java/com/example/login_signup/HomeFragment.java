@@ -11,6 +11,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 public class HomeFragment extends Fragment {
 
     public HomeFragment() {}
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
@@ -21,7 +22,12 @@ public class HomeFragment extends Fragment {
             startActivity(intent);
         });
 
+        FloatingActionButton fabChatAi = view.findViewById(R.id.fab_chat_ai);
+        fabChatAi.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), ConversationListActivity.class);
+            startActivity(intent);
+        });
+
         return view;
     }
-
 }

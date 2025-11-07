@@ -16,6 +16,7 @@ public class ConversationListAdapter extends RecyclerView.Adapter<ConversationLi
 
     private final Context context;
     private final List<Conversation> conversationList;
+    private final SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
 
     public ConversationListAdapter(Context context, List<Conversation> conversationList) {
         this.context = context;
@@ -32,7 +33,21 @@ public class ConversationListAdapter extends RecyclerView.Adapter<ConversationLi
     @Override
     public void onBindViewHolder(@NonNull ConversationViewHolder holder, int position) {
         Conversation conversation = conversationList.get(position);
-        holder.bind(conversation);
+
+        // Assuming Conversation has a title or a way to represent it. 
+        // For now, let's use a placeholder title with the conversation ID.
+        holder.conversationTitle.setText("Chat: " + conversation.getId());
+        holder.lastMessage.setText(conversation.getLastMessage());
+
+        if (conversation.getTimestamp() != null) {
+            holder.timestamp.setText(sdf.format(conversation.getTimestamp()));
+        }
+
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(context, ChatActivity.class);
+            intent.putExtra("conversationId", conversation.getId());
+            context.startActivity(intent);
+        });
     }
 
     @Override
@@ -40,37 +55,16 @@ public class ConversationListAdapter extends RecyclerView.Adapter<ConversationLi
         return conversationList.size();
     }
 
-    class ConversationViewHolder extends RecyclerView.ViewHolder {
-        TextView titleTextView;
-        TextView lastMessageTextView;
-        TextView timestampTextView;
+    static class ConversationViewHolder extends RecyclerView.ViewHolder {
+        TextView conversationTitle;
+        TextView lastMessage;
+        TextView timestamp;
 
-        ConversationViewHolder(@NonNull View itemView) {
+        public ConversationViewHolder(@NonNull View itemView) {
             super(itemView);
-            titleTextView = itemView.findViewById(R.id.conversationTitleTextView);
-            lastMessageTextView = itemView.findViewById(R.id.lastMessageTextView);
-            timestampTextView = itemView.findViewById(R.id.timestampTextView);
-
-            itemView.setOnClickListener(v -> {
-                int position = getAdapterPosition();
-                if (position != RecyclerView.NO_POSITION) {
-                    Conversation conversation = conversationList.get(position);
-                    Intent intent = new Intent(context, ChatActivity.class);
-                    intent.putExtra("conversationId", conversation.getId());
-                    context.startActivity(intent);
-                }
-            });
-        }
-
-        void bind(Conversation conversation) {
-            // The title could be the first message or a generated title
-            titleTextView.setText("Cuộc trò chuyện - " + conversation.getId().substring(0, 5));
-            lastMessageTextView.setText(conversation.getLastMessage());
-
-            if (conversation.getTimestamp() != null) {
-                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm, dd/MM", Locale.getDefault());
-                timestampTextView.setText(sdf.format(conversation.getTimestamp()));
-            }
+            conversationTitle = itemView.findViewById(R.id.conversation_title);
+            lastMessage = itemView.findViewById(R.id.last_message);
+            timestamp = itemView.findViewById(R.id.timestamp);
         }
     }
 }

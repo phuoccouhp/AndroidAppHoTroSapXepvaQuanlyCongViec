@@ -1,41 +1,40 @@
 package com.example.login_signup;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.widget.ImageButton;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-public class HomeActivity extends AppCompatActivity {
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-    private ImageButton homeButton, calendarButton, documentsButton, settingsButton;
+public class HomeActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        homeButton = findViewById(R.id.nav_home_button);
-        calendarButton = findViewById(R.id.nav_calendar_button);
-        documentsButton = findViewById(R.id.nav_documents_button);
-        settingsButton = findViewById(R.id.nav_settings_button);
+        BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
+        bottomNav.setOnItemSelectedListener(item -> {
+            Fragment selectedFragment = null;
+            int itemId = item.getItemId();
+            if (itemId == R.id.nav_home) {
+                selectedFragment = new HomeFragment();
+            } else if (itemId == R.id.nav_calendar) {
+                selectedFragment = new CalendarFragment();
+            } else if (itemId == R.id.nav_documents) {
+                selectedFragment = new DocumentsFragment();
+            } else if (itemId == R.id.nav_settings) {
+                selectedFragment = new ProfileFragment();
+            }
 
+            if (selectedFragment != null) {
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, selectedFragment).commit();
+            }
+            return true;
+        });
+
+        // Load the default fragment
         if (savedInstanceState == null) {
-            loadFragment(new HomeFragment());
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new HomeFragment()).commit();
         }
-
-        homeButton.setOnClickListener(v -> loadFragment(new HomeFragment()));
-        calendarButton.setOnClickListener(v -> loadFragment(new CalendarFragment()));
-        documentsButton.setOnClickListener(v -> loadFragment(new DocumentsFragment()));
-        settingsButton.setOnClickListener(v -> loadFragment(new ProfileFragment()));
-    }
-
-    private void loadFragment(Fragment fragment) {
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.fragment_container, fragment)
-                .commit();
     }
 }

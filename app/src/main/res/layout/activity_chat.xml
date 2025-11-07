@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="#F0F2F5"
     tools:context=".ChatActivity">
 
     <androidx.appcompat.widget.Toolbar
@@ -12,58 +12,61 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/colorPrimary"
-        app:title="Chat-1"
         app:titleTextColor="@color/white"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:elevation="4dp"
+        android:layout_alignParentTop="true"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewChat"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:padding="8dp"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar"
-        app:layout_constraintBottom_toTopOf="@+id/viewInput"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <View
-        android:id="@+id/viewInput"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/ai_bubble_color"
-        app:layout_constraintBottom_toTopOf="@+id/layoutInput" />
+        android:layout_height="match_parent"
+        android:layout_below="@id/toolbar"
+        android:layout_above="@id/input_layout_container"
+        android:padding="8dp"
+        android:clipToPadding="false" />
 
-    <LinearLayout
-        android:id="@+id/layoutInput"
+    <FrameLayout
+        android:id="@+id/input_layout_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
         android:padding="8dp"
-        android:background="@color/white"
-        app:layout_constraintBottom_toBottomOf="parent">
+        android:background="@color/white">
 
-        <EditText
-            android:id="@+id/editTextMessage"
-            android:layout_width="0dp"
+        <LinearLayout
+            android:id="@+id/layoutInput"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@drawable/edit_text_background"
-            android:hint="Type a message..."
-            android:inputType="textMultiLine"
-            android:padding="12dp"
-            android:maxLines="5"
-            android:textColor="@android:color/black"
-            android:textColorHint="@android:color/darker_gray" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-        <ImageView
-            android:id="@+id/buttonSend"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/ic_send"
-            android:layout_marginStart="8dp"
-            android:padding="8dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Send" />
-    </LinearLayout>
+            <EditText
+                android:id="@+id/editTextMessage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/edit_text_background"
+                android:hint="Type a message..."
+                android:inputType="textMultiLine"
+                android:maxLines="5"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:textColor="@android:color/black"
+                android:textColorHint="#8A8A8A" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/buttonSend"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:src="@drawable/ic_send"
+                app:backgroundTint="@color/colorPrimary"
+                app:tint="@color/white"
+                app:elevation="2dp"
+                app:fabSize="mini"/>
+        </LinearLayout>
+    </FrameLayout>
+
+</RelativeLayout>

@@ -129,10 +129,10 @@ public class TaskDetailFragment extends Fragment {
     private void populateUiWithTaskData(DocumentSnapshot doc) {
         etTaskName.setText(doc.getString("title"));
 
-        // FIX: Handle both "note" and "notes" for backward compatibility
+        
         String noteContent = doc.getString("note");
         if (noteContent == null) {
-            noteContent = doc.getString("notes"); // Fallback to old field
+            noteContent = doc.getString("notes"); 
         }
         etNotes.setText(noteContent);
 

@@ -11,22 +11,19 @@ public class Task implements Serializable {
     private String uid;
     private String title;
     private String category;
-    private String note; // The only field for task description
+    private String note; 
     private boolean reminder;
     private boolean completed;
     private Date taskDate;
     private String vibration;
     private String ringtone;
 
-    // Fields that are not stored in Firestore but used in the app
     @Exclude private String time;
     @Exclude private String date;
 
     public Task() {
-        // Needed for Firestore
     }
 
-    // Constructor without 'detail'
     public Task(String id, String title, String category, String time, boolean completed, String date, String note) {
         this.id = id;
         this.title = title;
@@ -68,7 +65,6 @@ public class Task implements Serializable {
     public String getRingtone() { return ringtone; }
     public void setRingtone(String ringtone) { this.ringtone = ringtone; }
 
-    // Getters and setters for the non-Firestore fields
     @Exclude
     public String getTime() { return time; }
     public void setTime(String time) { this.time = time; }

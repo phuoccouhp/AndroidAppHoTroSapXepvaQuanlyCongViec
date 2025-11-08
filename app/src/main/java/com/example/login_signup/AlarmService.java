@@ -25,7 +25,7 @@ public class AlarmService extends Service {
         String vibrationPattern = intent.getStringExtra("vibration");
         String ringtoneUriString = intent.getStringExtra("ringtone");
 
-        // Get the ringtone
+        
         Uri alarmUri = (ringtoneUriString != null) ? Uri.parse(ringtoneUriString) : RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
         if (alarmUri == null) {
             alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
@@ -33,12 +33,12 @@ public class AlarmService extends Service {
         ringtone = RingtoneManager.getRingtone(this, alarmUri);
         ringtone.setLooping(true);
 
-        // Get the vibration pattern
+        
         long[] pattern = getVibrationPattern(vibrationPattern);
 
-        // Start playing the alarm and vibrating
+        
         ringtone.play();
-        vibrator.vibrate(pattern, 0); // Repeat
+        vibrator.vibrate(pattern, 0); 
 
         return START_STICKY;
     }

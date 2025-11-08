@@ -1,7 +1,7 @@
 package com.example.login_signup;
 
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity; // Hoặc androidx.activity.ComponentActivity nếu bạn chọn Empty Activity mới nhất
+import androidx.appcompat.app.AppCompatActivity; 
 
 public class DocumentsActivity extends AppCompatActivity {
 

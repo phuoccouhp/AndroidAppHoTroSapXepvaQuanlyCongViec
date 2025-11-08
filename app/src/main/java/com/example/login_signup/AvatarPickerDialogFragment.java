@@ -20,7 +20,7 @@ public class AvatarPickerDialogFragment extends DialogFragment {
     }
 
     private AvatarPickerListener listener;
-    // THAY ĐỔI: Sử dụng tên các file ảnh .jpg của bạn
+    
     private static final String[] AVATAR_IDS = {
         "anh1", "anh2", "anh3", "anh4", "anh5"
     };

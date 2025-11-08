@@ -59,7 +59,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             }
         });
 
-        // FIX: Change the main task icon (img_check) to the category icon.
+        
         int iconResId;
         switch (task.getCategory()) {
             case "Work":
@@ -75,13 +75,13 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
                 iconResId = R.drawable.baseline_shopping_cart_24;
                 break;
             default:
-                // A default icon if the category doesn't match
+                
                 iconResId = R.drawable.baseline_check_circle_24;
                 break;
         }
         holder.imgCheck.setImageResource(iconResId);
 
-        // FIX: Remove the compound drawable from the TextView to ensure only one icon is displayed.
+        
         holder.tvCategory.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
     }
 

@@ -9,10 +9,10 @@ public class ChatSession {
     private String name;
     private String lastMessage;
     private Date lastUpdated;
-    private String userId; // To know which user this session belongs to
+    private String userId; 
 
     public ChatSession() {
-        // Constructor rỗng cần thiết cho Firestore
+        
     }
 
     public ChatSession(String name, String userId) {

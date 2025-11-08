@@ -15,7 +15,7 @@ public class AlarmActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alarm);
 
-        // Make the activity show over the lock screen and turn the screen on
+        
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
             setShowWhenLocked(true);
             setTurnScreenOn(true);
@@ -40,13 +40,13 @@ public class AlarmActivity extends AppCompatActivity {
         tvTaskCategory.setText("Category: " + taskCategory);
         tvTaskNote.setText("Note: " + taskNote);
 
-        // Start the service to play sound and vibrate
+        
         Intent serviceIntent = new Intent(this, AlarmService.class);
-        serviceIntent.putExtras(getIntent().getExtras()); // Pass all extras to the service
+        serviceIntent.putExtras(getIntent().getExtras()); 
         startService(serviceIntent);
 
         btnStopAlarm.setOnClickListener(v -> {
-            // Stop the service and finish the activity
+            
             stopService(new Intent(this, AlarmService.class));
             finish();
         });

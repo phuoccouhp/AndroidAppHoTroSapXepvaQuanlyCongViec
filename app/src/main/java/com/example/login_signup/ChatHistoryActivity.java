@@ -45,7 +45,7 @@ public class ChatHistoryActivity extends AppCompatActivity {
         adapter = new ChatHistoryAdapter(sessionList);
         recyclerViewChatHistory.setAdapter(adapter);
 
-        // Add Divider
+        
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerViewChatHistory.getContext(), layoutManager.getOrientation());
         dividerItemDecoration.setDrawable(ContextCompat.getDrawable(this, R.drawable.list_divider));
         recyclerViewChatHistory.addItemDecoration(dividerItemDecoration);
@@ -101,14 +101,14 @@ public class ChatHistoryActivity extends AppCompatActivity {
                     db.collection("chat_sessions")
                             .add(newSession)
                             .addOnSuccessListener(documentReference -> {
-                                // INSTANT UPDATE LOGIC
+                                
                                 newSession.setId(documentReference.getId());
-                                newSession.setLastUpdated(new Date()); // Set current time
-                                sessionList.add(0, newSession); // Add to the top
+                                newSession.setLastUpdated(new Date()); 
+                                sessionList.add(0, newSession); 
                                 adapter.notifyItemInserted(0);
                                 recyclerViewChatHistory.scrollToPosition(0);
                                 
-                                // Open the new chat screen
+                                
                                 Intent intent = new Intent(ChatHistoryActivity.this, ChatActivity.class);
                                 intent.putExtra("CHAT_SESSION_ID", documentReference.getId());
                                 intent.putExtra("CHAT_SESSION_NAME", chatName);

@@ -60,7 +60,7 @@ public class SignUp extends AppCompatActivity {
                             startActivity(new Intent(this, Login.class));
                             finish();
                         } else {
-                            // sendSignInLink(email);
+                            
                             Intent i = new Intent(this, Register.class);
                             i.putExtra("email", email);
                             startActivity(i);
@@ -96,97 +96,22 @@ public class SignUp extends AppCompatActivity {
                 });
 
         btnGoogle.setOnClickListener(v -> googlePicker.launch(googleClient.getSignInIntent()));
-        // Thêm code này vào cuối phương thức onCreate(), sau các đoạn findViewById khác
+        
 
         findViewById(R.id.tvLogin).setOnClickListener(v -> {
-            // Tạo Intent để chuyển từ SignUp sang Login
+            
             Intent intent = new Intent(this, Login.class);
             startActivity(intent);
 
-            // (Tùy chọn) Kết thúc Activity SignUp để người dùng không thể quay lại bằng nút back
-            // finish();
+            
+            
         });
     }
 
-//    private void sendSignInLink(String email) {
-//        ActionCodeSettings actionCodeSettings = ActionCodeSettings.newBuilder()
-//                .setUrl("https://login-3f2b3.web.app/__/auth/handler")
-//                .setHandleCodeInApp(true)
-//                .setAndroidPackageName(getPackageName(), true, null)
-//                .build();
-//
-//        mAuth.sendSignInLinkToEmail(email, actionCodeSettings)
-//                .addOnCompleteListener(task -> {
-//                    if (task.isSuccessful()) {
-//                        Toast.makeText(this, "Đã gửi liên kết xác minh tới " + email, Toast.LENGTH_LONG).show();
-//                        getSharedPreferences("auth", MODE_PRIVATE)
-//                                .edit().putString("emailForSignIn", email).apply();
-//                    } else {
-//                        Toast.makeText(this, "Gửi liên kết thất bại: " +
-//                                (task.getException() != null ? task.getException().getMessage() : ""), Toast.LENGTH_LONG).show();
-//                    }
-//                });
-//    }
-//    private void handleEmailLinkIntent(Intent intent) {
-//        if (intent == null) return;
-//        Uri link = intent.getData();
-//        if (link != null && mAuth.isSignInWithEmailLink(link.toString())) {
-//            String email = getSharedPreferences("auth", MODE_PRIVATE)
-//                    .getString("emailForSignIn", null);
-//            if (email == null) {
-//                Toast.makeText(this, "Không tìm thấy email đã lưu. Hãy nhập lại.", Toast.LENGTH_LONG).show();
-//                return;
-//            }
-//            mAuth.signInWithEmailLink(email, link.toString())
-//                    .addOnCompleteListener(task -> {
-//                        if (task.isSuccessful()) {
-//                            startActivity(new Intent(this, Register.class)
-//                                    .putExtra("email", email));
-//                            finish();
-//                        } else {
-//                            Toast.makeText(this, "Liên kết không hợp lệ/hết hạn.", Toast.LENGTH_LONG).show();
-//                        }
-//                    });
-//        }
-//    }
+
 
     private boolean isValidEmail(String email) {
         return !TextUtils.isEmpty(email) && Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
 
-//    @Override
-//    protected void onStart() {
-//        super.onStart();
-//        handleEmailLinkIntent(getIntent());
-//        Intent intent = getIntent();
-//        Uri link = intent.getData();
-//
-//        if (link != null && mAuth.isSignInWithEmailLink(link.toString())) {
-//            String email = getSharedPreferences("auth", MODE_PRIVATE)
-//                    .getString("emailForSignIn", null);
-//
-//            if (email != null) {
-//                mAuth.signInWithEmailLink(email, link.toString())
-//                        .addOnCompleteListener(task -> {
-//                            if (task.isSuccessful()) {
-//                                Toast.makeText(this, "Email đã được xác thực!", Toast.LENGTH_SHORT).show();
-//
-//                                Intent i = new Intent(this, Register.class);
-//                                i.putExtra("email", email);
-//                                startActivity(i);
-//                                finish();
-//                            } else {
-//                                Toast.makeText(this, "Liên kết không hợp lệ hoặc đã hết hạn.", Toast.LENGTH_LONG).show();
-//                            }
-//                        });
-//            } else {
-//                Toast.makeText(this, "Không tìm thấy email đã lưu. Hãy nhập lại.", Toast.LENGTH_LONG).show();
-//            }
-//        }
-//    }
-//    @Override protected void onNewIntent(Intent intent) {
-//        super.onNewIntent(intent);
-//        setIntent(intent);
-//        handleEmailLinkIntent(intent);
-//    }
 }

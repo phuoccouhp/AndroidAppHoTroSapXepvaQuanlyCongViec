@@ -197,10 +197,10 @@ public class ChatActivity extends AppCompatActivity {
         } else if (input.contains("shop") || input.contains("mua sắm")) {
             return "Shopping";
         }
-        return "Personal"; // Default
+        return "Personal"; 
     }
 
-    // FIX: Updated handleIdleState to recognize keywords without "task"
+    
     private void handleIdleState(String text) {
         if (text.matches(".*\\b(add|create|new|make)\\b.*")) {
             currentAiState = AiState.AWAITING_TASK_TITLE;
@@ -264,7 +264,7 @@ public class ChatActivity extends AppCompatActivity {
                      cal.setTime(parsedDate);
                 }
                 dateParsed = true;
-            } catch (ParseException e) { /* Failed */ }
+            } catch (ParseException e) {  }
         }
 
         if (dateParsed) {

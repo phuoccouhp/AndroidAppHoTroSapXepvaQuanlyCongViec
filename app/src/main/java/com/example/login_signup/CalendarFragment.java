@@ -116,7 +116,7 @@ public class CalendarFragment extends Fragment {
                                 String title = doc.getString("title");
                                 String category = doc.getString("category");
 
-                                // FIX: Handle both "note" and "notes" for backward compatibility
+                                
                                 String noteContent = doc.getString("note");
                                 if (noteContent == null) {
                                     noteContent = doc.getString("notes");

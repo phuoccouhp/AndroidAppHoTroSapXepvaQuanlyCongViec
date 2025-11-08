@@ -44,7 +44,7 @@ public class ProfileFragment extends Fragment implements AvatarPickerDialogFragm
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
-        // Ánh xạ các view từ layout
+        
         ivAvatar = view.findViewById(R.id.iv_avatar);
         tvEditAvatar = view.findViewById(R.id.tv_edit_avatar);
         tvName = view.findViewById(R.id.tvName);
@@ -52,10 +52,10 @@ public class ProfileFragment extends Fragment implements AvatarPickerDialogFragm
         tvChangePass = view.findViewById(R.id.tvChangePass);
         btnLogout = view.findViewById(R.id.btnLogout);
 
-        // Tải thông tin người dùng (bao gồm cả avatar)
+        
         loadUserProfile();
 
-        // Thiết lập sự kiện click để mở hộp thoại chọn avatar
+        
         View.OnClickListener avatarClickListener = v -> {
             AvatarPickerDialogFragment dialog = new AvatarPickerDialogFragment();
             dialog.show(getChildFragmentManager(), "AvatarPicker");
@@ -63,7 +63,7 @@ public class ProfileFragment extends Fragment implements AvatarPickerDialogFragm
         ivAvatar.setOnClickListener(avatarClickListener);
         tvEditAvatar.setOnClickListener(avatarClickListener);
 
-        // Các sự kiện click khác
+        
         tvChangePass.setOnClickListener(v -> {
             if (mAuth.getCurrentUser() != null) {
                 startActivity(new Intent(requireContext(), ChangePassword.class));
@@ -86,13 +86,13 @@ public class ProfileFragment extends Fragment implements AvatarPickerDialogFragm
 
                     tvName.setText(name != null ? name : "Name not set");
 
-                    // Sử dụng AvatarUtils để lấy và hiển thị avatar
+                    
                     int avatarResId = AvatarUtils.getAvatarResourceId(getContext(), avatarId);
                     ivAvatar.setImageResource(avatarResId);
                 } else {
                     Log.d(TAG, "Không tìm thấy thông tin người dùng.");
                     tvName.setText("Name not set");
-                    ivAvatar.setImageResource(R.drawable.ic_avatar_1); // Avatar mặc định
+                    ivAvatar.setImageResource(R.drawable.ic_avatar_1); 
                 }
             }).addOnFailureListener(e -> {
                 Log.e(TAG, "Lỗi khi lấy thông tin người dùng", e);
@@ -104,11 +104,11 @@ public class ProfileFragment extends Fragment implements AvatarPickerDialogFragm
 
     @Override
     public void onAvatarSelected(String avatarId) {
-        // Cập nhật avatar trên giao diện ngay lập tức
+        
         int avatarResId = AvatarUtils.getAvatarResourceId(getContext(), avatarId);
         ivAvatar.setImageResource(avatarResId);
 
-        // Lưu avatarId mới vào Firestore
+        
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
             String uid = currentUser.getUid();
@@ -118,7 +118,7 @@ public class ProfileFragment extends Fragment implements AvatarPickerDialogFragm
                     .addOnFailureListener(e -> {
                         Log.w(TAG, "Lỗi khi cập nhật avatar", e);
                         Toast.makeText(getContext(), "Không thể cập nhật avatar.", Toast.LENGTH_SHORT).show();
-                        loadUserProfile(); // Tải lại thông tin cũ nếu cập nhật thất bại
+                        loadUserProfile(); 
                     });
         }
     }

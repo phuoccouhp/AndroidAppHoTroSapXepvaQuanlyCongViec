@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
 
     private final ActivityResultLauncher<String> requestPermissionLauncher = registerForActivityResult(
             new ActivityResultContracts.RequestPermission(), isGranted -> {
-                // After the user responds, regardless of the choice, proceed to the splash screen.
+                
                 startSplashScreen();
             });
 
@@ -77,16 +77,16 @@ public class MainActivity extends AppCompatActivity {
         setupRandom();
         startAnim();
 
-        // Handle permissions first, then start the splash screen timer.
+        
         handlePermissionsAndNavigation();
     }
 
     private void handlePermissionsAndNavigation() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-            // Request permission. The launcher's callback will then call startSplashScreen().
+            
             requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
         } else {
-            // If permission is already granted or not required for the OS version, proceed directly.
+            
             startSplashScreen();
         }
     }
@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Check for exact alarm permission every time the activity is resumed.
+        
         checkExactAlarmPermission();
     }
 
@@ -102,8 +102,8 @@ public class MainActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
             if (alarmManager != null && !alarmManager.canScheduleExactAlarms()) {
-                // This is a simplified check. A better UX would involve a dialog explaining why
-                // the permission is needed and guiding the user to the settings.
+                
+                
                 Intent intent = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, Uri.parse("package:" + getPackageName()));
                 if (getPackageManager().resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY) != null) {
                     startActivity(intent);

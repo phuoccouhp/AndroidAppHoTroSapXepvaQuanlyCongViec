@@ -9,7 +9,7 @@ public class ChatMessage {
     private Date timestamp;
 
     public ChatMessage() {
-        // Constructor rỗng cần thiết cho Firestore
+        
     }
 
     public ChatMessage(String message, String userId) {

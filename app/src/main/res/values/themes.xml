@@ -4,6 +4,14 @@
 
     <style name="Theme.Login_Signup" parent="Base.Theme.Login_Signup" />
 
+    <!-- CRITICAL FIX: This theme MUST be a true, non-floating, fullscreen theme -->
+    <style name="Theme.App.Alarm" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <!-- These attributes made the activity a dialog, causing the full-screen intent to be ignored -->
+        <!-- <item name="android:windowIsFloating">true</item> -->
+        <!-- <item name="android:windowIsTranslucent">true</item> -->
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
+
     <style name="CalenderViewDateCustom" parent="android:TextAppearance.DeviceDefault.Small">
         <item name="android:textColor">@color/oxford_blue</item>
         <item name="android:textSize">14sp</item>

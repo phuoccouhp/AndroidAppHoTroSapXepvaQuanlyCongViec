@@ -5,9 +5,12 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
+import android.os.Build;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 public class TaskReminderReceiver extends BroadcastReceiver {
 
@@ -20,21 +23,31 @@ public class TaskReminderReceiver extends BroadcastReceiver {
         }
     }
 
-    private void handleAlarm(Context context, Intent intent) {
-        boolean isAdvance = intent.getBooleanExtra("isAdvance", false);
-        String taskId = intent.getStringExtra("taskId");
+    private void handleAlarm(Context context, Intent sourceIntent) {
+        boolean isAdvance = sourceIntent.getBooleanExtra("isAdvance", false);
+        String taskId = sourceIntent.getStringExtra("taskId");
 
         if (isAdvance) {
-            String title = intent.getStringExtra("title");
-            String note = intent.getStringExtra("note");
-            String category = intent.getStringExtra("category");
-            String taskInfo = "Title: " + title + "\nCategory: " + category + "\nNote: " + note;
-            NotificationHelper.showAdvanceNotification(context, title, taskInfo, taskId.hashCode());
+            String title = sourceIntent.getStringExtra("title");
+            String dueTimeString = sourceIntent.getStringExtra("due_time_string");
+            String taskInfo = "Sắp tới: " + title + "\nLúc: " + dueTimeString;
+            NotificationHelper.showAdvanceNotification(context, "Công việc sắp tới", taskInfo, taskId.hashCode());
         } else {
-            Intent alarmIntent = new Intent(context, AlarmActivity.class);
-            alarmIntent.putExtras(intent.getExtras());
-            alarmIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(alarmIntent);
+            // FIX: Create a clean Intent for the service.
+            // Blindly copying extras from the AlarmManager's intent can cause a crash due to unparcelable data.
+            Intent serviceIntent = new Intent(context, AlarmService.class);
+            serviceIntent.putExtra("taskId", sourceIntent.getStringExtra("taskId"));
+            serviceIntent.putExtra("title", sourceIntent.getStringExtra("title"));
+            serviceIntent.putExtra("note", sourceIntent.getStringExtra("note"));
+            serviceIntent.putExtra("category", sourceIntent.getStringExtra("category"));
+            serviceIntent.putExtra("ringtone", sourceIntent.getStringExtra("ringtone"));
+            serviceIntent.putExtra("vibration", sourceIntent.getStringExtra("vibration"));
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(serviceIntent);
+            } else {
+                context.startService(serviceIntent);
+            }
         }
     }
 
@@ -59,34 +72,33 @@ public class TaskReminderReceiver extends BroadcastReceiver {
 
     private void scheduleAlarmsForTask(Context context, Task task) {
         long dueTime = task.getTaskDate().getTime();
-        String taskId = task.getId();
-        String title = task.getTitle();
-        String note = task.getNote();
-        String category = task.getCategory();
-        String vibration = task.getVibration();
-        String ringtone = task.getRingtone();
-
-        scheduleNotification(context, taskId, title, note, category, dueTime, false, vibration, ringtone);
+        scheduleNotification(context, task, dueTime, false);
 
         long twentyFourHoursInMillis = 24 * 60 * 60 * 1000;
         long advanceTime = dueTime - twentyFourHoursInMillis;
         if (advanceTime > System.currentTimeMillis()) {
-            scheduleNotification(context, taskId + "_advance", title, note, category, advanceTime, true, vibration, ringtone);
+            scheduleNotification(context, task, advanceTime, true);
         }
     }
 
-    private void scheduleNotification(Context context, String taskId, String title, String note, String category, long time, boolean isAdvance, String vibration, String ringtone) {
+    private void scheduleNotification(Context context, Task task, long time, boolean isAdvance) {
+        String taskId = isAdvance ? task.getId() + "_advance" : task.getId();
+
         Intent intent = new Intent(context, TaskReminderReceiver.class);
         intent.putExtra("taskId", taskId);
-        intent.putExtra("title", title);
-        intent.putExtra("note", note);
-        intent.putExtra("category", category);
+        intent.putExtra("title", task.getTitle());
+        intent.putExtra("note", task.getNote());
+        intent.putExtra("category", task.getCategory());
         intent.putExtra("isAdvance", isAdvance);
-        if (ringtone != null) {
-            intent.putExtra("ringtone", ringtone);
+        if (task.getRingtone() != null) {
+            intent.putExtra("ringtone", task.getRingtone());
         }
-        if (vibration != null) {
-            intent.putExtra("vibration", vibration);
+        if (task.getVibration() != null) {
+            intent.putExtra("vibration", task.getVibration());
+        }
+        if (isAdvance) {
+            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm, dd/MM", Locale.getDefault());
+            intent.putExtra("due_time_string", sdf.format(task.getTaskDate()));
         }
 
         int requestCode = taskId.hashCode();
@@ -94,7 +106,18 @@ public class TaskReminderReceiver extends BroadcastReceiver {
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         if (alarmManager != null) {
-            alarmManager.setExact(AlarmManager.RTC_WAKEUP, time, pendingIntent);
+            try {
+                if (!isAdvance) {
+                    Intent showTaskIntent = new Intent(context, HomeActivity.class);
+                    PendingIntent showTaskPendingIntent = PendingIntent.getActivity(context, requestCode, showTaskIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+                    AlarmManager.AlarmClockInfo alarmClockInfo = new AlarmManager.AlarmClockInfo(time, showTaskPendingIntent);
+                    alarmManager.setAlarmClock(alarmClockInfo, pendingIntent);
+                } else {
+                    alarmManager.setExact(AlarmManager.RTC_WAKEUP, time, pendingIntent);
+                }
+            } catch (SecurityException se) {
+                // Permission not granted
+            }
         }
     }
 }

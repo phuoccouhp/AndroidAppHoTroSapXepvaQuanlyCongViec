@@ -1,7 +1,10 @@
 package com.example.login_signup;
 
+import android.app.AlarmManager;
 import android.app.DatePickerDialog;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -129,10 +132,9 @@ public class TaskDetailFragment extends Fragment {
     private void populateUiWithTaskData(DocumentSnapshot doc) {
         etTaskName.setText(doc.getString("title"));
 
-        
         String noteContent = doc.getString("note");
         if (noteContent == null) {
-            noteContent = doc.getString("notes"); 
+            noteContent = doc.getString("notes");
         }
         etNotes.setText(noteContent);
 
@@ -180,6 +182,7 @@ public class TaskDetailFragment extends Fragment {
             new TimePickerDialog(requireContext(), (view, hour, minute) -> {
                 dueDateTime.set(Calendar.HOUR_OF_DAY, hour);
                 dueDateTime.set(Calendar.MINUTE, minute);
+                dueDateTime.set(Calendar.SECOND, 0);
                 updateDateAndTimeButtons();
             }, dueDateTime.get(Calendar.HOUR_OF_DAY), dueDateTime.get(Calendar.MINUTE), true).show();
         });
@@ -223,6 +226,24 @@ public class TaskDetailFragment extends Fragment {
         db.collection("tasks").document(currentTaskId).update(taskData)
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(getContext(), "Task updated successfully", Toast.LENGTH_SHORT).show();
+
+                    cancelAlarmsForTask(getContext(), currentTaskId);
+
+                    if (reminderOn) {
+                        Task updatedTask = new Task();
+                        updatedTask.setId(currentTaskId);
+                        updatedTask.setTitle((String) taskData.get("title"));
+                        updatedTask.setNote((String) taskData.get("note"));
+                        updatedTask.setCategory((String) taskData.get("category"));
+                        updatedTask.setTaskDate((Date) taskData.get("taskDate"));
+                        updatedTask.setVibration((String) taskData.get("vibration"));
+                        if (taskData.get("ringtone") != null) {
+                            updatedTask.setRingtone(taskData.get("ringtone").toString());
+                        }
+                        scheduleAlarmsForTask(getContext(), updatedTask);
+                    }
+
+                    getParentFragmentManager().setFragmentResult("task_updated_result", new Bundle());
                     getParentFragmentManager().popBackStack();
                 })
                 .addOnFailureListener(e -> Toast.makeText(getContext(), "Error updating task", Toast.LENGTH_SHORT).show());
@@ -249,6 +270,76 @@ public class TaskDetailFragment extends Fragment {
             }
         } else {
             btnSelectRingtone.setText("Select Sound");
+        }
+    }
+
+    private void cancelAlarmsForTask(Context context, String taskId) {
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        if (alarmManager == null) return;
+
+        Intent mainIntent = new Intent(context, TaskReminderReceiver.class);
+        int mainRequestCode = taskId.hashCode();
+        PendingIntent mainPendingIntent = PendingIntent.getBroadcast(context, mainRequestCode, mainIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        alarmManager.cancel(mainPendingIntent);
+
+        Intent advanceIntent = new Intent(context, TaskReminderReceiver.class);
+        int advanceRequestCode = (taskId + "_advance").hashCode();
+        PendingIntent advancePendingIntent = PendingIntent.getBroadcast(context, advanceRequestCode, advanceIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        alarmManager.cancel(advancePendingIntent);
+    }
+
+    private void scheduleAlarmsForTask(Context context, Task task) {
+        long dueTime = task.getTaskDate().getTime();
+        long currentTime = System.currentTimeMillis();
+        long twentyFourHoursInMillis = 24 * 60 * 60 * 1000;
+
+        if (dueTime > currentTime) {
+            scheduleNotification(context, task, dueTime, false);
+        }
+
+        long timeDifference = dueTime - currentTime;
+        if (timeDifference > 0 && timeDifference < twentyFourHoursInMillis) {
+            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm, dd/MM", Locale.getDefault());
+            String taskInfo = "Due at: " + sdf.format(task.getTaskDate());
+            NotificationHelper.showAdvanceNotification(context, task.getTitle(), taskInfo, task.getId().hashCode() + 1);
+        } else if (timeDifference >= twentyFourHoursInMillis) {
+            long advanceTime = dueTime - twentyFourHoursInMillis;
+            scheduleNotification(context, task, advanceTime, true);
+        }
+    }
+
+    private void scheduleNotification(Context context, Task task, long time, boolean isAdvance) {
+        String taskId = isAdvance ? task.getId() + "_advance" : task.getId();
+        Intent intent = new Intent(context, TaskReminderReceiver.class);
+        intent.putExtra("taskId", taskId);
+        intent.putExtra("title", task.getTitle());
+        intent.putExtra("note", task.getNote());
+        intent.putExtra("category", task.getCategory());
+        intent.putExtra("isAdvance", isAdvance);
+        if (task.getRingtone() != null) {
+            intent.putExtra("ringtone", task.getRingtone());
+        }
+        if (task.getVibration() != null) {
+            intent.putExtra("vibration", task.getVibration());
+        }
+
+        int requestCode = taskId.hashCode();
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
+        if (alarmManager != null) {
+            try {
+                if (!isAdvance) {
+                    Intent showTaskIntent = new Intent(context, HomeActivity.class);
+                    PendingIntent showTaskPendingIntent = PendingIntent.getActivity(context, requestCode, showTaskIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+                    AlarmManager.AlarmClockInfo alarmClockInfo = new AlarmManager.AlarmClockInfo(time, showTaskPendingIntent);
+                    alarmManager.setAlarmClock(alarmClockInfo, pendingIntent);
+                } else {
+                    alarmManager.setExact(AlarmManager.RTC_WAKEUP, time, pendingIntent);
+                }
+            } catch (SecurityException se) {
+                Toast.makeText(context, "Permission not granted", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 }

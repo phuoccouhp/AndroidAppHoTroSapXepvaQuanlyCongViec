@@ -1,8 +1,15 @@
 package com.example.login_signup;
 
+import android.app.AlarmManager;
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.View;
 import android.widget.ImageButton;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
@@ -24,15 +31,35 @@ public class HomeActivity extends AppCompatActivity {
         navButtons.add(findViewById(R.id.nav_documents_button));
         navButtons.add(findViewById(R.id.nav_settings_button));
 
-        
         navButtons.get(0).setOnClickListener(v -> loadFragment(new HomeFragment(), v));
         navButtons.get(1).setOnClickListener(v -> loadFragment(new CalendarFragment(), v));
         navButtons.get(2).setOnClickListener(v -> loadFragment(new DocumentsFragment(), v));
         navButtons.get(3).setOnClickListener(v -> loadFragment(new ProfileFragment(), v));
 
-        
         if (savedInstanceState == null) {
             loadFragment(new HomeFragment(), navButtons.get(0));
+        }
+
+        // CRITICAL FIX: Check and request the special "Alarms & reminders" permission
+        checkAndRequestAlarmPermission();
+    }
+
+    private void checkAndRequestAlarmPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+            if (!alarmManager.canScheduleExactAlarms()) {
+                new AlertDialog.Builder(this)
+                        .setTitle("Permission Required")
+                        .setMessage("This app needs permission to set precise alarms to function correctly. Please grant this permission in the settings.")
+                        .setPositiveButton("Go to Settings", (dialog, which) -> {
+                            Intent intent = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
+                                    Uri.parse("package:" + getPackageName()));
+                            startActivity(intent);
+                        })
+                        .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                        .create()
+                        .show();
+            }
         }
     }
 
@@ -50,7 +77,6 @@ public class HomeActivity extends AppCompatActivity {
             boolean isSelected = (button == selectedButton);
             button.setSelected(isSelected);
 
-            
             if (isSelected) {
                 button.animate().scaleX(1.2f).scaleY(1.2f).setDuration(200).start();
             } else {

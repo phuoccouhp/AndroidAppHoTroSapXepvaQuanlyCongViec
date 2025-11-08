@@ -16,7 +16,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.DocumentReference;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -108,6 +107,7 @@ public class AddTaskActivity extends AppCompatActivity {
             new TimePickerDialog(this, (view, hour, minute) -> {
                 dueDateTime.set(Calendar.HOUR_OF_DAY, hour);
                 dueDateTime.set(Calendar.MINUTE, minute);
+                dueDateTime.set(Calendar.SECOND, 0);
                 updateDateAndTimeButtons();
             }, c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), true).show();
         });
@@ -172,7 +172,6 @@ public class AddTaskActivity extends AppCompatActivity {
                 .addOnSuccessListener(documentReference -> {
                     Toast.makeText(this, "Task saved", Toast.LENGTH_SHORT).show();
                     if (reminderOn) {
-
                         Task taskToSchedule = new Task();
                         taskToSchedule.setId(documentReference.getId());
                         taskToSchedule.setTitle(name);
@@ -193,33 +192,21 @@ public class AddTaskActivity extends AppCompatActivity {
         long dueTime = task.getTaskDate().getTime();
         long currentTime = System.currentTimeMillis();
         long twentyFourHoursInMillis = 24 * 60 * 60 * 1000;
+
         if (dueTime > currentTime) {
-            scheduleNotification(context, task, dueTime, false); // isAdvance = false
+            scheduleNotification(context, task, dueTime, false);
         }
 
         long timeDifference = dueTime - currentTime;
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm 'ngày' dd/MM", Locale.getDefault());
-        String taskInfo = task.getTitle() + "\n" +
-                "Vào lúc: " + sdf.format(task.getTaskDate());
-
-        int advanceNotificationId = task.getId().hashCode() + 1;
-
         if (timeDifference > 0 && timeDifference < twentyFourHoursInMillis) {
-
-            NotificationHelper.showAdvanceNotification(
-                    context,
-                    "Công việc sắp tới!",
-                    taskInfo,
-                    advanceNotificationId
-            );
-
+            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm, dd/MM", Locale.getDefault());
+            String taskInfo = "Due at: " + sdf.format(task.getTaskDate());
+            NotificationHelper.showAdvanceNotification(context, task.getTitle(), taskInfo, task.getId().hashCode() + 1);
         } else if (timeDifference >= twentyFourHoursInMillis) {
-
             long advanceTime = dueTime - twentyFourHoursInMillis;
-            scheduleNotification(context, task, advanceTime, true); // isAdvance = true
+            scheduleNotification(context, task, advanceTime, true);
         }
     }
-
 
     private void scheduleNotification(Context context, Task task, long time, boolean isAdvance) {
         String taskId = isAdvance ? task.getId() + "_advance" : task.getId();
@@ -243,9 +230,16 @@ public class AddTaskActivity extends AppCompatActivity {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         if (alarmManager != null) {
             try {
-                alarmManager.setExact(AlarmManager.RTC_WAKEUP, time, pendingIntent);
+                if (!isAdvance) {
+                    Intent showTaskIntent = new Intent(context, HomeActivity.class);
+                    PendingIntent showTaskPendingIntent = PendingIntent.getActivity(context, requestCode, showTaskIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+                    AlarmManager.AlarmClockInfo alarmClockInfo = new AlarmManager.AlarmClockInfo(time, showTaskPendingIntent);
+                    alarmManager.setAlarmClock(alarmClockInfo, pendingIntent);
+                } else {
+                    alarmManager.setExact(AlarmManager.RTC_WAKEUP, time, pendingIntent);
+                }
             } catch (SecurityException se) {
-                Toast.makeText(context, "Permission to schedule alarms not granted.", Toast.LENGTH_LONG).show();
+                Toast.makeText(context, "Permission not granted", Toast.LENGTH_SHORT).show();
             }
         }
     }

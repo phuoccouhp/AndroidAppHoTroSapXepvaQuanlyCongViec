@@ -1,13 +1,11 @@
 package com.example.login_signup;
 
-import android.app.Notification;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.IBinder;
 import android.os.Vibrator;
 import android.text.TextUtils;
@@ -25,21 +23,17 @@ public class AlarmService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        // --- CRITICAL: Defensive Null & Empty Checks ---
         if (intent == null) {
             stopSelf();
             return START_NOT_STICKY;
         }
 
-        // The taskId is used as the notification ID. It CANNOT be null or empty.
-        // An empty string's hashcode is 0, which is an invalid ID for startForeground.
         String taskId = intent.getStringExtra("taskId");
         if (TextUtils.isEmpty(taskId)) {
             stopSelf();
             return START_NOT_STICKY;
         }
 
-        // --- Start Sound and Vibration Immediately ---
         String vibrationPattern = intent.getStringExtra("vibration");
         String ringtoneUriString = intent.getStringExtra("ringtone");
 
@@ -55,14 +49,6 @@ public class AlarmService extends Service {
 
         long[] pattern = getVibrationPattern(vibrationPattern);
         vibrator.vibrate(pattern, 0);
-
-        // --- Create and Show Full-Screen Notification ---
-        String title = intent.getStringExtra("title");
-        int notificationId = taskId.hashCode(); // This is now safe
-
-        Notification notification = NotificationHelper.buildDueTimeNotification(this, "Tới giờ làm rồi!", title, notificationId, intent);
-
-        startForeground(notificationId, notification);
 
         return START_STICKY;
     }

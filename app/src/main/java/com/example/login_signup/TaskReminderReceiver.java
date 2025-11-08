@@ -25,29 +25,18 @@ public class TaskReminderReceiver extends BroadcastReceiver {
 
     private void handleAlarm(Context context, Intent sourceIntent) {
         boolean isAdvance = sourceIntent.getBooleanExtra("isAdvance", false);
-        String taskId = sourceIntent.getStringExtra("taskId");
 
         if (isAdvance) {
+            String taskId = sourceIntent.getStringExtra("taskId");
             String title = sourceIntent.getStringExtra("title");
             String dueTimeString = sourceIntent.getStringExtra("due_time_string");
             String taskInfo = "Sắp tới: " + title + "\nLúc: " + dueTimeString;
             NotificationHelper.showAdvanceNotification(context, "Công việc sắp tới", taskInfo, taskId.hashCode());
         } else {
-            // FIX: Create a clean Intent for the service.
-            // Blindly copying extras from the AlarmManager's intent can cause a crash due to unparcelable data.
-            Intent serviceIntent = new Intent(context, AlarmService.class);
-            serviceIntent.putExtra("taskId", sourceIntent.getStringExtra("taskId"));
-            serviceIntent.putExtra("title", sourceIntent.getStringExtra("title"));
-            serviceIntent.putExtra("note", sourceIntent.getStringExtra("note"));
-            serviceIntent.putExtra("category", sourceIntent.getStringExtra("category"));
-            serviceIntent.putExtra("ringtone", sourceIntent.getStringExtra("ringtone"));
-            serviceIntent.putExtra("vibration", sourceIntent.getStringExtra("vibration"));
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context.startForegroundService(serviceIntent);
-            } else {
-                context.startService(serviceIntent);
-            }
+            Intent alarmIntent = new Intent(context, AlarmActivity.class);
+            alarmIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            alarmIntent.putExtras(sourceIntent.getExtras());
+            context.startActivity(alarmIntent);
         }
     }
 
@@ -107,16 +96,11 @@ public class TaskReminderReceiver extends BroadcastReceiver {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         if (alarmManager != null) {
             try {
-                if (!isAdvance) {
-                    Intent showTaskIntent = new Intent(context, HomeActivity.class);
-                    PendingIntent showTaskPendingIntent = PendingIntent.getActivity(context, requestCode, showTaskIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-                    AlarmManager.AlarmClockInfo alarmClockInfo = new AlarmManager.AlarmClockInfo(time, showTaskPendingIntent);
-                    alarmManager.setAlarmClock(alarmClockInfo, pendingIntent);
-                } else {
-                    alarmManager.setExact(AlarmManager.RTC_WAKEUP, time, pendingIntent);
-                }
+                Intent showTaskIntent = new Intent(context, HomeActivity.class);
+                PendingIntent showTaskPendingIntent = PendingIntent.getActivity(context, requestCode, showTaskIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+                AlarmManager.AlarmClockInfo alarmClockInfo = new AlarmManager.AlarmClockInfo(time, showTaskPendingIntent);
+                alarmManager.setAlarmClock(alarmClockInfo, pendingIntent);
             } catch (SecurityException se) {
-                // Permission not granted
             }
         }
     }

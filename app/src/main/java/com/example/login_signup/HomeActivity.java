@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.provider.Settings;
 import android.view.View;
 import android.widget.ImageButton;
@@ -40,8 +41,9 @@ public class HomeActivity extends AppCompatActivity {
             loadFragment(new HomeFragment(), navButtons.get(0));
         }
 
-        // CRITICAL FIX: Check and request the special "Alarms & reminders" permission
         checkAndRequestAlarmPermission();
+        checkBatteryOptimizations();
+        checkDrawOverlayPermission();
     }
 
     private void checkAndRequestAlarmPermission() {
@@ -52,14 +54,46 @@ public class HomeActivity extends AppCompatActivity {
                         .setTitle("Permission Required")
                         .setMessage("This app needs permission to set precise alarms to function correctly. Please grant this permission in the settings.")
                         .setPositiveButton("Go to Settings", (dialog, which) -> {
-                            Intent intent = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
-                                    Uri.parse("package:" + getPackageName()));
+                            Intent intent = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, Uri.parse("package:" + getPackageName()));
                             startActivity(intent);
                         })
                         .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
                         .create()
                         .show();
             }
+        }
+    }
+
+    private void checkBatteryOptimizations() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+            if (!pm.isIgnoringBatteryOptimizations(getPackageName())) {
+                 new AlertDialog.Builder(this)
+                        .setTitle("Important: Allow Background Activity")
+                        .setMessage("For alarms to work correctly even when the app is closed, please allow the app to run in the background without restrictions. 'Unrestricted' is the recommended setting.")
+                        .setPositiveButton("Go to Settings", (dialog, which) -> {
+                            Intent intent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+                            intent.setData(Uri.parse("package:" + getPackageName()));
+                            startActivity(intent);
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .show();
+            }
+        }
+    }
+
+    private void checkDrawOverlayPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Crucial Permission Required")
+                    .setMessage("To ensure the alarm screen appears instantly over other apps, please grant the 'Display over other apps' permission.")
+                    .setPositiveButton("Go to Settings", (dialog, which) -> {
+                        Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                                Uri.parse("package:" + getPackageName()));
+                        startActivity(intent);
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
         }
     }
 

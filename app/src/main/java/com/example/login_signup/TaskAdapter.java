@@ -1,5 +1,6 @@
 package com.example.login_signup;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,6 +58,31 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
                 deleteClickListener.onDeleteClick(taskToDelete);
             }
         });
+
+        // FIX: Change the main task icon (img_check) to the category icon.
+        int iconResId;
+        switch (task.getCategory()) {
+            case "Work":
+                iconResId = R.drawable.baseline_work_24;
+                break;
+            case "Personal":
+                iconResId = R.drawable.baseline_person_24;
+                break;
+            case "Health":
+                iconResId = R.drawable.baseline_health_24;
+                break;
+            case "Shopping":
+                iconResId = R.drawable.baseline_shopping_cart_24;
+                break;
+            default:
+                // A default icon if the category doesn't match
+                iconResId = R.drawable.baseline_check_circle_24;
+                break;
+        }
+        holder.imgCheck.setImageResource(iconResId);
+
+        // FIX: Remove the compound drawable from the TextView to ensure only one icon is displayed.
+        holder.tvCategory.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
     }
 
     @Override

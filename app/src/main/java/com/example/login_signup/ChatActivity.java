@@ -169,7 +169,11 @@ public class ChatActivity extends AppCompatActivity {
         switch (currentAiState) {
             case IDLE:                      handleIdleState(textLower); break;
             case AWAITING_TASK_TITLE:       context.put("title", text); askForCategory(); break;
-            case AWAITING_TASK_CATEGORY:    context.put("category", text); askForNote(); break;
+            case AWAITING_TASK_CATEGORY:
+                String normalizedCategory = normalizeCategory(textLower);
+                context.put("category", normalizedCategory);
+                askForNote();
+                break;
             case AWAITING_TASK_NOTE:        context.put("note", text.equalsIgnoreCase("skip") ? "" : text); askForDate(); break;
             case AWAITING_TASK_DATE:        handleDate(textLower); break;
             case AWAITING_TASK_TIME:        handleTime(textLower); break;
@@ -182,20 +186,35 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
+    private String normalizeCategory(String input) {
+        input = input.toLowerCase();
+        if (input.contains("work") || input.contains("công việc") || input.contains("công ty")) {
+            return "Work";
+        } else if (input.contains("personal") || input.contains("cá nhân")) {
+            return "Personal";
+        } else if (input.contains("health") || input.contains("sức khỏe") || input.contains("y tế")) {
+            return "Health";
+        } else if (input.contains("shop") || input.contains("mua sắm")) {
+            return "Shopping";
+        }
+        return "Personal"; // Default
+    }
+
+    // FIX: Updated handleIdleState to recognize keywords without "task"
     private void handleIdleState(String text) {
-        if (text.matches(".*(add|create|new|make).*task.*")) {
+        if (text.matches(".*\\b(add|create|new|make)\\b.*")) {
             currentAiState = AiState.AWAITING_TASK_TITLE;
             sendAiMessage("Great! What is the title of the new task?");
-        } else if (text.matches(".*(delete|remove|get rid of).*task.*")) {
+        } else if (text.matches(".*\\b(delete|remove|get rid of)\\b.*")) {
             currentAiState = AiState.AWAITING_DELETE_SELECTION;
             sendAiMessage("I can do that. What is the title of the task you want to delete?");
-        } else if (text.matches(".*(edit|change|update).*task.*")) {
+        } else if (text.matches(".*\\b(edit|change|update)\\b.*.*")) {
             currentAiState = AiState.AWAITING_EDIT_SELECTION;
             sendAiMessage("Sure. What is the title of the task you want to edit?");
-        } else if (text.matches(".*(complete|finish|done).*task.*")) {
+        } else if (text.matches(".*\\b(complete|finish|done)\\b.*.*")) {
             currentAiState = AiState.AWAITING_COMPLETE_SELECTION;
             sendAiMessage("Excellent! What is the title of the task you completed?");
-        } else if (text.matches(".*(show|list|view|what are my).*task.*")) {
+        } else if (text.matches(".*\\b(show|list|view|what are|tasks)\\b.*.*")) {
             showTasksFromFirestore();
         } else {
             sendAiMessage("Sorry, I don't understand that yet. I can help you add, show, edit, delete or complete tasks.");

@@ -6,4 +6,17 @@
     </style>
 
     <style name="Theme.Login_Signup" parent="Base.Theme.Login_Signup" />
+
+    <!-- FIX: Removed invalid MaterialComponent styles. -->
+    <!-- These legacy styles are valid and will customize the CalendarView. -->
+    <style name="CalenderViewDateCustom" parent="android:TextAppearance.DeviceDefault.Small">
+        <item name="android:textColor">@color/oxford_blue</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="CalenderViewWeekCustom" parent="android:TextAppearance.DeviceDefault.Small">
+        <item name="android:textColor">#A0AEC0</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
 </resources>

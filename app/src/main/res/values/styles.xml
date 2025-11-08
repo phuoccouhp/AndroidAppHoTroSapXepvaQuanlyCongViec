@@ -22,11 +22,4 @@
     <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
     </style>
 
-    <style name="MyCalendarTheme" parent="Theme.MaterialComponents.Light">
-        <item name="colorPrimary">@color/pastel_blue_light</item>
-        <item name="colorAccent">@color/pastel_blue_light</item>
-    </style>
-
-
-
 </resources>

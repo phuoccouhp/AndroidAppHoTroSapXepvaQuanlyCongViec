@@ -8,7 +8,6 @@
     android:background="@drawable/background"
     tools:context=".HomeActivity">
 
-    <!-- Khung chứa fragment -->
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_container"
         android:layout_width="0dp"
@@ -18,7 +17,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Thanh navigation -->
     <androidx.cardview.widget.CardView
         android:id="@+id/bottom_nav_card"
         android:layout_width="wrap_content"
@@ -44,7 +42,7 @@
                 android:layout_height="wrap_content"
                 android:src="@drawable/sharp_home_24"
                 android:background="@drawable/custom_ripple"
-                app:tint="@color/navy_blue"
+                app:tint="@color/nav_icon_tint_selector" 
                 android:padding="8dp"
                 android:contentDescription="Home" />
 
@@ -54,7 +52,7 @@
                 android:layout_height="wrap_content"
                 android:src="@drawable/outline_calendar_month_24"
                 android:background="@drawable/custom_ripple"
-                app:tint="@color/navy_blue"
+                app:tint="@color/nav_icon_tint_selector"
                 android:padding="8dp"
                 android:layout_marginStart="36dp"
                 android:contentDescription="Calendar" />
@@ -65,7 +63,7 @@
                 android:layout_height="wrap_content"
                 android:src="@drawable/outline_edit_document_24"
                 android:background="@drawable/custom_ripple"
-                app:tint="@color/navy_blue"
+                app:tint="@color/nav_icon_tint_selector"
                 android:padding="8dp"
                 android:layout_marginStart="36dp"
                 android:contentDescription="Documents" />
@@ -76,7 +74,7 @@
                 android:layout_height="wrap_content"
                 android:src="@drawable/baseline_manage_accounts_24"
                 android:background="@drawable/custom_ripple"
-                app:tint="@color/navy_blue"
+                app:tint="@color/nav_icon_tint_selector"
                 android:padding="8dp"
                 android:layout_marginStart="36dp"
                 android:contentDescription="Settings" />

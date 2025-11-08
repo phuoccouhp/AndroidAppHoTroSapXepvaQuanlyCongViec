@@ -21,6 +21,12 @@ public class HomeFragment extends Fragment {
             startActivity(intent);
         });
 
+        FloatingActionButton fabAiChat = view.findViewById(R.id.fab_ai_chat);
+        fabAiChat.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), ChatHistoryActivity.class);
+            startActivity(intent);
+        });
+
         return view;
     }
 

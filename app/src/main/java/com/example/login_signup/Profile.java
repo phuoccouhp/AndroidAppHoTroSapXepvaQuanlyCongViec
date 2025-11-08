@@ -8,7 +8,6 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -20,11 +19,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 public class Profile extends AppCompatActivity {
 
 
-    private TextView tvName, tvEmail, tvChangePassword;
+    private TextView tvName, tvEmail, tvChangePass;
     private Button btnLogout;
     private BottomNavigationView bottomNav;
-
-
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
 
@@ -33,24 +30,18 @@ public class Profile extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
-
-        tvName = findViewById(R.id.tv_name);
-        tvEmail = findViewById(R.id.tv_email);
-        tvChangePassword = findViewById(R.id.tv_change_password);
-        btnLogout = findViewById(R.id.btn_logout);
-        bottomNav = findViewById(R.id.bottom_nav);
-
+        tvName = findViewById(R.id.tvName);
+        tvEmail = findViewById(R.id.tvEmail);
+        tvChangePass = findViewById(R.id.tvChangePass);
+        btnLogout = findViewById(R.id.btnLogout);
+        bottomNav = findViewById(R.id.bottomNav);
 
         loadUserProfile();
-
-
         setupClickListeners();
         setupBottomNavigation();
-
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             v.setPadding(insets.getSystemWindowInsets().left, insets.getSystemWindowInsets().top,
@@ -58,7 +49,6 @@ public class Profile extends AppCompatActivity {
             return insets;
         });
     }
-
 
     private void loadUserProfile() {
         FirebaseUser currentUser = mAuth.getCurrentUser();
@@ -70,8 +60,6 @@ public class Profile extends AppCompatActivity {
                     tvName.setText(documentSnapshot.getString("name"));
                     tvEmail.setText(documentSnapshot.getString("email"));
 
-
-
                 } else {
                     Toast.makeText(Profile.this, "Không tìm thấy thông tin người dùng.", Toast.LENGTH_SHORT).show();
                 }
@@ -81,7 +69,6 @@ public class Profile extends AppCompatActivity {
         }
     }
 
-
     private void setupClickListeners() {
         btnLogout.setOnClickListener(v -> {
             mAuth.signOut();
@@ -89,12 +76,14 @@ public class Profile extends AppCompatActivity {
             goToLoginActivity();
         });
 
-        tvChangePassword.setOnClickListener(v -> {
-            Intent intent = new Intent(Profile.this, Change_password.class);
-            startActivity(intent);
+        tvChangePass.setOnClickListener(v -> {
+            if (com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser() == null) {
+                startActivity(new Intent(this, Login.class));
+                return;
+            }
+            startActivity(new Intent(this, ChangePassword.class));
         });
     }
-
 
     private void setupBottomNavigation() {
         bottomNav.setSelectedItemId(R.id.nav_settings);
@@ -118,7 +107,6 @@ public class Profile extends AppCompatActivity {
             return false;
         });
     }
-
 
     private void goToLoginActivity() {
         Intent intent = new Intent(Profile.this, Login.class);

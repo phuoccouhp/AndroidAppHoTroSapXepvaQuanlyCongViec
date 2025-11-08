@@ -12,7 +12,29 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="24dp"
-        android:paddingBottom="100dp"> <!-- Added padding to prevent overlap -->
+        android:paddingBottom="100dp"> 
+
+        <ImageButton
+            android:id="@+id/btn_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/outline_arrow_back_24"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Back"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_add_task_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="New Task"
+            android:textSize="32sp"
+            android:fontFamily="@font/smoochsans_bold"
+            android:textColor="@color/oxford_blue"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btn_back" 
+            android:layout_marginTop="16dp"/>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_save_task"
@@ -24,17 +46,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:contentDescription="Save Task" />
-
-        <TextView
-            android:id="@+id/tv_add_task_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="New Task"
-            android:textSize="32sp"
-            android:fontFamily="@font/smoochsans_bold"
-            android:textColor="@color/oxford_blue"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/et_task_name"

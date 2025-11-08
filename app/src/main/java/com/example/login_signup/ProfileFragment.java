@@ -81,7 +81,8 @@ public class ProfileFragment extends Fragment implements AvatarPickerDialogFragm
 
             docRef.get().addOnSuccessListener(documentSnapshot -> {
                 if (documentSnapshot.exists()) {
-                    String name = documentSnapshot.getString("fullName");
+                    // FIX: Changed "fullName" to "name" to match the key used during registration.
+                    String name = documentSnapshot.getString("name");
                     String avatarId = documentSnapshot.getString("avatarId");
 
                     tvName.setText(name != null ? name : "Name not set");

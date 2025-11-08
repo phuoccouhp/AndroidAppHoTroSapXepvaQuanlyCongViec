@@ -3,6 +3,7 @@ package com.example.login_signup;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ImageButton; // Import ImageButton
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -27,6 +28,7 @@ public class ChatHistoryActivity extends AppCompatActivity {
     private RecyclerView recyclerViewChatHistory;
     private ChatHistoryAdapter adapter;
     private List<ChatSession> sessionList = new ArrayList<>();
+    private ImageButton btnBack; // Added back button
 
     private FirebaseFirestore db;
     private FirebaseAuth auth;
@@ -45,7 +47,9 @@ public class ChatHistoryActivity extends AppCompatActivity {
         adapter = new ChatHistoryAdapter(sessionList);
         recyclerViewChatHistory.setAdapter(adapter);
 
-        
+        btnBack = findViewById(R.id.btn_back); // Initialize back button
+        btnBack.setOnClickListener(v -> finish()); // Set listener
+
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerViewChatHistory.getContext(), layoutManager.getOrientation());
         dividerItemDecoration.setDrawable(ContextCompat.getDrawable(this, R.drawable.list_divider));
         recyclerViewChatHistory.addItemDecoration(dividerItemDecoration);
@@ -101,13 +105,11 @@ public class ChatHistoryActivity extends AppCompatActivity {
                     db.collection("chat_sessions")
                             .add(newSession)
                             .addOnSuccessListener(documentReference -> {
-                                
                                 newSession.setId(documentReference.getId());
                                 newSession.setLastUpdated(new Date()); 
                                 sessionList.add(0, newSession); 
                                 adapter.notifyItemInserted(0);
                                 recyclerViewChatHistory.scrollToPosition(0);
-                                
                                 
                                 Intent intent = new Intent(ChatHistoryActivity.this, ChatActivity.class);
                                 intent.putExtra("CHAT_SESSION_ID", documentReference.getId());

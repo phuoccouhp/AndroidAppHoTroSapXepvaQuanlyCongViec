@@ -8,7 +8,6 @@
     android:background="#F4F7FF"
     tools:context=".DocumentsFragment">
 
-    <!-- Nút menu -->
     <ImageButton
         android:id="@+id/btn_menu"
         android:layout_width="48dp"
@@ -20,7 +19,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Tiêu đề -->
     <TextView
         android:id="@+id/tv_welcome_back"
         android:layout_width="wrap_content"
@@ -34,7 +32,6 @@
         app:layout_constraintStart_toEndOf="@id/btn_menu"
         app:layout_constraintEnd_toStartOf="@id/btn_profile" />
 
-    <!-- Nút profile -->
     <ImageButton
         android:id="@+id/btn_profile"
         android:layout_width="48dp"
@@ -45,7 +42,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/btn_menu" />
 
-    <!-- Nội dung cuộn -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -62,7 +58,6 @@
             android:orientation="vertical"
             android:paddingHorizontal="16dp">
 
-            <!-- Thẻ chào -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="100dp"
@@ -96,7 +91,6 @@ time here"
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Categories -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -106,7 +100,6 @@ time here"
                 android:textColor="@color/oxford_blue"
                 android:layout_marginTop="24dp"/>
 
-            <!-- Dòng icon category -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -114,7 +107,6 @@ time here"
                 android:layout_marginTop="8dp"
                 android:baselineAligned="false">
 
-                <!-- All -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -136,7 +128,6 @@ time here"
                         android:maxLines="1"/>
                 </LinearLayout>
 
-                <!-- Work -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -158,7 +149,6 @@ time here"
                         android:maxLines="1"/>
                 </LinearLayout>
 
-                <!-- Personal -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -180,7 +170,6 @@ time here"
                         android:maxLines="1"/>
                 </LinearLayout>
 
-                <!-- Health -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -202,7 +191,6 @@ time here"
                         android:maxLines="1"/>
                 </LinearLayout>
 
-                <!-- Shopping -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -227,7 +215,6 @@ time here"
             </LinearLayout>
 
 
-            <!-- Your Task for Today -->
             <TextView
                 android:id="@+id/tv_task_today"
                 android:layout_width="wrap_content"
@@ -254,7 +241,6 @@ time here"
                     tools:listitem="@layout/item_task" />
             </androidx.cardview.widget.CardView>
 
-            <!-- Your Task for Future -->
             <TextView
                 android:id="@+id/tv_task_future"
                 android:layout_width="wrap_content"

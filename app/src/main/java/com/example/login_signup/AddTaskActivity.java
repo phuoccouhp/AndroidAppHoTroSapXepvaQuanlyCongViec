@@ -27,6 +27,7 @@ public class AddTaskActivity extends AppCompatActivity {
     private Spinner spinnerCategories, spinnerVibration;
     private Button btnSetDueDate, btnSetTime, btnSetReminder, btnSelectRingtone;
     private FloatingActionButton fabSaveTask;
+    private ImageButton btnBack;
 
     private Calendar dueDateTime = Calendar.getInstance();
     private boolean reminderOn = false;
@@ -74,6 +75,7 @@ public class AddTaskActivity extends AppCompatActivity {
         btnSetReminder = findViewById(R.id.btn_set_reminder);
         btnSelectRingtone = findViewById(R.id.btn_select_ringtone);
         fabSaveTask = findViewById(R.id.fab_save_task);
+        btnBack = findViewById(R.id.btn_back);
     }
 
     private void setupSpinners() {
@@ -89,6 +91,8 @@ public class AddTaskActivity extends AppCompatActivity {
     }
 
     private void setupListeners() {
+        btnBack.setOnClickListener(v -> finish());
+
         btnSetDueDate.setOnClickListener(v -> {
             Calendar c = Calendar.getInstance();
             new DatePickerDialog(this, (view, year, month, day) -> {
@@ -143,7 +147,7 @@ public class AddTaskActivity extends AppCompatActivity {
             return;
         }
 
-        
+        // Đảm bảo thời gian due date là ở tương lai
         if (dueDateTime.getTimeInMillis() <= System.currentTimeMillis()) {
             Toast.makeText(this, "Please select a due date in the future", Toast.LENGTH_SHORT).show();
             return;
@@ -169,7 +173,7 @@ public class AddTaskActivity extends AppCompatActivity {
                 .addOnSuccessListener(documentReference -> {
                     Toast.makeText(this, "Task saved", Toast.LENGTH_SHORT).show();
                     if (reminderOn) {
-                        
+                        // Create a temporary Task object to pass to the scheduling method
                         Task taskToSchedule = new Task();
                         taskToSchedule.setId(documentReference.getId());
                         taskToSchedule.setTitle(name);
@@ -186,55 +190,61 @@ public class AddTaskActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> Toast.makeText(this, "Error saving task", Toast.LENGTH_SHORT).show());
     }
 
-    
+    /**
+     * =================================================================
+     * HÀM NÀY CHỨA LOGIC MÀ BẠN YÊU CẦU
+     * =================================================================
+     */
     private void scheduleAlarmsForTask(Context context, Task task) {
         long dueTime = task.getTaskDate().getTime();
         long currentTime = System.currentTimeMillis();
         long twentyFourHoursInMillis = 24 * 60 * 60 * 1000;
 
-        
-        
+        // 1. Luôn lên lịch cho thông báo CHÍNH (vào đúng giờ)
+        // (Đây là thông báo kiểu báo thức, toàn màn hình)
         if (dueTime > currentTime) {
-            scheduleNotification(context, task, dueTime, false); 
+            scheduleNotification(context, task, dueTime, false); // isAdvance = false
         }
 
-        
+        // 2. Xử lý logic cho thông báo "BÁO TRƯỚC" (advance)
         long timeDifference = dueTime - currentTime;
 
-        
+        // Định dạng thời gian để hiển thị trên thông báo
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm 'ngày' dd/MM", Locale.getDefault());
         String taskInfo = task.getTitle() + "\n" +
                 "Vào lúc: " + sdf.format(task.getTaskDate());
 
-        
+        // Tạo một ID riêng cho thông báo advance (khác với thông báo chính)
         int advanceNotificationId = task.getId().hashCode() + 1;
 
         if (timeDifference > 0 && timeDifference < twentyFourHoursInMillis) {
-            
-            
+            // --- KỊCH BẢN 1: Task diễn ra TRONG VÒNG 24 GIỜ TỚI ---
+            // Hiển thị một thông báo advance (loại thường) NGAY LẬP TỨC
 
             NotificationHelper.showAdvanceNotification(
                     context,
-                    "Công việc sắp tới!", 
-                    taskInfo,              
+                    "Công việc sắp tới!", // taskTitle
+                    taskInfo,              // taskInfo
                     advanceNotificationId
             );
 
         } else if (timeDifference >= twentyFourHoursInMillis) {
-            
-            
+            // --- KỊCH BẢN 2: Task diễn ra SAU HƠN 24 GIỜ ---
+            // Lên lịch một thông báo advance (loại thường) để bắn vào lúc T-24 giờ
             long advanceTime = dueTime - twentyFourHoursInMillis;
-            scheduleNotification(context, task, advanceTime, true); 
+            scheduleNotification(context, task, advanceTime, true); // isAdvance = true
         }
-        
+        // Nếu timeDifference <= 0 (task ở quá khứ), không làm gì cả.
     }
 
 
-    
+    /**
+     * Hàm này gửi Intent đến TaskReminderReceiver để lên lịch
+     */
     private void scheduleNotification(Context context, Task task, long time, boolean isAdvance) {
         String taskId = isAdvance ? task.getId() + "_advance" : task.getId();
 
-        Intent intent = new Intent(context, TaskReminderReceiver.class); 
+        Intent intent = new Intent(context, TaskReminderReceiver.class); // USE THE CORRECT RECEIVER
         intent.putExtra("taskId", taskId);
         intent.putExtra("title", task.getTitle());
         intent.putExtra("note", task.getNote());

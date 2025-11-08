@@ -8,7 +8,6 @@
     android:background="@drawable/background"
     tools:context=".HomeActivity">
 
-    <!-- Khung chứa fragment -->
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_container"
         android:layout_width="0dp"
@@ -18,7 +17,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Thanh navigation -->
     <androidx.cardview.widget.CardView
         android:id="@+id/bottom_nav_card"
         android:layout_width="wrap_content"

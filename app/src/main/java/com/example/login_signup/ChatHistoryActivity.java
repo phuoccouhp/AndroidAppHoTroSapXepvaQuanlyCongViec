@@ -28,7 +28,7 @@ public class ChatHistoryActivity extends AppCompatActivity {
     private RecyclerView recyclerViewChatHistory;
     private ChatHistoryAdapter adapter;
     private List<ChatSession> sessionList = new ArrayList<>();
-    private ImageButton btnBack; // Added back button
+    private ImageButton btnBack;
 
     private FirebaseFirestore db;
     private FirebaseAuth auth;
@@ -47,8 +47,8 @@ public class ChatHistoryActivity extends AppCompatActivity {
         adapter = new ChatHistoryAdapter(sessionList);
         recyclerViewChatHistory.setAdapter(adapter);
 
-        btnBack = findViewById(R.id.btn_back); // Initialize back button
-        btnBack.setOnClickListener(v -> finish()); // Set listener
+        btnBack = findViewById(R.id.btn_back);
+        btnBack.setOnClickListener(v -> finish());
 
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerViewChatHistory.getContext(), layoutManager.getOrientation());
         dividerItemDecoration.setDrawable(ContextCompat.getDrawable(this, R.drawable.list_divider));

@@ -66,10 +66,8 @@ public class TaskReminderReceiver extends BroadcastReceiver {
         String vibration = task.getVibration();
         String ringtone = task.getRingtone();
 
-        // Reschedule the main due-time alarm
         scheduleNotification(context, taskId, title, note, category, dueTime, false, vibration, ringtone);
 
-        // Reschedule the advance notification
         long twentyFourHoursInMillis = 24 * 60 * 60 * 1000;
         long advanceTime = dueTime - twentyFourHoursInMillis;
         if (advanceTime > System.currentTimeMillis()) {

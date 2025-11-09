@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.EditText;
 import android.widget.Toast;
-import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -35,7 +34,7 @@ public class NewPassword extends AppCompatActivity {
         String p2 = val(etConfirm);
 
         if (TextUtils.isEmpty(p1)) { etNewPass.setError("Nhập mật khẩu mới"); etNewPass.requestFocus(); return; }
-        if (p1.length() < 6)        { etNewPass.setError("Mật khẩu ≥ 6 ký tự"); etNewPass.requestFocus(); return; }
+        if (p1.length() < 6) { etNewPass.setError("Mật khẩu ≥ 6 ký tự"); etNewPass.requestFocus(); return; }
         if (!TextUtils.equals(p1, p2)) { etConfirm.setError("Không khớp"); etConfirm.requestFocus(); return; }
 
         FirebaseUser user = mAuth.getCurrentUser();
@@ -51,11 +50,11 @@ public class NewPassword extends AppCompatActivity {
                     Toast.makeText(this, "Đổi mật khẩu thành công!",
                             Toast.LENGTH_SHORT).show();
 
-                    Intent intent = new Intent(NewPassword.this, Login.class);
+                    Intent intent = new Intent(NewPassword.this, LoginActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                     finish();
-                    
+
                 })
                 .addOnFailureListener(e ->
                         Toast.makeText(this, "Đổi mật khẩu thất bại: " + e.getMessage(),

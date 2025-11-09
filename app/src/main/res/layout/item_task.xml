@@ -18,11 +18,11 @@
         android:gravity="center_vertical">
 
         <ImageView
-            android:id="@+id/img_check"
+            android:id="@+id/imgCategory"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:src="@drawable/baseline_radio_button_unchecked_24"
-            android:tint="@color/pastel_blue_dark" />
+            app:tint="@color/pastel_blue_dark" />
 
         <LinearLayout
             android:orientation="vertical"
@@ -65,8 +65,8 @@
             android:layout_height="32dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/baseline_delete_24"
-            android:tint="@color/black"
-            android:contentDescription="Xóa công việc" />
+            android:contentDescription="Xóa công việc"
+            app:tint="@color/black" />
 
     </LinearLayout>
 </androidx.cardview.widget.CardView>

@@ -20,9 +20,9 @@ public class AvatarPickerDialogFragment extends DialogFragment {
     }
 
     private AvatarPickerListener listener;
-    
+
     private static final String[] AVATAR_IDS = {
-        "anh1", "anh2", "anh3", "anh4", "anh5"
+            "anh1", "anh2", "anh3", "anh4", "anh5", "anh6"
     };
 
     @NonNull
@@ -32,7 +32,7 @@ public class AvatarPickerDialogFragment extends DialogFragment {
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.dialog_avatar_picker, null);
 
-        GridView gridView = view.findViewById(R.id.gv_avatars);
+        GridView gridView = view.findViewById(R.id.gvAvatars);
         gridView.setAdapter(new AvatarAdapter(getContext()));
 
         gridView.setOnItemClickListener((parent, view1, position, id) -> {

@@ -8,9 +8,7 @@ public class ChatMessage {
     private String userId;
     private Date timestamp;
 
-    public ChatMessage() {
-        
-    }
+    public ChatMessage() {}
 
     public ChatMessage(String message, String userId) {
         this.message = message;

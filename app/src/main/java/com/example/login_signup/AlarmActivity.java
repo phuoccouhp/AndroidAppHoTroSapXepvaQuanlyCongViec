@@ -20,31 +20,31 @@ public class AlarmActivity extends AppCompatActivity {
         } else {
             getWindow().addFlags(
                     WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
-                    WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
-                    WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                            WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
+                            WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
             );
         }
 
         setContentView(R.layout.activity_alarm);
 
-        TextView tvTaskTitle = findViewById(R.id.tv_alarm_task_title);
-        TextView tvTaskCategory = findViewById(R.id.tv_alarm_task_category);
-        TextView tvTaskNote = findViewById(R.id.tv_alarm_task_note);
-        Button btnStopAlarm = findViewById(R.id.btn_stop_alarm);
+        TextView tvAlarm = findViewById(R.id.tvAlarm);
+        TextView tvCategory = findViewById(R.id.tvCategory);
+        TextView tvTaskNote = findViewById(R.id.tvTaskNote);
+        Button btnDismiss = findViewById(R.id.btnDismiss);
 
         String taskTitle = getIntent().getStringExtra("title");
         String taskCategory = getIntent().getStringExtra("category");
         String taskNote = getIntent().getStringExtra("note");
 
-        tvTaskTitle.setText(taskTitle);
-        tvTaskCategory.setText(taskCategory != null ? "Category: " + taskCategory : "");
+        tvAlarm.setText(taskTitle);
+        tvCategory.setText(taskCategory != null ? "Category: " + taskCategory : "");
         tvTaskNote.setText(taskNote != null ? "Note: " + taskNote : "");
 
         Intent serviceIntent = new Intent(this, AlarmService.class);
         serviceIntent.putExtras(getIntent().getExtras());
         startService(serviceIntent);
 
-        btnStopAlarm.setOnClickListener(v -> {
+        btnDismiss.setOnClickListener(v -> {
             stopService(new Intent(this, AlarmService.class));
             finishAndRemoveTask();
         });

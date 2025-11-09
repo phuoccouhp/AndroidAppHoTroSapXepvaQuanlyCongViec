@@ -6,9 +6,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/background"
-    tools:context=".Login">
+    tools:context=".LoginActivity">
 
     <ScrollView
+        android:id="@+id/scroll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -22,28 +23,29 @@
             android:paddingBottom="50dp">
 
             <TextView
-            android:id="@+id/lb_sign_up"
-            android:layout_width="300dp"
-            android:layout_height="70dp"
-            android:layout_margin="40dp"
-            android:fontFamily="@font/bebasneue_regular"
-            android:shadowColor="#80000000"
-            android:shadowDx="4"
-            android:shadowDy="4"
-            android:shadowRadius="6"
-            android:text="LOGIN"
-            android:textAlignment="center"
-            android:textColor="@color/pastel_deep_blue_violet"
-            android:textSize="60sp"
-            android:textStyle="bold"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+                android:id="@+id/tvLogin"
+                android:layout_width="300dp"
+                android:layout_height="70dp"
+                android:layout_margin="40dp"
+                android:fontFamily="@font/bebasneue_regular"
+                android:shadowColor="#80000000"
+                android:shadowDx="4"
+                android:shadowDy="4"
+                android:shadowRadius="6"
+                android:text="LOGIN"
+                android:textAlignment="center"
+                android:textColor="@color/pastel_deep_blue_violet"
+                android:textSize="60sp"
+                android:textStyle="bold"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/lb_welcome"
+                android:id="@+id/tvWelcome"
                 android:layout_width="250dp"
                 android:layout_height="30dp"
+                android:layout_margin="10dp"
                 android:fontFamily="@font/smoochsans_medium"
                 android:text="Welcome back"
                 android:textAlignment="center"
@@ -51,109 +53,118 @@
                 android:textSize="25sp"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/lb_sign_up" />
+                app:layout_constraintTop_toBottomOf="@id/tvLogin" />
 
             <ImageView
-                android:id="@+id/image_login"
+                android:id="@+id/imgLogin"
                 android:layout_width="200dp"
                 android:layout_height="200dp"
-                android:layout_margin="10dp"
+                android:layout_margin="15dp"
+                android:scaleType="fitCenter"
                 android:background="@drawable/image_login"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/lb_welcome" />
+                app:layout_constraintTop_toBottomOf="@id/tvWelcome" />
 
-            <TextView
-                android:id="@+id/lb_email"
-                android:layout_width="wrap_content"
+            <ImageView
+                android:id="@+id/imgEmail"
+                android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_marginStart="50dp"
+                android:src="@drawable/baseline_email_24"
+                app:layout_constraintBottom_toBottomOf="@+id/tvEmail"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/tvEmail" />
+
+            <TextView
+                android:id="@+id/tvEmail"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_marginStart="10dp"
                 android:layout_marginTop="30dp"
                 android:fontFamily="@font/smoochsans_bold"
                 android:text="Email"
                 android:textColor="@color/dark_blue"
                 android:textSize="25sp"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/image_login" />
-
-            <ImageView
-                android:id="@+id/image_email"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_marginEnd="8dp"
-                android:src="@drawable/baseline_email_24"
-                app:layout_constraintBottom_toBottomOf="@+id/lb_email"
-                app:layout_constraintRight_toLeftOf="@+id/lb_email"
-                app:layout_constraintTop_toTopOf="@+id/lb_email" />
+                app:layout_constraintLeft_toRightOf="@+id/imgEmail"
+                app:layout_constraintTop_toBottomOf="@id/imgLogin" />
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/text_email_layout"
-                android:layout_width="350dp"
-                android:layout_height="50dp"
-                android:layout_margin="10dp"
+                android:id="@+id/layoutEmail"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="50dp"
+                android:layout_marginEnd="50dp"
                 app:boxBackgroundMode="none"
                 app:hintEnabled="false"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/lb_email">
+                app:layout_constraintTop_toBottomOf="@id/tvEmail"
+                app:endIconMode="clear_text">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/text_email"
+                    android:id="@+id/etEmail"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:background="@drawable/edit_text"
                     android:inputType="textEmailAddress"
-                    android:padding="5dp" />
+                    android:paddingVertical="12dp"
+                    android:textColor="@android:color/black" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <TextView
-                android:id="@+id/lb_password"
-                android:layout_width="wrap_content"
+            <ImageView
+                android:id="@+id/imgOldPass"
+                android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_marginStart="50dp"
+                android:src="@drawable/outline_edit_square_24"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/tvPassword"
+                app:layout_constraintBottom_toBottomOf="@+id/tvPassword" />
+
+            <TextView
+                android:id="@+id/tvPassword"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_marginStart="10dp"
                 android:layout_marginTop="10dp"
                 android:fontFamily="@font/smoochsans_bold"
                 android:text="Password"
                 android:textColor="@color/dark_blue"
                 android:textSize="25sp"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/text_email_layout" />
-
-            <ImageView
-                android:id="@+id/image_password"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_marginEnd="8dp"
-                android:src="@drawable/outline_edit_square_24"
-                app:layout_constraintRight_toLeftOf="@+id/lb_password"
-                app:layout_constraintTop_toTopOf="@+id/lb_password" />
+                app:layout_constraintLeft_toRightOf="@+id/imgOldPass"
+                app:layout_constraintTop_toBottomOf="@id/layoutEmail" />
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/text_password"
-                android:layout_width="350dp"
-                android:layout_height="50dp"
-                android:layout_margin="10dp"
+                android:id="@+id/layoutOldPass"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="50dp"
+                android:layout_marginEnd="50dp"
                 app:boxBackgroundMode="none"
                 app:hintEnabled="false"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/lb_password"
+                app:layout_constraintTop_toBottomOf="@id/tvPassword"
                 app:passwordToggleEnabled="true">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/password_edit_text"
+                    android:id="@+id/etOldPass"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:background="@drawable/edit_text"
                     android:inputType="textPassword"
-                    android:padding="5dp" />
+                    android:paddingVertical="12dp"
+                    android:textColor="@android:color/black" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btn_login"
+                android:id="@+id/btnLogin"
                 android:layout_width="250dp"
                 android:layout_height="60dp"
-                android:layout_margin="40dp"
+                android:layout_margin="20dp"
                 android:background="@drawable/btn_background"
                 android:fontFamily="@font/smoochsans_semibold"
                 android:text="Login"
@@ -161,13 +172,13 @@
                 android:textSize="30sp"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/text_password" />
+                app:layout_constraintTop_toBottomOf="@id/layoutOldPass" />
 
             <TextView
-                android:id="@+id/lb_forget_pass"
+                android:id="@+id/tvForgetPass"
                 android:layout_width="250dp"
                 android:layout_height="30dp"
-                android:layout_margin="10dp"
+                android:layout_margin="20dp"
                 android:clickable="true"
                 android:focusable="true"
                 android:fontFamily="@font/smoochsans_semibold"
@@ -176,10 +187,10 @@
                 android:textSize="20sp"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/btn_login" />
+                app:layout_constraintTop_toBottomOf="@id/btnLogin" />
 
             <LinearLayout
-                android:id="@+id/layout_login"
+                android:id="@+id/layoutSignUp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="30dp"
@@ -187,18 +198,18 @@
                 android:orientation="horizontal"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/lb_forget_pass">
+                app:layout_constraintTop_toBottomOf="@id/tvForgetPass">
 
                 <TextView
-                    android:id="@+id/text_already"
+                    android:id="@+id/tvNoAccount"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily= "@font/smoochsans_medium"
+                    android:layout_height="match_parent"
+                    android:fontFamily="@font/smoochsans_medium"
                     android:text="DON'T HAVE AN ACCOUNT? "
                     android:textSize="19sp" />
 
                 <TextView
-                    android:id="@+id/text_signup"
+                    android:id="@+id/tvSignUp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:clickable="true"
@@ -210,7 +221,7 @@
             </LinearLayout>
 
             <TextView
-                android:id="@+id/text_or"
+                android:id="@+id/tvOr"
                 android:layout_width="50dp"
                 android:layout_height="30dp"
                 android:layout_margin="5dp"
@@ -220,10 +231,10 @@
                 android:textSize="20sp"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/layout_login" />
+                app:layout_constraintTop_toBottomOf="@id/layoutSignUp" />
 
             <TextView
-                android:id="@+id/text_continue"
+                android:id="@+id/tvContinue"
                 android:layout_width="wrap_content"
                 android:layout_height="30dp"
                 android:fontFamily="@font/smoochsans_medium"
@@ -232,17 +243,18 @@
                 android:textSize="19sp"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/text_or" />
+                app:layout_constraintTop_toBottomOf="@id/tvOr" />
 
             <ImageButton
-                android:id="@+id/image_gg"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:id="@+id/btnGoogle"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/gg"
+                android:scaleType="fitCenter"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/text_continue" />
+                app:layout_constraintTop_toBottomOf="@id/tvContinue" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

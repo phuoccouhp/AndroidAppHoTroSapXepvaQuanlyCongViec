@@ -1,10 +1,13 @@
 package com.example.login_signup;
 
+import android.Manifest;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -17,6 +20,7 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -29,26 +33,31 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
-public class Login extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity {
 
-    // Khai báo các thành phần UI
-    private EditText emailEditText;
-    private EditText passwordEditText;
-    private Button loginButton;
-    private TextView forgotPasswordTextView;
-    private TextView signUpTextView;
-    private ImageButton googleSignInButton;
+    private EditText etEmail;
+    private EditText etOldPass;
+    private Button btnLogin;
+    private TextView tvForgetPass;
+    private TextView tvSignUp;
+    private ImageButton btnGoogle;
 
     private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
     private ActivityResultLauncher<Intent> googleSignInLauncher;
+
+    private final ActivityResultLauncher<String> requestPermissionLauncher = registerForActivityResult(
+            new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (!isGranted) {
+                    Toast.makeText(this, "Notification permission is required for reminders.", Toast.LENGTH_LONG).show();
+                }
+            });
 
     @Override
     protected void onStart() {
         super.onStart();
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
-            // Nếu có người dùng đã đăng nhập, chuyển thẳng vào HomeActivity
             Toast.makeText(this, "Đã tự động đăng nhập!", Toast.LENGTH_SHORT).show();
             navigateToHomeActivity();
         }
@@ -61,12 +70,12 @@ public class Login extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
 
-        emailEditText = findViewById(R.id.text_email);
-        passwordEditText = findViewById(R.id.password_edit_text);
-        loginButton = findViewById(R.id.btn_login);
-        forgotPasswordTextView = findViewById(R.id.lb_forget_pass);
-        signUpTextView = findViewById(R.id.text_signup);
-        googleSignInButton = findViewById(R.id.image_gg);
+        etEmail = findViewById(R.id.etEmail);
+        etOldPass = findViewById(R.id.etOldPass);
+        btnLogin = findViewById(R.id.btnLogin);
+        tvForgetPass = findViewById(R.id.tvForgetPass);
+        tvSignUp = findViewById(R.id.tvSignUp);
+        btnGoogle = findViewById(R.id.btnGoogle);
 
         createGoogleSignInRequest();
         googleSignInLauncher = registerForActivityResult(
@@ -83,16 +92,16 @@ public class Login extends AppCompatActivity {
                     }
                 });
 
-        loginButton.setOnClickListener(v -> handleLogin());
-        forgotPasswordTextView.setOnClickListener(v -> {
-            Intent intent = new Intent(Login.this, ForgetPassword.class);
+        btnLogin.setOnClickListener(v -> handleLogin());
+        tvForgetPass.setOnClickListener(v -> {
+            Intent intent = new Intent(LoginActivity.this, ForgetPasswordActivity.class);
             startActivity(intent);
         });
-        signUpTextView.setOnClickListener(v -> {
-            Intent intent = new Intent(Login.this, Sign_up.class);
+        tvSignUp.setOnClickListener(v -> {
+            Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
             startActivity(intent);
         });
-        googleSignInButton.setOnClickListener(v -> signInWithGoogle());
+        btnGoogle.setOnClickListener(v -> signInWithGoogle());
     }
 
     @Override
@@ -130,8 +139,8 @@ public class Login extends AppCompatActivity {
     }
 
     private void handleLogin() {
-        String email = emailEditText.getText().toString().trim();
-        String password = passwordEditText.getText().toString();
+        String email = etEmail.getText().toString().trim();
+        String password = etOldPass.getText().toString();
 
         if (email.isEmpty() || password.isEmpty()) {
             Toast.makeText(this, "Vui lòng nhập email và mật khẩu", Toast.LENGTH_SHORT).show();
@@ -141,10 +150,10 @@ public class Login extends AppCompatActivity {
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
-                        Toast.makeText(Login.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
                         navigateToHomeActivity();
                     } else {
-                        Toast.makeText(Login.this, "Đăng nhập thất bại: " + task.getException().getMessage(),
+                        Toast.makeText(LoginActivity.this, "Đăng nhập thất bại: " + task.getException().getMessage(),
                                 Toast.LENGTH_LONG).show();
                     }
                 });
@@ -170,18 +179,29 @@ public class Login extends AppCompatActivity {
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
-                        Toast.makeText(Login.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
                         navigateToHomeActivity();
                     } else {
-                        Toast.makeText(Login.this, "Xác thực Firebase thất bại.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, "Xác thực Firebase thất bại.", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
 
     private void navigateToHomeActivity() {
-        Intent intent = new Intent(Login.this, HomeActivity.class);
+        requestNotificationPermission();
+
+        Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
+    }
+
+    private void requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) !=
+                    PackageManager.PERMISSION_GRANTED) {
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+            }
+        }
     }
 }

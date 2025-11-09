@@ -13,11 +13,16 @@
         <item name="android:textColor">@android:color/black</item>
     </style>
 
-
     <style name="ShapeAppearance.App.CircleImageView" parent="">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>
     </style>
 
+    <style name="MyCalendarTheme" parent="Theme.MaterialComponents.Light">
+        <item name="colorPrimary">@color/pastel_blue_light</item>
+        <item name="colorAccent">@color/pastel_blue_light</item>
+    </style>
 
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+    </style>
 </resources>

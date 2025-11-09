@@ -3,13 +3,16 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
+
     <color name="pastel_green_light">#A8E6CF</color>
     <color name="pastel_green_medium">#81C784</color>
     <color name="pastel_green_dark">#4CAF50</color>
 
+
     <color name="pastel_blue_light">#B3E5FC</color>
     <color name="pastel_blue_medium">#81D4FA</color>
     <color name="pastel_blue_dark">#4FC3F7</color>
+
 
     <color name="pastel_teal">#80CBC4</color>
     <color name="pastel_aqua">#A7FFEB</color>
@@ -24,5 +27,13 @@
     <color name="pastel_blue_violet">#9FA8DA</color>
     <color name="pastel_indigo">#7986CB</color>
     <color name="pastel_deep_blue_violet">#5C6BC0</color>
+
+    <color name="colorPrimary">#007BFF</color>
+    <color name="colorPrimaryDark">#0056b3</color>
+    <color name="colorAccent">#007BFF</color>
+    <color name="user_bubble_color">#007BFF</color>
+    <color name="ai_bubble_color">#EAEAEA</color>
+    <color name="text_color_light">#FFFFFF</color>
+    <color name="text_color_dark">#000000</color>
 
 </resources>

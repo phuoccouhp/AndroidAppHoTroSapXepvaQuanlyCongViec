@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A bounded, circular ripple effect -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="#33AAAAAA"> <!-- Ripple color: a subtle, light grey -->
+
+    <!-- The mask defines the shape and bounds of the ripple. -->
+    <!-- Using an oval shape creates a circular ripple. -->
+    <item android:id="@android:id/mask">
+        <shape android:shape="oval">
+            <solid android:color="@android:color/white" />
+        </shape>
+    </item>
+
+    <!-- This is the button's background in its normal state. -->
+    <!-- It's transparent so only the icon is visible. -->
+    <item android:drawable="@android:color/transparent" />
+
+</ripple>

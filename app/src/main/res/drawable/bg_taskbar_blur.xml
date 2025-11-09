@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Hiệu ứng mờ và bán trong suốt -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#CCFFFFFF"/> <!-- Màu trắng mờ (80% opacity) -->
+            <corners android:radius="16dp"/>
+            <stroke android:color="#80FFFFFF" android:width="1dp"/>
+        </shape>
+    </item>
+</layer-list>

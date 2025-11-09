@@ -218,22 +218,14 @@
                 android:textColor="@color/oxford_blue"
                 android:layout_marginTop="24dp" />
 
-            <androidx.cardview.widget.CardView
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvTaskToday"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="4dp"
-                app:cardBackgroundColor="@android:color/white">
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvTaskToday"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@android:color/transparent"
-                    android:nestedScrollingEnabled="false"
-                    tools:listitem="@layout/item_task" />
-            </androidx.cardview.widget.CardView>
+                android:background="@android:color/transparent"
+                android:nestedScrollingEnabled="false"
+                tools:listitem="@layout/item_task" />
 
             <TextView
                 android:id="@+id/tvTaskFuture"
@@ -245,22 +237,13 @@
                 android:textColor="@color/oxford_blue"
                 android:layout_marginTop="24dp" />
 
-            <androidx.cardview.widget.CardView
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvTaskFuture"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="4dp"
-                app:cardBackgroundColor="@android:color/white">
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvTaskFuture"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:nestedScrollingEnabled="false"
-                    tools:listitem="@layout/item_task" />
-
-            </androidx.cardview.widget.CardView>
+                android:nestedScrollingEnabled="false"
+                tools:listitem="@layout/item_task" />
         </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,16 +7,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.view.MenuItem;
 import android.widget.EditText;
-import android.widget.ImageView;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -57,7 +56,9 @@ public class ChatActivity extends AppCompatActivity {
     private ChatAdapter adapter;
     private List<ChatMessage> messageList = new ArrayList<>();
     private EditText etMessage;
-    private ImageView btnSend;
+    private FloatingActionButton btnSend;
+    private ImageButton btnBack;
+    private TextView tvTitle;
 
     private FirebaseFirestore db;
     private FirebaseAuth auth;
@@ -71,10 +72,11 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
 
         sessionId = getIntent().getStringExtra("CHAT_SESSION_ID");
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle(getIntent().getStringExtra("CHAT_SESSION_NAME"));
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        btnBack = findViewById(R.id.btnBack);
+        tvTitle = findViewById(R.id.tvTitle);
+        tvTitle.setText(getIntent().getStringExtra("CHAT_SESSION_NAME"));
+        btnBack.setOnClickListener(v -> onBackPressed());
 
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
@@ -507,12 +509,5 @@ public class ChatActivity extends AppCompatActivity {
     }
     private String formatDate(Date date) {
         return new SimpleDateFormat("dd/MM", Locale.getDefault()).format(date);
-    }
-
-    @Override public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            onBackPressed(); return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 }

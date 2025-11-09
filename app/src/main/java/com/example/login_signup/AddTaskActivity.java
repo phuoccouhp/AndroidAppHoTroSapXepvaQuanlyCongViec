@@ -169,7 +169,7 @@ public class AddTaskActivity extends AppCompatActivity {
         taskData.put("uid", userId);
         taskData.put("title", name);
         taskData.put("category", spinnerCategories.getSelectedItem().toString());
-        taskData.put("note", noteContent);
+        taskData.put("notes", noteContent);
         taskData.put("reminder", reminderOn);
         taskData.put("completed", false);
         taskData.put("taskDate", dueDateTime.getTime());

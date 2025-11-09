@@ -34,7 +34,6 @@ public class MainActivity extends AppCompatActivity {
 
     private final ActivityResultLauncher<String> requestPermissionLauncher = registerForActivityResult(
             new ActivityResultContracts.RequestPermission(), isGranted -> {
-                // Do nothing here. onResume will handle the logic flow.
             });
 
     private void Init() {

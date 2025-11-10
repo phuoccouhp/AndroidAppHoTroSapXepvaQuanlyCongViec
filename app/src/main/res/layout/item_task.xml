@@ -32,7 +32,7 @@
             android:layout_marginStart="12dp">
 
             <TextView
-                android:id="@+id/tvTaskTitle"
+                android:id="@+id/tvAlarmHeader"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Task title"
@@ -41,7 +41,7 @@
                 android:fontFamily="@font/smoochsans_bold" />
 
             <TextView
-                android:id="@+id/tvTaskCategory"
+                android:id="@+id/tvTaskTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Category"

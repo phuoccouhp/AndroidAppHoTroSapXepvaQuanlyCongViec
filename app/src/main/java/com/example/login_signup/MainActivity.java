@@ -27,17 +27,18 @@ import android.view.View;
 public class MainActivity extends AppCompatActivity {
     private static final int SPLASH_TIME_OUT = 3000;
     Animation bottomToTopAnim;
-    TextView tvTaskify, tvWelcome, tvSlogan;
+    TextView tvTasktify, tvWelcome, tvSlogan;
     ImageView imgTaskify;
     ProgressBar progressBar;
-    private boolean isSplashScreenStarted = false;
 
     private final ActivityResultLauncher<String> requestPermissionLauncher = registerForActivityResult(
             new ActivityResultContracts.RequestPermission(), isGranted -> {
+
+                startSplashScreen();
             });
 
     private void Init() {
-        tvTaskify = findViewById(R.id.tvTaskify);
+        tvTasktify = findViewById(R.id.tvTaskify);
         tvWelcome = findViewById(R.id.tvWelcome);
         tvSlogan = findViewById(R.id.tvSlogan);
         imgTaskify = findViewById(R.id.imgTaskify);
@@ -53,17 +54,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void startAnim() {
         bottomToTopAnim = AnimationUtils.loadAnimation(this, R.anim.bottom_to_top);
-        tvTaskify.startAnimation(bottomToTopAnim);
+        tvTasktify.startAnimation(bottomToTopAnim);
         imgTaskify.startAnimation(bottomToTopAnim);
         tvWelcome.startAnimation(bottomToTopAnim);
         tvSlogan.startAnimation(bottomToTopAnim);
     }
 
     private void startSplashScreen() {
-        if (isSplashScreenStarted) {
-            return;
-        }
-        isSplashScreenStarted = true;
         progressBar.setVisibility(View.VISIBLE);
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             Intent intent = new Intent(MainActivity.this, LoginActivity.class);
@@ -79,23 +76,25 @@ public class MainActivity extends AppCompatActivity {
         Init();
         setupRandom();
         startAnim();
+
+        handlePermissionsAndNavigation();
+    }
+
+    private void handlePermissionsAndNavigation() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+        } else {
+            startSplashScreen();
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        checkExactAlarmPermission();
+    }
 
-        if (isSplashScreenStarted) {
-            return;
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
-                return;
-            }
-        }
-
+    private void checkExactAlarmPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
             if (alarmManager != null && !alarmManager.canScheduleExactAlarms()) {
@@ -103,9 +102,7 @@ public class MainActivity extends AppCompatActivity {
                 if (getPackageManager().resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY) != null) {
                     startActivity(intent);
                 }
-                return;
             }
         }
-        startSplashScreen();
     }
 }

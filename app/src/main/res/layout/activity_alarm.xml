@@ -36,7 +36,7 @@
                 app:tint="@color/pastel_blue_dark" />
 
             <TextView
-                android:id="@+id/tvAlarm"
+                android:id="@+id/tvAlarmHeader"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/smoochsans_bold"
@@ -48,7 +48,7 @@
                 app:layout_constraintTop_toBottomOf="@id/imgAlarm" />
 
             <TextView
-                android:id="@+id/tvAlarmTask"
+                android:id="@+id/tvTaskTitle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
@@ -58,7 +58,7 @@
                 android:textSize="22sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tvAlarm"
+                app:layout_constraintTop_toBottomOf="@id/tvAlarmHeader"
                 tools:text="Submit the project report to the board" />
 
             <View
@@ -69,10 +69,10 @@
                 android:background="#E0E0E0"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tvAlarmTask" />
+                app:layout_constraintTop_toBottomOf="@id/tvTaskTitle" />
 
             <TextView
-                android:id="@+id/tvCategory"
+                android:id="@+id/tvTaskCategory"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
@@ -100,11 +100,11 @@
                 app:drawableTint="#8A8A8A"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tvCategory"
+                app:layout_constraintTop_toBottomOf="@id/tvTaskCategory"
                 tools:text="Note: Don't forget to attach the TPS reports and the cover sheet."/>
 
             <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btnDismiss"
+                android:id="@+id/btnStopAlarm"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:layout_marginTop="32dp"

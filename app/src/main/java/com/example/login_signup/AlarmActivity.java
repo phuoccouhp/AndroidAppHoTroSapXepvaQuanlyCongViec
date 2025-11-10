@@ -27,24 +27,24 @@ public class AlarmActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_alarm);
 
-        TextView tvAlarm = findViewById(R.id.tvAlarm);
-        TextView tvCategory = findViewById(R.id.tvCategory);
+        TextView tvTaskTitle = findViewById(R.id.tvTaskTitle);
+        TextView tvTaskCategory = findViewById(R.id.tvTaskCategory);
         TextView tvTaskNote = findViewById(R.id.tvTaskNote);
-        Button btnDismiss = findViewById(R.id.btnDismiss);
+        Button btnStopAlarm = findViewById(R.id.btnStopAlarm);
 
         String taskTitle = getIntent().getStringExtra("title");
         String taskCategory = getIntent().getStringExtra("category");
         String taskNote = getIntent().getStringExtra("note");
 
-        tvAlarm.setText(taskTitle);
-        tvCategory.setText(taskCategory != null ? "Category: " + taskCategory : "");
+        tvTaskTitle.setText(taskTitle);
+        tvTaskCategory.setText(taskCategory != null ? "Category: " + taskCategory : "");
         tvTaskNote.setText(taskNote != null ? "Note: " + taskNote : "");
 
         Intent serviceIntent = new Intent(this, AlarmService.class);
         serviceIntent.putExtras(getIntent().getExtras());
         startService(serviceIntent);
 
-        btnDismiss.setOnClickListener(v -> {
+        btnStopAlarm.setOnClickListener(v -> {
             stopService(new Intent(this, AlarmService.class));
             finishAndRemoveTask();
         });

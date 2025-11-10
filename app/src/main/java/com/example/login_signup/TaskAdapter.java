@@ -96,8 +96,8 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
 
         public TaskViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvTaskTitle = itemView.findViewById(R.id.tvTaskTitle);
-            tvTaskCategory = itemView.findViewById(R.id.tvTaskCategory);
+            tvTaskTitle = itemView.findViewById(R.id.tvAlarmHeader);
+            tvTaskCategory = itemView.findViewById(R.id.tvTaskTitle);
             tvTaskTime = itemView.findViewById(R.id.tvTaskTime);
             btnDeleteTask = itemView.findViewById(R.id.btnDeleteTask);
             imgCategory = itemView.findViewById(R.id.imgCategory);

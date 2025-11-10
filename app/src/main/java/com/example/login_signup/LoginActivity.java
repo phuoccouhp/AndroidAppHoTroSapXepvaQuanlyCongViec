@@ -33,7 +33,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
-public class Login extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity {
 
     private EditText etEmail;
     private EditText etOldPass;
@@ -94,11 +94,11 @@ public class Login extends AppCompatActivity {
 
         btnLogin.setOnClickListener(v -> handleLogin());
         tvForgetPass.setOnClickListener(v -> {
-            Intent intent = new Intent(Login.this, ForgetPassword.class);
+            Intent intent = new Intent(LoginActivity.this, ForgetPasswordActivity.class);
             startActivity(intent);
         });
         tvSignUp.setOnClickListener(v -> {
-            Intent intent = new Intent(Login.this, SignUp.class);
+            Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
             startActivity(intent);
         });
         btnGoogle.setOnClickListener(v -> signInWithGoogle());
@@ -150,10 +150,10 @@ public class Login extends AppCompatActivity {
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
-                        Toast.makeText(Login.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
                         navigateToHomeActivity();
                     } else {
-                        Toast.makeText(Login.this, "Đăng nhập thất bại: " + task.getException().getMessage(),
+                        Toast.makeText(LoginActivity.this, "Đăng nhập thất bại: " + task.getException().getMessage(),
                                 Toast.LENGTH_LONG).show();
                     }
                 });
@@ -179,10 +179,10 @@ public class Login extends AppCompatActivity {
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
-                        Toast.makeText(Login.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
                         navigateToHomeActivity();
                     } else {
-                        Toast.makeText(Login.this, "Xác thực Firebase thất bại.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, "Xác thực Firebase thất bại.", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -190,7 +190,7 @@ public class Login extends AppCompatActivity {
     private void navigateToHomeActivity() {
         requestNotificationPermission();
 
-        Intent intent = new Intent(Login.this, HomeActivity.class);
+        Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();

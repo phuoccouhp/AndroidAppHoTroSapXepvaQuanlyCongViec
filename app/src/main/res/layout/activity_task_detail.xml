@@ -1,133 +1,238 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fillViewport="true"
     android:background="#F4F7FF"
-    tools:context=".TaskDetailFragment" 
-    android:padding="24dp">
+    tools:context=".TaskDetailActivity">
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/btn_confirm_task"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/baseline_check_24"
-        app:tint="@color/white"
-        app:backgroundTint="@color/pastel_blue_dark"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:contentDescription="Confirm Changes" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/btn_cancel_task"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/baseline_close_24"
-        app:tint="@color/white"
-        app:backgroundTint="@color/material_grey_600"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:contentDescription="Cancel Changes" />
-
-    <TextView
-        android:id="@+id/tv_task_detail_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Edit Task"
-        android:textSize="32sp"
-        android:fontFamily="@font/smoochsans_bold"
-        android:textColor="@color/oxford_blue"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <EditText
-        android:id="@+id/et_task_name"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:hint="Task Name"
-        android:background="@drawable/bg_dialog_rounded"
-        android:backgroundTint="@color/white"
-        android:padding="16dp"
-        app:layout_constraintTop_toBottomOf="@id/tv_task_detail_title" />
+        android:padding="24dp">
 
-    <EditText
-        android:id="@+id/et_task_detail"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:hint="Task Detail"
-        android:background="@drawable/bg_dialog_rounded"
-        android:backgroundTint="@color/white"
-        android:padding="16dp"
-        app:layout_constraintTop_toBottomOf="@id/et_task_name" />
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/outline_arrow_back_24"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Back"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <Spinner
-        android:id="@+id/spinner_categories"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:background="@drawable/bg_dialog_rounded"
-        android:backgroundTint="@color/white"
-        android:padding="16dp"
-        app:layout_constraintTop_toBottomOf="@id/et_task_detail" />
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Task detail"
+            android:textSize="30sp"
+            android:fontFamily="@font/smoochsans_bold"
+            android:textColor="@color/oxford_blue"
+            android:layout_marginTop="0dp"
+            app:layout_constraintTop_toTopOf="@id/btnBack"
+            app:layout_constraintBottom_toBottomOf="@id/btnBack"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-    <Button
-        android:id="@+id/btn_pick_date"
-        style="?attr/materialButtonOutlinedStyle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:layout_marginEnd="8dp"
-        android:backgroundTint="@color/white"
-        android:drawableStart="@drawable/outline_calendar_month_24"
-        android:text="Pick Date"
-        android:textColor="@color/oxford_blue"
-        app:cornerRadius="16dp"
-        app:layout_constraintEnd_toStartOf="@id/btn_pick_time"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/spinner_categories" />
+        <TextView
+            android:id="@+id/tvTaskName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Name task"
+            android:textSize="22sp"
+            android:fontFamily="@font/smoochsans_bold"
+            android:textColor="@color/oxford_blue"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btnBack" />
 
-    <Button
-        android:id="@+id/btn_pick_time"
-        style="?attr/materialButtonOutlinedStyle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:backgroundTint="@color/white"
-        android:drawableStart="@drawable/baseline_access_time_24"
-        android:text="Pick Time"
-        android:textColor="@color/oxford_blue"
-        app:cornerRadius="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/btn_pick_date"
-        app:layout_constraintTop_toTopOf="@id/btn_pick_date" />
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etTaskName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
+            android:hint="Task..."
+            android:padding="16dp"
+            android:background="@drawable/bg_dialog_rounded"
+            android:backgroundTint="@color/white"
+            app:layout_constraintTop_toBottomOf="@id/tvTaskName"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-    <Button
-        android:id="@+id/btn_reminder"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:backgroundTint="@color/white"
-        android:drawableStart="@drawable/baseline_notifications_24"
-        android:text="Set Reminder"
-        style="?attr/materialButtonOutlinedStyle"
-        app:cornerRadius="16dp"
-        android:textColor="@color/oxford_blue"
-        app:layout_constraintTop_toBottomOf="@id/btn_pick_date" />
+        <TextView
+            android:id="@+id/tvCategories"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Category"
+            android:textSize="22sp"
+            android:fontFamily="@font/smoochsans_bold"
+            android:textColor="@color/oxford_blue"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/etTaskName" />
 
-    <EditText
-        android:id="@+id/et_notes"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="16dp"
-        android:background="@drawable/bg_dialog_rounded"
-        android:backgroundTint="@color/white"
-        android:gravity="top"
-        android:hint="Notes"
-        android:padding="16dp"
-        app:layout_constraintBottom_toTopOf="@id/btn_confirm_task"
-        app:layout_constraintTop_toBottomOf="@id/btn_reminder" />
+        <Spinner
+            android:id="@+id/spinnerCategories"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/bg_dialog_rounded"
+            android:backgroundTint="@color/white"
+            android:padding="16dp"
+            app:layout_constraintTop_toBottomOf="@id/tvCategories"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/tvDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Due Date"
+            android:textSize="22sp"
+            android:fontFamily="@font/smoochsans_bold"
+            android:textColor="@color/oxford_blue"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/spinnerCategories" />
+
+        <Button
+            android:id="@+id/btnSetDueDate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="8dp"
+            android:text="Set Date"
+            android:drawableLeft="@drawable/outline_calendar_month_24"
+            android:backgroundTint="@color/white"
+            android:textColor="@color/oxford_blue"
+            app:layout_constraintTop_toBottomOf="@id/tvDate"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/btnSetTime"
+            style="?attr/materialButtonOutlinedStyle"
+            app:cornerRadius="16dp" />
+
+        <Button
+            android:id="@+id/btnSetTime"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="Set Time"
+            android:drawableLeft="@drawable/baseline_access_time_24"
+            android:backgroundTint="@color/white"
+            android:textColor="@color/oxford_blue"
+            app:layout_constraintTop_toTopOf="@id/btnSetDueDate"
+            app:layout_constraintStart_toEndOf="@id/btnSetDueDate"
+            app:layout_constraintEnd_toEndOf="parent"
+            style="?attr/materialButtonOutlinedStyle"
+            app:cornerRadius="16dp" />
+
+        <TextView
+            android:id="@+id/tvReminder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Reminder &amp; Sound"
+            android:textSize="22sp"
+            android:fontFamily="@font/smoochsans_bold"
+            android:textColor="@color/oxford_blue"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btnSetDueDate" />
+
+        <Button
+            android:id="@+id/btnSetReminder"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="8dp"
+            android:text="Reminder OFF"
+            android:drawableLeft="@drawable/baseline_notifications_24"
+            android:backgroundTint="@color/white"
+            android:textColor="@color/oxford_blue"
+            app:layout_constraintTop_toBottomOf="@id/tvReminder"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/btnSelectRingtone"
+            style="?attr/materialButtonOutlinedStyle"
+            app:cornerRadius="16dp" />
+
+        <Button
+            android:id="@+id/btnSelectRingtone"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="Select Sound"
+            android:backgroundTint="@color/white"
+            android:textColor="@color/oxford_blue"
+            app:layout_constraintTop_toTopOf="@id/btnSetReminder"
+            app:layout_constraintStart_toEndOf="@id/btnSetReminder"
+            app:layout_constraintEnd_toEndOf="parent"
+            style="?attr/materialButtonOutlinedStyle"
+            app:cornerRadius="16dp" />
+
+        <TextView
+            android:id="@+id/tvVibration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Vibration"
+            android:textSize="22sp"
+            android:fontFamily="@font/smoochsans_bold"
+            android:textColor="@color/oxford_blue"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btnSetReminder" />
+
+        <Spinner
+            android:id="@+id/spinnerVibration"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/bg_dialog_rounded"
+            android:backgroundTint="@color/white"
+            android:padding="16dp"
+            app:layout_constraintTop_toBottomOf="@id/tvVibration"/>
+
+        <TextView
+            android:id="@+id/tvNotes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Notes"
+            android:textSize="22sp"
+            android:fontFamily="@font/smoochsans_bold"
+            android:textColor="@color/oxford_blue"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/spinnerVibration" />
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etNotes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textSize="16sp"
+            android:textColor="@android:color/black"
+            android:hint="Add notes..."
+            android:minHeight="130dp"
+            android:padding="16dp"
+            android:gravity="top"
+            android:background="@drawable/bg_dialog_description"
+            android:backgroundTint="@color/white"
+            app:layout_constraintTop_toBottomOf="@id/tvNotes"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/btnSaveTask"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/baseline_check_24"
+            app:tint="@color/white"
+            app:backgroundTint="@color/pastel_blue_dark"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:contentDescription="Save Task" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

@@ -1,6 +1,5 @@
 package com.example.login_signup;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,12 +45,12 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     public void onBindViewHolder(@NonNull TaskViewHolder holder, int position) {
         Task task = taskList.get(position);
 
-        holder.tvTitle.setText(task.getTitle());
-        holder.tvCategory.setText(task.getCategory());
-        holder.tvTime.setText(task.getTime());
+        holder.tvTaskTitle.setText(task.getTitle());
+        holder.tvTaskCategory.setText(task.getCategory());
+        holder.tvTaskTime.setText(task.getTime());
         holder.itemView.setOnClickListener(v -> clickListener.onItemClick(task));
 
-        holder.btnDelete.setOnClickListener(v -> {
+        holder.btnDeleteTask.setOnClickListener(v -> {
             int pos = holder.getAdapterPosition();
             if (pos != RecyclerView.NO_POSITION) {
                 Task taskToDelete = taskList.get(pos);
@@ -59,7 +58,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             }
         });
 
-        
+
         int iconResId;
         switch (task.getCategory()) {
             case "Work":
@@ -75,14 +74,14 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
                 iconResId = R.drawable.baseline_shopping_cart_24;
                 break;
             default:
-                
+
                 iconResId = R.drawable.baseline_check_circle_24;
                 break;
         }
-        holder.imgCheck.setImageResource(iconResId);
+        holder.imgCategory.setImageResource(iconResId);
 
-        
-        holder.tvCategory.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+
+        holder.tvTaskCategory.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
     }
 
     @Override
@@ -91,17 +90,17 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     }
 
     public static class TaskViewHolder extends RecyclerView.ViewHolder {
-        TextView tvTitle, tvCategory, tvTime;
-        ImageButton btnDelete;
-        ImageView imgCheck;
+        TextView tvTaskTitle, tvTaskCategory, tvTaskTime;
+        ImageButton btnDeleteTask;
+        ImageView imgCategory;
 
         public TaskViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvTitle = itemView.findViewById(R.id.tvTaskTitle);
-            tvCategory = itemView.findViewById(R.id.tvTaskCategory);
-            tvTime = itemView.findViewById(R.id.tvTaskTime);
-            btnDelete = itemView.findViewById(R.id.btnDeleteTask);
-            imgCheck = itemView.findViewById(R.id.img_check);
+            tvTaskTitle = itemView.findViewById(R.id.tvTaskTitle);
+            tvTaskCategory = itemView.findViewById(R.id.tvTaskCategory);
+            tvTaskTime = itemView.findViewById(R.id.tvTaskTime);
+            btnDeleteTask = itemView.findViewById(R.id.btnDeleteTask);
+            imgCategory = itemView.findViewById(R.id.imgCategory);
         }
     }
 }

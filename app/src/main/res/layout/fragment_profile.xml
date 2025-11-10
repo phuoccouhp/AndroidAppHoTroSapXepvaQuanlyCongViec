@@ -9,34 +9,33 @@
     tools:context=".ProfileFragment">
 
     <TextView
-        android:id="@+id/tvCalendarTitle"
+        android:id="@+id/tvProfileTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:fontFamily="@font/smoochsans_bold"
-        android:gravity="center"
+        android:layout_marginTop="18dp"
         android:text="Your Profile"
+        android:textSize="30sp"
+        android:textColor="@color/oxford_blue"
         android:textAlignment="center"
-        android:textColor="#1E293B"
-        android:textSize="22sp"
+        android:fontFamily="@font/smoochsans_bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/iv_avatar"
+        android:id="@+id/imgAvatar"
         android:layout_width="120dp"
         android:layout_height="120dp"
         android:layout_marginTop="24dp"
-        android:src="@drawable/ic_avatar_1" 
+        android:src="@drawable/ic_avatar_1"
         app:civ_border_color="@color/dark_blue"
         app:civ_border_width="2dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvCalendarTitle" />
+        app:layout_constraintTop_toBottomOf="@id/tvProfileTitle" />
 
     <TextView
-        android:id="@+id/tv_edit_avatar"
+        android:id="@+id/tvEditAvatar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="?attr/selectableItemBackground"
@@ -46,10 +45,10 @@
         android:padding="8dp"
         android:text="Change Avatar"
         android:textColor="@color/dark_blue"
-        android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="@id/iv_avatar"
-        app:layout_constraintStart_toStartOf="@id/iv_avatar"
-        app:layout_constraintTop_toBottomOf="@id/iv_avatar" />
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="@id/imgAvatar"
+        app:layout_constraintStart_toStartOf="@id/imgAvatar"
+        app:layout_constraintTop_toBottomOf="@id/imgAvatar" />
 
     <TextView
         android:id="@+id/tvYourname"
@@ -62,7 +61,7 @@
         android:textColor="@color/dark_blue"
         android:textSize="24sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_edit_avatar" />
+        app:layout_constraintTop_toBottomOf="@id/tvEditAvatar" />
 
     <TextView
         android:id="@+id/tvName"
@@ -135,13 +134,13 @@
         android:id="@+id/btnLogout"
         android:layout_width="250dp"
         android:layout_height="60dp"
-        android:layout_marginBottom="32dp"
+        android:layout_marginTop="80dp"
         android:background="@drawable/btn_background"
         android:fontFamily="@font/smoochsans_semibold"
         android:text="Log out"
         android:textColor="@color/white"
         android:textSize="30sp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvChangePass"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 

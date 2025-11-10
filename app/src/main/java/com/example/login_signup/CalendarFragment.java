@@ -1,8 +1,12 @@
 package com.example.login_signup;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.*;
 import android.widget.*;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -25,8 +29,10 @@ public class CalendarFragment extends Fragment {
     private FirebaseAuth auth;
     private Date selectedDate = new Date();
 
-    private TextView tvTaskListLabel;
+    private TextView tvTaskList;
     private String todayDateString;
+
+    private ActivityResultLauncher<Intent> taskDetailLauncher;
 
     @Nullable
     @Override
@@ -37,8 +43,8 @@ public class CalendarFragment extends Fragment {
         todayDateString = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
 
         calendarView = v.findViewById(R.id.calendarView);
-        recyclerView = v.findViewById(R.id.recyclerViewTasks);
-        tvTaskListLabel = v.findViewById(R.id.tvTaskListLabel);
+        recyclerView = v.findViewById(R.id.rvTasks);
+        tvTaskList = v.findViewById(R.id.tvTaskList);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -47,12 +53,9 @@ public class CalendarFragment extends Fragment {
 
         adapter = new TaskAdapter(taskList,
                 task -> {
-                    TaskDetailFragment detailFragment = TaskDetailFragment.newInstance(task.getId());
-                    requireActivity().getSupportFragmentManager()
-                            .beginTransaction()
-                            .replace(R.id.fragment_container, detailFragment)
-                            .addToBackStack(null)
-                            .commit();
+                    Intent intent = new Intent(getActivity(), TaskDetailActivity.class);
+                    intent.putExtra("taskId", task.getId());
+                    taskDetailLauncher.launch(intent);
                 },
                 task -> {
                     deleteTaskFromFirestore(task);
@@ -61,12 +64,13 @@ public class CalendarFragment extends Fragment {
 
         recyclerView.setAdapter(adapter);
 
-        getParentFragmentManager().setFragmentResultListener(
-                "task_updated_result",
-                this,
-                (requestKey, result) -> {
-                    if (result.getBoolean("task_updated", false)) {
-                        loadTasksForDate(selectedDate);
+        taskDetailLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                        if (result.getData().getBooleanExtra("isTaskUpdated", false)) {
+                            loadTasksForDate(selectedDate);
+                        }
                     }
                 }
         );
@@ -89,10 +93,10 @@ public class CalendarFragment extends Fragment {
         SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         String selectedDayString = sdfDate.format(dateToLoad);
         if (selectedDayString.equals(todayDateString)) {
-            tvTaskListLabel.setText("Your Task for Today");
+            tvTaskList.setText("Your Task for Today");
         } else {
             SimpleDateFormat sdfDisplay = new SimpleDateFormat("dd MMMM, yyyy", Locale.getDefault());
-            tvTaskListLabel.setText("Task for " + sdfDisplay.format(dateToLoad));
+            tvTaskList.setText("Task for " + sdfDisplay.format(dateToLoad));
         }
 
         db.collection("tasks")
@@ -116,7 +120,7 @@ public class CalendarFragment extends Fragment {
                                 String title = doc.getString("title");
                                 String category = doc.getString("category");
 
-                                
+
                                 String noteContent = doc.getString("note");
                                 if (noteContent == null) {
                                     noteContent = doc.getString("notes");

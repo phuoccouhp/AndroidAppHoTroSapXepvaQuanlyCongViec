@@ -5,58 +5,55 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?attr/selectableItemBackground"
-    android:paddingHorizontal="16dp"
-    android:paddingVertical="12dp">
+    android:padding="12dp">
 
     <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/imageViewAvatar"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
+        android:id="@+id/imgViewAvatar"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:src="@drawable/ic_ai_avatar"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/textViewChatName"
+        android:id="@+id/tvChatName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="14dp"
         android:ellipsize="end"
         android:maxLines="1"
-        android:text="Chat-1"
+        android:text="Chat 1"
         android:textColor="@color/text_color_dark"
-        android:textSize="17sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/textViewLastMessage"
-        app:layout_constraintEnd_toStartOf="@id/textViewTimestamp"
-        app:layout_constraintStart_toEndOf="@+id/imageViewAvatar"
-        app:layout_constraintTop_toTopOf="@+id/imageViewAvatar"
+        android:textSize="24sp"
+        android:fontFamily="@font/smoochsans_bold"
+        app:layout_constraintStart_toEndOf="@+id/imgViewAvatar"
+        app:layout_constraintEnd_toStartOf="@id/tvTimestamp"
+        app:layout_constraintTop_toTopOf="@+id/imgViewAvatar"
         app:layout_constraintVertical_chainStyle="packed" />
 
     <TextView
-        android:id="@+id/textViewLastMessage"
+        android:id="@+id/tvLastMessage"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:ellipsize="end"
         android:maxLines="1"
         android:text="This is the last message..."
         android:textColor="@color/text_color_dark"
-        android:textSize="15sp"
-        app:layout_constraintBottom_toBottomOf="@+id/imageViewAvatar"
-        app:layout_constraintEnd_toEndOf="@+id/textViewChatName"
-        app:layout_constraintStart_toStartOf="@+id/textViewChatName"
-        app:layout_constraintTop_toBottomOf="@+id/textViewChatName" />
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="@id/tvChatName"
+        app:layout_constraintEnd_toStartOf="@id/tvTimestamp"
+        app:layout_constraintBottom_toBottomOf="@id/imgViewAvatar"/>
 
     <TextView
-        android:id="@+id/textViewTimestamp"
+        android:id="@+id/tvTimestamp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
         android:text="5m ago"
         android:textColor="@color/text_color_dark"
-        android:textSize="13sp"
+        android:textSize="16sp"
+        android:paddingStart="10dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/textViewChatName" />
-
+        app:layout_constraintTop_toTopOf="@+id/tvChatName"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

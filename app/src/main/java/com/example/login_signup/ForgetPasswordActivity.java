@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 
-public class ForgetPassword extends AppCompatActivity {
+public class ForgetPasswordActivity extends AppCompatActivity {
 
     private EditText etEmail;
     private FirebaseAuth mAuth;

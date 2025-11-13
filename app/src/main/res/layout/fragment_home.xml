@@ -8,7 +8,7 @@
     tools:context=".HomeFragment">
 
     <TextView
-        android:id="@+id/lb_todo"
+        android:id="@+id/tvTaskify"
         android:layout_width="300dp"
         android:layout_height="90dp"
         android:layout_margin="70dp"
@@ -27,17 +27,17 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
-        android:id="@+id/image_business"
+        android:id="@+id/imgTaskify"
         android:layout_width="300dp"
         android:layout_height="250dp"
         android:layout_margin="30dp"
         android:background="@drawable/home_activity"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/lb_todo" />
+        app:layout_constraintTop_toBottomOf="@id/tvTaskify" />
 
     <TextView
-        android:id="@+id/text_welcome"
+        android:id="@+id/tvWelcome"
         android:layout_width="300dp"
         android:layout_height="50dp"
         android:layout_margin="20dp"
@@ -49,12 +49,12 @@
         android:textStyle="bold"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/image_business" />
+        app:layout_constraintTop_toBottomOf="@id/imgTaskify" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/add_task_container"
+        android:id="@+id/layoutNewTask"
         android:layout_width="wrap_content"
-        android:layout_height="56dp" 
+        android:layout_height="56dp"
         android:background="@drawable/bg_unified_label"
         android:elevation="6dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -72,10 +72,10 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/fab_add_task"/>
+            app:layout_constraintEnd_toStartOf="@id/btnAddTask"/>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_add_task"
+            android:id="@+id/btnAddTask"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/outline_add_circle_24"
@@ -93,13 +93,13 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/ai_chat_container"
+        android:id="@+id/layoutAIChat"
         android:layout_width="wrap_content"
         android:layout_height="56dp"
         android:background="@drawable/bg_unified_label"
         android:elevation="6dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/add_task_container"
+        app:layout_constraintBottom_toTopOf="@id/layoutNewTask"
         android:layout_marginEnd="32dp"
         android:layout_marginBottom="16dp">
 
@@ -113,10 +113,10 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/fab_ai_chat"/>
+            app:layout_constraintEnd_toStartOf="@id/btnAIChat"/>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_ai_chat"
+            android:id="@+id/btnAIChat"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_ai_chat"
@@ -132,5 +132,4 @@
             android:layout_marginEnd="4dp"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

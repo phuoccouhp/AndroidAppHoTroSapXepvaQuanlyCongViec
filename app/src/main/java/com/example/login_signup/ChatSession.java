@@ -9,9 +9,11 @@ public class ChatSession {
     private String name;
     private String lastMessage;
     private Date lastUpdated;
-    private String userId;
+    private String userId; 
 
-    public ChatSession() {}
+    public ChatSession() {
+        
+    }
 
     public ChatSession(String name, String userId) {
         this.name = name;

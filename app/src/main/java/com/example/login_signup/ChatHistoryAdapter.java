@@ -63,10 +63,10 @@ public class ChatHistoryAdapter extends RecyclerView.Adapter<ChatHistoryAdapter.
 
         public SessionViewHolder(@NonNull View itemView) {
             super(itemView);
-            imageViewAvatar = itemView.findViewById(R.id.imgViewAvatar);
-            textViewChatName = itemView.findViewById(R.id.tvChatName);
-            textViewLastMessage = itemView.findViewById(R.id.tvLastMessage);
-            textViewTimestamp = itemView.findViewById(R.id.tvTimestamp);
+            imageViewAvatar = itemView.findViewById(R.id.imageViewAvatar);
+            textViewChatName = itemView.findViewById(R.id.textViewChatName);
+            textViewLastMessage = itemView.findViewById(R.id.textViewLastMessage);
+            textViewTimestamp = itemView.findViewById(R.id.textViewTimestamp);
         }
     }
 }

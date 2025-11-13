@@ -41,21 +41,21 @@ public class ChatHistoryActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
 
-        recyclerViewChatHistory = findViewById(R.id.rvChatHistory);
+        recyclerViewChatHistory = findViewById(R.id.recyclerViewChatHistory);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerViewChatHistory.setLayoutManager(layoutManager);
         adapter = new ChatHistoryAdapter(sessionList);
         recyclerViewChatHistory.setAdapter(adapter);
 
-        btnBack = findViewById(R.id.btnBack);
+        btnBack = findViewById(R.id.btn_back);
         btnBack.setOnClickListener(v -> finish());
 
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerViewChatHistory.getContext(), layoutManager.getOrientation());
         dividerItemDecoration.setDrawable(ContextCompat.getDrawable(this, R.drawable.list_divider));
         recyclerViewChatHistory.addItemDecoration(dividerItemDecoration);
 
-        FloatingActionButton btnNewChat = findViewById(R.id.btnNewChat);
-        btnNewChat.setOnClickListener(v -> createNewChatSession());
+        FloatingActionButton fabNewChat = findViewById(R.id.fabNewChat);
+        fabNewChat.setOnClickListener(v -> createNewChatSession());
 
         loadChatSessions();
     }
@@ -106,11 +106,11 @@ public class ChatHistoryActivity extends AppCompatActivity {
                             .add(newSession)
                             .addOnSuccessListener(documentReference -> {
                                 newSession.setId(documentReference.getId());
-                                newSession.setLastUpdated(new Date());
-                                sessionList.add(0, newSession);
+                                newSession.setLastUpdated(new Date()); 
+                                sessionList.add(0, newSession); 
                                 adapter.notifyItemInserted(0);
                                 recyclerViewChatHistory.scrollToPosition(0);
-
+                                
                                 Intent intent = new Intent(ChatHistoryActivity.this, ChatActivity.class);
                                 intent.putExtra("CHAT_SESSION_ID", documentReference.getId());
                                 intent.putExtra("CHAT_SESSION_NAME", chatName);

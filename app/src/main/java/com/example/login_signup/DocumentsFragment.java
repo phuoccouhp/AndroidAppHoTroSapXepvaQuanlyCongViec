@@ -1,12 +1,8 @@
 package com.example.login_signup;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.*;
 import android.widget.*;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -21,7 +17,7 @@ import java.util.*;
 
 public class DocumentsFragment extends Fragment {
 
-    private RecyclerView rvTaskToday, rvTaskFuture;
+    private RecyclerView recyclerViewToday, recyclerViewFuture;
     private TaskAdapter adapterToday, adapterFuture;
 
     private List<Task> allTasks = new ArrayList<>();
@@ -34,7 +30,6 @@ public class DocumentsFragment extends Fragment {
     private ImageButton btnAll, btnWork, btnPersonal, btnHealth, btnShopping;
 
     private String todayDateString;
-    private ActivityResultLauncher<Intent> taskDetailLauncher;
 
     @Nullable
     @Override
@@ -45,50 +40,44 @@ public class DocumentsFragment extends Fragment {
 
         todayDateString = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
 
-        rvTaskToday = v.findViewById(R.id.rvTaskToday);
-        rvTaskFuture = v.findViewById(R.id.rvTaskFuture);
-
-        rvTaskToday.setLayoutManager(new LinearLayoutManager(getContext()));
-        rvTaskFuture.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerViewToday = v.findViewById(R.id.recyclerViewTasksToday);
+        recyclerViewFuture = v.findViewById(R.id.recyclerViewTasksFuture);
+        recyclerViewToday.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerViewFuture.setLayoutManager(new LinearLayoutManager(getContext()));
 
         adapterToday = new TaskAdapter(todayTasks, task -> {
-            Intent intent = new Intent(getActivity(), TaskDetailActivity.class);
-            intent.putExtra("taskId", task.getId());
-            taskDetailLauncher.launch(intent);
+            TaskDetailFragment detailFragment = TaskDetailFragment.newInstance(task.getId());
+            requireActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, detailFragment)
+                    .addToBackStack(null)
+                    .commit();
         }, task -> {
             deleteTaskFromFirestore(task);
         });
 
         adapterFuture = new TaskAdapter(futureTasks, task -> {
-            Intent intent = new Intent(getActivity(), TaskDetailActivity.class);
-            intent.putExtra("taskId", task.getId());
-            taskDetailLauncher.launch(intent);
+            TaskDetailFragment detailFragment = TaskDetailFragment.newInstance(task.getId());
+            requireActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, detailFragment)
+                    .addToBackStack(null)
+                    .commit();
         }, task -> {
             deleteTaskFromFirestore(task);
         });
 
-        rvTaskToday.setAdapter(adapterToday);
-        rvTaskFuture.setAdapter(adapterFuture);
-
-        taskDetailLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
-                        if (result.getData().getBooleanExtra("isTaskUpdated", false)) {
-                            loadAllTasks();
-                        }
-                    }
-                }
-        );
+        recyclerViewToday.setAdapter(adapterToday);
+        recyclerViewFuture.setAdapter(adapterFuture);
 
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
 
-        btnAll = v.findViewById(R.id.btnAll);
-        btnWork = v.findViewById(R.id.btnWork);
-        btnPersonal = v.findViewById(R.id.btnPersonal);
-        btnHealth = v.findViewById(R.id.btnHealth);
-        btnShopping = v.findViewById(R.id.btnShopping);
+        btnAll = v.findViewById(R.id.btn_all);
+        btnWork = v.findViewById(R.id.btn_work);
+        btnPersonal = v.findViewById(R.id.btn_personal);
+        btnHealth = v.findViewById(R.id.btn_health);
+        btnShopping = v.findViewById(R.id.btn_shopping);
 
         btnAll.setOnClickListener(view -> {
             selectedCategory = null;
@@ -131,7 +120,7 @@ public class DocumentsFragment extends Fragment {
                 .whereEqualTo("uid", uid)
                 .addSnapshotListener((value, error) -> {
                     if (error != null || value == null) {
-                        return;
+                        return; 
                     }
 
                     allTasks.clear();
@@ -149,7 +138,7 @@ public class DocumentsFragment extends Fragment {
                         String title = doc.getString("title");
                         String category = doc.getString("category");
 
-
+                        
                         String noteContent = doc.getString("note");
                         if (noteContent == null) {
                             noteContent = doc.getString("notes");

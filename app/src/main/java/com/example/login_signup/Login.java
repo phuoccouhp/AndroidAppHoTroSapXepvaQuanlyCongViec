@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -32,8 +33,10 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
-public class LoginActivity extends AppCompatActivity {
+public class Login extends AppCompatActivity {
 
     private EditText etEmail;
     private EditText etOldPass;
@@ -43,6 +46,7 @@ public class LoginActivity extends AppCompatActivity {
     private ImageButton btnGoogle;
 
     private FirebaseAuth mAuth;
+    private FirebaseFirestore db;
     private GoogleSignInClient mGoogleSignInClient;
     private ActivityResultLauncher<Intent> googleSignInLauncher;
 
@@ -69,6 +73,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
 
         etEmail = findViewById(R.id.etEmail);
         etOldPass = findViewById(R.id.etOldPass);
@@ -94,11 +99,11 @@ public class LoginActivity extends AppCompatActivity {
 
         btnLogin.setOnClickListener(v -> handleLogin());
         tvForgetPass.setOnClickListener(v -> {
-            Intent intent = new Intent(LoginActivity.this, ForgetPasswordActivity.class);
+            Intent intent = new Intent(Login.this, ForgetPassword.class);
             startActivity(intent);
         });
         tvSignUp.setOnClickListener(v -> {
-            Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
+            Intent intent = new Intent(Login.this, SignUp.class);
             startActivity(intent);
         });
         btnGoogle.setOnClickListener(v -> signInWithGoogle());
@@ -150,10 +155,10 @@ public class LoginActivity extends AppCompatActivity {
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
-                        Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(Login.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
                         navigateToHomeActivity();
                     } else {
-                        Toast.makeText(LoginActivity.this, "Đăng nhập thất bại: " + task.getException().getMessage(),
+                        Toast.makeText(Login.this, "Đăng nhập thất bại: " + task.getException().getMessage(),
                                 Toast.LENGTH_LONG).show();
                     }
                 });
@@ -179,18 +184,57 @@ public class LoginActivity extends AppCompatActivity {
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
-                        Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
-                        navigateToHomeActivity();
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        if (user != null) {
+                            checkAndCreateUserProfile(user, this::navigateToHomeActivity);
+                        } else {
+                            Toast.makeText(Login.this, "Xác thực Firebase thất bại.", Toast.LENGTH_SHORT).show();
+                        }
                     } else {
-                        Toast.makeText(LoginActivity.this, "Xác thực Firebase thất bại.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(Login.this, "Xác thực Firebase thất bại.", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
 
+    private void checkAndCreateUserProfile(FirebaseUser user, Runnable onComplete) {
+        String uid = user.getUid();
+        DocumentReference docRef = db.collection("users").document(uid);
+
+        docRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                if (!task.getResult().exists()) {
+                    // User profile does not exist, create it
+                    String name = user.getDisplayName();
+                    String email = user.getEmail();
+                    Uri photoUrl = user.getPhotoUrl();
+
+                    java.util.Map<String, Object> newUser = new java.util.HashMap<>();
+                    newUser.put("name", name);
+                    newUser.put("email", email);
+                    newUser.put("avatarUrl", photoUrl != null ? photoUrl.toString() : "");
+
+                    docRef.set(newUser)
+                            .addOnSuccessListener(aVoid -> {
+                                Toast.makeText(Login.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
+                                onComplete.run();
+                            })
+                            .addOnFailureListener(e -> {
+                                Toast.makeText(Login.this, "Không thể tạo hồ sơ người dùng.", Toast.LENGTH_SHORT).show();
+                            });
+                } else {
+                    // User profile already exists
+                    Toast.makeText(Login.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
+                    onComplete.run();
+                }
+            } else {
+                Toast.makeText(Login.this, "Lỗi kiểm tra hồ sơ người dùng.", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     private void navigateToHomeActivity() {
         requestNotificationPermission();
-
-        Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+        Intent intent = new Intent(Login.this, HomeActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();

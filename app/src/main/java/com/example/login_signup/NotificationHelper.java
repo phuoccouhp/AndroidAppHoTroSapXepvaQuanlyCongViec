@@ -23,19 +23,15 @@ public class NotificationHelper {
     public static void createNotificationChannels(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationManager manager = context.getSystemService(NotificationManager.class);
-
-            // FIX: Restore sound and vibration to the channel itself.
-            // A high-priority channel MUST have sound and/or vibration to be considered for a full-screen intent.
-            // Setting them to null effectively downgrades the notification's urgency.
             NotificationChannel reminderChannel = new NotificationChannel(
                     CHANNEL_ID_REMINDER, CHANNEL_NAME_REMINDER, NotificationManager.IMPORTANCE_HIGH);
+
             reminderChannel.setDescription(CHANNEL_DESC_REMINDER);
             reminderChannel.enableLights(true);
             reminderChannel.setLightColor(Color.RED);
             reminderChannel.enableVibration(true);
             reminderChannel.setVibrationPattern(new long[]{0, 1000, 500, 1000});
-            // Note: The sound for the notification will be the default notification sound.
-            // The AlarmService will play the chosen alarm ringtone separately.
+
             manager.createNotificationChannel(reminderChannel);
 
             NotificationChannel advanceChannel = new NotificationChannel(

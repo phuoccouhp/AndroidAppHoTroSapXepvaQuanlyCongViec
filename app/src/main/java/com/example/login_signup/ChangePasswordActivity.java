@@ -1,6 +1,5 @@
 package com.example.login_signup;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.EditText;
@@ -13,7 +12,7 @@ import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-public class ChangePassword extends AppCompatActivity {
+public class ChangePasswordActivity extends AppCompatActivity {
 
     private EditText etOldPass, etNewPass, etConfirm;
     private FirebaseAuth mAuth;
@@ -40,7 +39,7 @@ public class ChangePassword extends AppCompatActivity {
 
         if (TextUtils.isEmpty(oldPw)) { etOldPass.setError("Nhập mật khẩu cũ"); etOldPass.requestFocus(); return; }
         if (TextUtils.isEmpty(newPw)) { etNewPass.setError("Nhập mật khẩu mới"); etNewPass.requestFocus(); return; }
-        if (newPw.length() < 6)       { etNewPass.setError("Mật khẩu ≥ 6 ký tự"); etNewPass.requestFocus(); return; }
+        if (newPw.length() < 6) { etNewPass.setError("Mật khẩu ≥ 6 ký tự"); etNewPass.requestFocus(); return; }
         if (!TextUtils.equals(newPw, cfPw)) { etConfirm.setError("Không khớp"); etConfirm.requestFocus(); return; }
         if (oldPw.equals(newPw)) { etNewPass.setError("Mật khẩu mới phải khác mật khẩu cũ"); etNewPass.requestFocus(); return; }
 

@@ -11,7 +11,7 @@ public class Task implements Serializable {
     private String uid;
     private String title;
     private String category;
-    private String note; 
+    private String note;
     private boolean reminder;
     private boolean completed;
     private Date taskDate;

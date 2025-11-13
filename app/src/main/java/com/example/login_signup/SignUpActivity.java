@@ -1,7 +1,6 @@
 package com.example.login_signup;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Patterns;
@@ -15,11 +14,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.auth.api.signin.*;
 import com.google.android.gms.common.api.ApiException;
-import com.google.firebase.auth.ActionCodeSettings;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-public class SignUp extends AppCompatActivity {
+public class SignUpActivity extends AppCompatActivity {
 
     private EditText etEmail;
     private ImageButton btnGoogle;
@@ -57,11 +55,11 @@ public class SignUp extends AppCompatActivity {
                     .addOnSuccessListener(snap -> {
                         if (!snap.isEmpty()) {
                             Toast.makeText(this, "Email đã tồn tại. Vui lòng đăng nhập.", Toast.LENGTH_LONG).show();
-                            startActivity(new Intent(this, Login.class));
+                            startActivity(new Intent(this, LoginActivity.class));
                             finish();
                         } else {
-                            
-                            Intent i = new Intent(this, Register.class);
+
+                            Intent i = new Intent(this, RegisterActivity.class);
                             i.putExtra("email", email);
                             startActivity(i);
                         }
@@ -84,7 +82,7 @@ public class SignUp extends AppCompatActivity {
                         GoogleSignInAccount acc = GoogleSignIn.getSignedInAccountFromIntent(result.getData())
                                 .getResult(ApiException.class);
                         if (acc != null && !TextUtils.isEmpty(acc.getEmail())) {
-                            Intent i = new Intent(this, Register.class);
+                            Intent i = new Intent(this, RegisterActivity.class);
                             i.putExtra("email", acc.getEmail());
                             startActivity(i);
                         } else {
@@ -96,15 +94,15 @@ public class SignUp extends AppCompatActivity {
                 });
 
         btnGoogle.setOnClickListener(v -> googlePicker.launch(googleClient.getSignInIntent()));
-        
+
 
         findViewById(R.id.tvLogin).setOnClickListener(v -> {
-            
-            Intent intent = new Intent(this, Login.class);
+
+            Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
 
-            
-            
+
+
         });
     }
 

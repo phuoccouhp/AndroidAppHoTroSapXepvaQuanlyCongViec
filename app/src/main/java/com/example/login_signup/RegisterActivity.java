@@ -16,7 +16,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Register extends AppCompatActivity {
+public class RegisterActivity extends AppCompatActivity {
 
     private EditText etName, etOldPass, etConfirm;
 
@@ -99,7 +99,7 @@ public class Register extends AppCompatActivity {
                             .set(data)
                             .addOnSuccessListener(aVoid -> {
                                 Toast.makeText(this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
-                                Intent i = new Intent(this, Login.class);
+                                Intent i = new Intent(this, LoginActivity.class);
                                 startActivity(i);
                                 finish();
                             })

@@ -229,16 +229,17 @@ time here"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
+                app:cardBackgroundColor="@android:color/transparent"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="4dp"
-                app:cardBackgroundColor="@android:color/white">
+                app:cardElevation="0dp"  app:cardUseCompatPadding="false"              >
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerViewTasksToday"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:nestedScrollingEnabled="false"
-                    tools:listitem="@layout/item_task" />
+                    tools:listitem="@layout/item_task"
+                    />
             </androidx.cardview.widget.CardView>
 
             <TextView
@@ -256,8 +257,8 @@ time here"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="4dp"
-                app:cardBackgroundColor="@android:color/white">
+                app:cardElevation="0dp"  app:cardBackgroundColor="@android:color/transparent"
+                app:cardUseCompatPadding="false"              >
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerViewTasksFuture"

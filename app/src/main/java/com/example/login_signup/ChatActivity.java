@@ -202,19 +202,19 @@ public class ChatActivity extends AppCompatActivity {
 
     
     private void handleIdleState(String text) {
-        if (text.matches(".*\\b(add|create|new|make)\\b.*")) {
+        if (text.matches(".*\\b(add|create|new|make|tạo|tạo mới|thêm)\\b.*")) {
             currentAiState = AiState.AWAITING_TASK_TITLE;
             sendAiMessage("Great! What is the title of the new task?");
-        } else if (text.matches(".*\\b(delete|remove|get rid of)\\b.*")) {
+        } else if (text.matches(".*\\b(delete|remove|get rid of|xoá)\\b.*")) {
             currentAiState = AiState.AWAITING_DELETE_SELECTION;
             sendAiMessage("I can do that. What is the title of the task you want to delete?");
-        } else if (text.matches(".*\\b(edit|change|update)\\b.*.*")) {
+        } else if (text.matches(".*\\b(edit|change|update|sửa|fix|chỉnh)\\b.*.*")) {
             currentAiState = AiState.AWAITING_EDIT_SELECTION;
             sendAiMessage("Sure. What is the title of the task you want to edit?");
         } else if (text.matches(".*\\b(complete|finish|done)\\b.*.*")) {
             currentAiState = AiState.AWAITING_COMPLETE_SELECTION;
             sendAiMessage("Excellent! What is the title of the task you completed?");
-        } else if (text.matches(".*\\b(show|list|view|what are|tasks)\\b.*.*")) {
+        } else if (text.matches(".*\\b(show|list|view|what are|tasks|hiện)\\b.*.*")) {
             showTasksFromFirestore();
         } else {
             sendAiMessage("Sorry, I don't understand that yet. I can help you add, show, edit, delete or complete tasks.");
@@ -230,9 +230,9 @@ public class ChatActivity extends AppCompatActivity {
     private void handleDate(String text) {
         Calendar cal = Calendar.getInstance();
         boolean dateParsed = false;
-        if (text.equals("today")) {
+        if (text.equals("today")||text.equals("hôm nay")||text.equals("nay")) {
             dateParsed = true; 
-        } else if (text.equals("tomorrow")) {
+        } else if (text.equals("tomorrow")||text.equals("mai")) {
             cal.add(Calendar.DAY_OF_YEAR, 1);
             dateParsed = true;
         } else if (text.startsWith("next ")) {

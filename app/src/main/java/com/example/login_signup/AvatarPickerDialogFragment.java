@@ -22,7 +22,7 @@ public class AvatarPickerDialogFragment extends DialogFragment {
     private AvatarPickerListener listener;
     
     private static final String[] AVATAR_IDS = {
-        "anh1", "anh2", "anh3", "anh4", "anh5"
+        "anh1", "anh2", "anh3", "anh4", "anh5" ,"anh6"
     };
 
     @NonNull

@@ -30,7 +30,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Login_Signup">
 
-        <service
+        <service 
             android:name=".AlarmService" />
 
         <receiver
@@ -43,42 +43,48 @@
         </receiver>
 
         <activity
-            android:name=".HomeActivity"
-            android:exported="false" />
-        <activity
             android:name=".AlarmActivity"
             android:theme="@style/Theme.App.Alarm"
             android:showWhenLocked="true"
             android:turnScreenOn="true" />
+
+        <activity
+            android:name=".ChatHistoryActivity"
+            android:exported="false" />
+            
         <activity
             android:name=".ChatActivity"
             android:exported="false" />
+
         <activity
-            android:name=".ChatHistoryActivity"
+            android:name=".HomeActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.example.login_signup.TaskDetailFragment"
             android:exported="false" />
         <activity
             android:name=".AddTaskActivity"
             android:exported="false" />
         <activity
-            android:name=".TaskDetailActivity"
+            android:name=".ChangePassword"
             android:exported="false" />
         <activity
-            android:name=".ChangePasswordActivity"
+            android:name=".Profile"
             android:exported="false" />
         <activity
-            android:name=".ForgetPasswordActivity"
+            android:name=".ForgetPassword"
             android:exported="false" />
         <activity
             android:name=".NewPassword"
             android:exported="false" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".Login"
             android:exported="false" />
         <activity
-            android:name=".SignUpActivity"
+            android:name=".SignUp"
             android:exported="false" />
         <activity
-            android:name=".RegisterActivity"
+            android:name=".Register"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

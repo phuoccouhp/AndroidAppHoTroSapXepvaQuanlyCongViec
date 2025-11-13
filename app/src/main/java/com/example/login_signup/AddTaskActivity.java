@@ -9,33 +9,23 @@ import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.Spinner;
-import android.widget.Toast;
-
+import android.widget.*;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 public class AddTaskActivity extends AppCompatActivity {
 
     private EditText etTaskName, etNotes;
     private Spinner spinnerCategories, spinnerVibration;
     private Button btnSetDueDate, btnSetTime, btnSetReminder, btnSelectRingtone;
-    private FloatingActionButton btnSaveTask;
+    private FloatingActionButton fabSaveTask;
     private ImageButton btnBack;
 
     private Calendar dueDateTime = Calendar.getInstance();
@@ -75,16 +65,16 @@ public class AddTaskActivity extends AppCompatActivity {
     }
 
     private void initViews() {
-        etTaskName = findViewById(R.id.etTaskName);
-        etNotes = findViewById(R.id.etNotes);
-        spinnerCategories = findViewById(R.id.spinnerCategories);
-        spinnerVibration = findViewById(R.id.spinnerVibration);
-        btnSetDueDate = findViewById(R.id.btnSetDueDate);
-        btnSetTime = findViewById(R.id.btnSetTime);
-        btnSetReminder = findViewById(R.id.btnSetReminder);
-        btnSelectRingtone = findViewById(R.id.btnSelectRingtone);
-        btnSaveTask = findViewById(R.id.btnSaveTask);
-        btnBack = findViewById(R.id.btnBack);
+        etTaskName = findViewById(R.id.et_task_name);
+        etNotes = findViewById(R.id.et_notes);
+        spinnerCategories = findViewById(R.id.spinner_categories);
+        spinnerVibration = findViewById(R.id.spinner_vibration);
+        btnSetDueDate = findViewById(R.id.btn_set_due_date);
+        btnSetTime = findViewById(R.id.btn_set_time);
+        btnSetReminder = findViewById(R.id.btn_set_reminder);
+        btnSelectRingtone = findViewById(R.id.btn_select_ringtone);
+        fabSaveTask = findViewById(R.id.fab_save_task);
+        btnBack = findViewById(R.id.btn_back);
     }
 
     private void setupSpinners() {
@@ -135,7 +125,7 @@ public class AddTaskActivity extends AppCompatActivity {
             ringtonePickerLauncher.launch(intent);
         });
 
-        btnSaveTask.setOnClickListener(v -> saveNewTask());
+        fabSaveTask.setOnClickListener(v -> saveNewTask());
     }
 
     private void updateDateAndTimeButtons() {
@@ -169,7 +159,7 @@ public class AddTaskActivity extends AppCompatActivity {
         taskData.put("uid", userId);
         taskData.put("title", name);
         taskData.put("category", spinnerCategories.getSelectedItem().toString());
-        taskData.put("notes", noteContent);
+        taskData.put("note", noteContent);
         taskData.put("reminder", reminderOn);
         taskData.put("completed", false);
         taskData.put("taskDate", dueDateTime.getTime());

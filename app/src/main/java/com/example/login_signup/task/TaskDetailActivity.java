@@ -1,16 +1,10 @@
-package com.example.login_signup;
+package com.example.login_signup.task;
 
 import android.os.Bundle;
-import android.view.View;
-import android.widget.TextView;
-import android.widget.Toast;
-import androidx.appcompat.app.AppCompatActivity;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.login_signup.R;
 
 public class TaskDetailActivity extends AppCompatActivity {
 

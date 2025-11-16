@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/background"
 
-    tools:context=".ChatHistoryActivity">
+    tools:context=".chat.ChatHistoryActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/header_layout"

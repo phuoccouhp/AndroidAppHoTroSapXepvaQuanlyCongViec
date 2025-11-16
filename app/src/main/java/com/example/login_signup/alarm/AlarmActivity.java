@@ -1,4 +1,4 @@
-package com.example.login_signup;
+package com.example.login_signup.alarm;
 
 import android.content.Intent;
 import android.os.Build;
@@ -7,6 +7,8 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.login_signup.R;
 
 public class AlarmActivity extends AppCompatActivity {
 

@@ -1,47 +1,47 @@
-package com.example.login_signup;
+package com.example.login_signup.log_sign;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Patterns;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.login_signup.R;
+import com.example.login_signup.classes.FirebaseRepo;
 import com.google.android.gms.auth.api.signin.*;
 import com.google.android.gms.common.api.ApiException;
-import com.google.firebase.auth.ActionCodeSettings;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class SignUp extends AppCompatActivity {
 
     private EditText etEmail;
     private ImageButton btnGoogle;
-
+    private Button btnNext;
+    private TextView tvLogin;
     private GoogleSignInClient googleClient;
     private ActivityResultLauncher<Intent> googlePicker;
 
-    private FirebaseAuth mAuth;
+    private FirebaseRepo fbRepo;
     private FirebaseFirestore db;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_signup);
-
+    private void Init(){
         etEmail = findViewById(R.id.etEmail);
         btnGoogle = findViewById(R.id.btnGoogle);
+        btnNext = findViewById(R.id.btnNext);
+        tvLogin = findViewById(R.id.tvLogin);
+    }
 
-        mAuth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance();
+    private void setOnClick(){
 
-        findViewById(R.id.btnNext).setOnClickListener(v -> {
+        btnNext.setOnClickListener(v -> {
             String email = etEmail.getText().toString().trim();
 
             if (!isValidEmail(email)) {
@@ -50,26 +50,39 @@ public class SignUp extends AppCompatActivity {
                 return;
             }
 
-            db.collection("users")
-                    .whereEqualTo("email", email)
-                    .limit(1)
-                    .get()
-                    .addOnSuccessListener(snap -> {
-                        if (!snap.isEmpty()) {
-                            Toast.makeText(this, "Email đã tồn tại. Vui lòng đăng nhập.", Toast.LENGTH_LONG).show();
-                            startActivity(new Intent(this, Login.class));
-                            finish();
-                        } else {
-                            
-                            Intent i = new Intent(this, Register.class);
-                            i.putExtra("email", email);
-                            startActivity(i);
-                        }
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(this, "Không kiểm tra được email: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                    });
+            fbRepo.checkEmailExists(email, (emailExists, message, e) -> {
+                if (e != null) {
+                    Toast.makeText(this, message + e.getMessage(), Toast.LENGTH_LONG).show();
+
+                } else if (emailExists) {
+                    Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+                    startActivity(new Intent(this, Login.class));
+                    finish();
+
+                } else {
+                    Intent i = new Intent(this, Register.class);
+                    i.putExtra("email", email);
+                    startActivity(i);
+                }
+            });
         });
+
+        btnGoogle.setOnClickListener(v -> googlePicker.launch(googleClient.getSignInIntent()));
+        tvLogin.setOnClickListener(v -> {
+            Intent intent = new Intent(this, Login.class);
+            startActivity(intent);
+        });
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_signup);
+
+        Init();
+        setOnClick();
+
+        fbRepo = new FirebaseRepo();
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
@@ -94,21 +107,7 @@ public class SignUp extends AppCompatActivity {
                         Toast.makeText(this, "Google chọn tài khoản lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
-
-        btnGoogle.setOnClickListener(v -> googlePicker.launch(googleClient.getSignInIntent()));
-        
-
-        findViewById(R.id.tvLogin).setOnClickListener(v -> {
-            
-            Intent intent = new Intent(this, Login.class);
-            startActivity(intent);
-
-            
-            
-        });
     }
-
-
 
     private boolean isValidEmail(String email) {
         return !TextUtils.isEmpty(email) && Patterns.EMAIL_ADDRESS.matcher(email).matches();

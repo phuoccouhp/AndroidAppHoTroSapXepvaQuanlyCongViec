@@ -15,7 +15,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,6 +23,8 @@ import androidx.core.content.ContextCompat;
 import java.util.Random;
 import android.widget.ProgressBar;
 import android.view.View;
+
+import com.example.login_signup.log_sign.Login;
 
 public class MainActivity extends AppCompatActivity {
     private static final int SPLASH_TIME_OUT = 3000;

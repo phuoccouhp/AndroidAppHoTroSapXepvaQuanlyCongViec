@@ -1,4 +1,4 @@
-package com.example.login_signup;
+package com.example.login_signup.task;
 
 import android.app.AlarmManager;
 import android.app.DatePickerDialog;
@@ -13,6 +13,12 @@ import android.widget.*;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.login_signup.HomeActivity;
+import com.example.login_signup.NotificationHelper;
+import com.example.login_signup.R;
+import com.example.login_signup.TaskReminderReceiver;
+import com.example.login_signup.classes.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;

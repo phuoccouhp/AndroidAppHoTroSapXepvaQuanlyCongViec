@@ -1,4 +1,4 @@
-package com.example.login_signup;
+package com.example.login_signup.chat;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -6,6 +6,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.login_signup.R;
 import com.google.firebase.auth.FirebaseAuth;
 import java.util.List;
 

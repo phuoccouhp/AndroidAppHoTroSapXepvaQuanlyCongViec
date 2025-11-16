@@ -1,4 +1,4 @@
-package com.example.login_signup;
+package com.example.login_signup.log_sign;
 
 import android.Manifest;
 import android.app.Dialog;
@@ -22,6 +22,10 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.example.login_signup.ForgetPassword;
+import com.example.login_signup.HomeActivity;
+import com.example.login_signup.R;
+import com.example.login_signup.classes.FirebaseRepo;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -42,7 +46,7 @@ public class Login extends AppCompatActivity {
     private TextView tvSignUp;
     private ImageButton btnGoogle;
 
-    private FirebaseAuth mAuth;
+    private FirebaseRepo fbRepo;
     private GoogleSignInClient mGoogleSignInClient;
     private ActivityResultLauncher<Intent> googleSignInLauncher;
 
@@ -56,42 +60,22 @@ public class Login extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser != null) {
+        if (fbRepo.getCurrentUser() != null) {
             Toast.makeText(this, "Đã tự động đăng nhập!", Toast.LENGTH_SHORT).show();
             navigateToHomeActivity();
         }
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
-
-        mAuth = FirebaseAuth.getInstance();
-
+    void Init(){
         etEmail = findViewById(R.id.etEmail);
         etOldPass = findViewById(R.id.etOldPass);
         btnLogin = findViewById(R.id.btnLogin);
         tvForgetPass = findViewById(R.id.tvForgetPass);
         tvSignUp = findViewById(R.id.tvSignUp);
         btnGoogle = findViewById(R.id.btnGoogle);
+    }
 
-        createGoogleSignInRequest();
-        googleSignInLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == RESULT_OK) {
-                        Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(result.getData());
-                        try {
-                            GoogleSignInAccount account = task.getResult(ApiException.class);
-                            firebaseAuthWithGoogle(account.getIdToken());
-                        } catch (ApiException e) {
-                            Toast.makeText(this, "Đăng nhập Google thất bại.", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-
+    void setOnClick(){
         btnLogin.setOnClickListener(v -> handleLogin());
         tvForgetPass.setOnClickListener(v -> {
             Intent intent = new Intent(Login.this, ForgetPassword.class);
@@ -102,6 +86,34 @@ public class Login extends AppCompatActivity {
             startActivity(intent);
         });
         btnGoogle.setOnClickListener(v -> signInWithGoogle());
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_login);
+
+        Init();
+        setOnClick();
+
+        fbRepo = new FirebaseRepo();
+
+        createGoogleSignInRequest();
+        googleSignInLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == RESULT_OK) {
+                    Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(result.getData());
+                    try {
+                        GoogleSignInAccount account = task.getResult(ApiException.class);
+                        firebaseAuthWithGoogle(account.getIdToken());
+                    } catch (ApiException e) {
+                        Toast.makeText(this, "Đăng nhập Google thất bại.", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+
+
     }
 
     @Override
@@ -142,21 +154,15 @@ public class Login extends AppCompatActivity {
         String email = etEmail.getText().toString().trim();
         String password = etOldPass.getText().toString();
 
-        if (email.isEmpty() || password.isEmpty()) {
-            Toast.makeText(this, "Vui lòng nhập email và mật khẩu", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, task -> {
-                    if (task.isSuccessful()) {
-                        Toast.makeText(Login.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
-                        navigateToHomeActivity();
-                    } else {
-                        Toast.makeText(Login.this, "Đăng nhập thất bại: " + task.getException().getMessage(),
-                                Toast.LENGTH_LONG).show();
-                    }
-                });
+        fbRepo.signInWithEmailAndPassword(email, password, (message, e) -> {
+            if (e == null) {
+                Toast.makeText(Login.this, message, Toast.LENGTH_SHORT).show();
+                navigateToHomeActivity();
+            } else {
+                Toast.makeText(Login.this, e.getMessage(),
+                        Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private void createGoogleSignInRequest() {
@@ -175,16 +181,14 @@ public class Login extends AppCompatActivity {
     }
 
     private void firebaseAuthWithGoogle(String idToken) {
-        AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
-        mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, task -> {
-                    if (task.isSuccessful()) {
-                        Toast.makeText(Login.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
-                        navigateToHomeActivity();
-                    } else {
-                        Toast.makeText(Login.this, "Xác thực Firebase thất bại.", Toast.LENGTH_SHORT).show();
-                    }
-                });
+        fbRepo.firebaseAuthWithGoogle(idToken, (message, e) -> {
+            if (e == null) {
+                Toast.makeText(Login.this, message, Toast.LENGTH_SHORT).show();
+                navigateToHomeActivity();
+            } else {
+                Toast.makeText(Login.this, "Đăng nhập thất bại: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void navigateToHomeActivity() {

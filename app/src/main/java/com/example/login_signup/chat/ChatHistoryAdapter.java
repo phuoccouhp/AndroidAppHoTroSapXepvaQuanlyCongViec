@@ -1,4 +1,4 @@
-package com.example.login_signup;
+package com.example.login_signup.chat;
 
 import android.content.Intent;
 import android.text.format.DateUtils;
@@ -8,6 +8,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.login_signup.R;
+
 import de.hdodenhof.circleimageview.CircleImageView;
 import java.util.List;
 

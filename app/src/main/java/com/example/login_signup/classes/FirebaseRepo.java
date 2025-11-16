@@ -1,0 +1,77 @@
+package com.example.login_signup.classes;
+
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
+
+public class FirebaseRepo {
+    private FirebaseAuth auth;
+    private FirebaseFirestore db;
+
+    //Interface to report success/failure
+    public interface OnCompleteCallback {
+        void onComplete(String message, Exception e);
+    }
+
+    //Interface to check email
+    public interface OnEmailCheckListener {
+        void onComplete(boolean emailExists, String message, Exception e);
+    }
+
+    public FirebaseRepo() {
+        this.auth = FirebaseAuth.getInstance();
+        this.db = FirebaseFirestore.getInstance();
+    }
+
+    public FirebaseUser getCurrentUser(){
+        return auth.getCurrentUser();
+    }
+
+    public void signInWithEmailAndPassword(String email, String password, OnCompleteCallback callback) {
+        if (email == null || email.isEmpty() || password == null || password.isEmpty()) {
+            callback.onComplete(null, new IllegalArgumentException("Vui lòng nhập email và mật khẩu"));
+            return;
+        }
+
+        auth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        callback.onComplete("Đăng nhập thành công!", null);
+                    } else {
+                        callback.onComplete("Đăng nhập thất bại: ", task.getException());
+                    }
+                });
+    }
+
+    public void firebaseAuthWithGoogle(String idToken, OnCompleteCallback callback){
+        AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
+        auth.signInWithCredential(credential)
+                .addOnCompleteListener(task -> {
+                   if(task.isSuccessful()){
+                       callback.onComplete("Đăng nhập thành công!", null);
+                   } else {
+                       callback.onComplete(null, task.getException());
+                   }
+                });
+    }
+
+    public void checkEmailExists(String email, OnEmailCheckListener listener) {
+        db.collection("users")
+                .whereEqualTo("email", email)
+                .limit(1)
+                .get()
+                .addOnSuccessListener(snap -> {
+                    if (!snap.isEmpty()) {
+                        listener.onComplete(true, "Email đã tồn tại. Vui lòng đăng nhập.", null);
+                    } else {
+                        listener.onComplete(false, null, null);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    listener.onComplete(false, "Không kiểm tra được email: ", e);
+                });
+    }
+}

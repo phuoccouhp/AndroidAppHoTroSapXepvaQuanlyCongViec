@@ -9,6 +9,9 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.login_signup.classes.Task;
+import com.example.login_signup.task.TaskAdapter;
+import com.example.login_signup.task.TaskDetailFragment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.*;
 
@@ -96,46 +99,46 @@ public class CalendarFragment extends Fragment {
         }
 
         db.collection("tasks")
-                .whereEqualTo("uid", uid)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        taskList.clear();
+            .whereEqualTo("uid", uid)
+            .get()
+            .addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    taskList.clear();
 
-                        SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                    SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm", Locale.getDefault());
 
-                        for (QueryDocumentSnapshot doc : task.getResult()) {
-                            Object rawDate = doc.get("taskDate");
-                            if (!(rawDate instanceof com.google.firebase.Timestamp)) continue;
+                    for (QueryDocumentSnapshot doc : task.getResult()) {
+                        Object rawDate = doc.get("taskDate");
+                        if (!(rawDate instanceof com.google.firebase.Timestamp)) continue;
 
-                            Date taskDate = ((com.google.firebase.Timestamp) rawDate).toDate();
-                            String taskDayString = sdfDate.format(taskDate);
+                        Date taskDate = ((com.google.firebase.Timestamp) rawDate).toDate();
+                        String taskDayString = sdfDate.format(taskDate);
 
-                            if (taskDayString.equals(selectedDayString)) {
-                                String id = doc.getId();
-                                String title = doc.getString("title");
-                                String category = doc.getString("category");
+                        if (taskDayString.equals(selectedDayString)) {
+                            String id = doc.getId();
+                            String title = doc.getString("title");
+                            String category = doc.getString("category");
 
-                                
-                                String noteContent = doc.getString("note");
-                                if (noteContent == null) {
-                                    noteContent = doc.getString("notes");
-                                }
 
-                                boolean completed = doc.getBoolean("completed") != null && doc.getBoolean("completed");
-                                String timeStr = sdfTime.format(taskDate);
-                                String dateStr = sdfDate.format(taskDate);
-
-                                taskList.add(new Task(id, title, category, timeStr, completed, dateStr, noteContent));
+                            String noteContent = doc.getString("note");
+                            if (noteContent == null) {
+                                noteContent = doc.getString("notes");
                             }
-                        }
-                        adapter.notifyDataSetChanged();
-                    } else {
-                        if (getContext() != null) {
-                            Toast.makeText(getContext(), "Lỗi tải dữ liệu", Toast.LENGTH_SHORT).show();
+
+                            boolean completed = doc.getBoolean("completed") != null && doc.getBoolean("completed");
+                            String timeStr = sdfTime.format(taskDate);
+                            String dateStr = sdfDate.format(taskDate);
+
+                            taskList.add(new Task(id, title, category, timeStr, completed, dateStr, noteContent));
                         }
                     }
-                });
+                    adapter.notifyDataSetChanged();
+                } else {
+                    if (getContext() != null) {
+                        Toast.makeText(getContext(), "Lỗi tải dữ liệu", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
     }
     private void deleteTaskFromFirestore(Task task) {
         if (task.getId() == null || task.getId().isEmpty()) {

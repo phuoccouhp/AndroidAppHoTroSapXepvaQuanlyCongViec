@@ -1,4 +1,4 @@
-package com.example.login_signup;
+package com.example.login_signup.chat;
 
 import com.google.firebase.firestore.ServerTimestamp;
 import java.util.Date;

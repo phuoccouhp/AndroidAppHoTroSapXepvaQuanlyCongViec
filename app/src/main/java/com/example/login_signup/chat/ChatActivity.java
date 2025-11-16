@@ -1,4 +1,4 @@
-package com.example.login_signup;
+package com.example.login_signup.chat;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -10,13 +10,17 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.login_signup.NotificationHelper;
+import com.example.login_signup.R;
+import com.example.login_signup.TaskReminderReceiver;
+import com.example.login_signup.classes.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -25,7 +29,6 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -321,7 +324,7 @@ public class ChatActivity extends AppCompatActivity {
     private void addTaskToFirestore() {
         FirebaseUser currentUser = auth.getCurrentUser();
         if (currentUser == null) return;
-        com.example.login_signup.Task newTask = new com.example.login_signup.Task();
+        Task newTask = new Task();
         newTask.setUid(currentUser.getUid());
         newTask.setTitle((String) context.get("title"));
         newTask.setCategory((String) context.get("category"));
@@ -433,7 +436,7 @@ public class ChatActivity extends AppCompatActivity {
             if (field.equals("date") || field.equals("time")) {
                 cancelScheduledNotifications(doc.getId());
                 doc.getReference().get().addOnSuccessListener(updatedDoc -> {
-                    com.example.login_signup.Task task = updatedDoc.toObject(com.example.login_signup.Task.class);
+                    Task task = updatedDoc.toObject(Task.class);
                     if (task != null && task.isReminder()) {
                         scheduleTaskReminderFromChat(updatedDoc.getId(), task);
                     }
@@ -443,7 +446,7 @@ public class ChatActivity extends AppCompatActivity {
         });
     }
     
-    private void scheduleTaskReminderFromChat(String taskId, com.example.login_signup.Task task) {
+    private void scheduleTaskReminderFromChat(String taskId, Task task) {
          long dueTime = task.getTaskDate().getTime();
         scheduleNotification(taskId, task, dueTime, false);
         long twentyFourHoursInMillis = 24 * 60 * 60 * 1000;
@@ -466,7 +469,7 @@ public class ChatActivity extends AppCompatActivity {
         Log.d(TAG, "Cancelled alarms for taskId: " + taskId);
     }
     
-    private void scheduleNotification(String uniqueTaskId, com.example.login_signup.Task task, long time, boolean isAdvance) {
+    private void scheduleNotification(String uniqueTaskId, Task task, long time, boolean isAdvance) {
         Intent intent = new Intent(this, TaskReminderReceiver.class);
         intent.putExtra("taskId", uniqueTaskId);
         intent.putExtra("title", task.getTitle());
@@ -499,7 +502,7 @@ public class ChatActivity extends AppCompatActivity {
                 } else {
                     StringBuilder taskListStr = new StringBuilder("Here are your current tasks:\n");
                     for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                        com.example.login_signup.Task task = doc.toObject(com.example.login_signup.Task.class);
+                        Task task = doc.toObject(Task.class);
                         taskListStr.append("- ").append(task.getTitle()).append("\n");
                     }
                     sendAiMessage(taskListStr.toString());

@@ -1,14 +1,14 @@
-package com.example.login_signup;
+package com.example.login_signup.log_sign;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.EditText;
 import android.widget.Toast;
-import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.login_signup.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 

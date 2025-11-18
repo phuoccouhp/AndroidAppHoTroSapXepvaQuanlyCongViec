@@ -5,7 +5,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class FirebaseRepo {
     private FirebaseAuth auth;
@@ -16,9 +18,18 @@ public class FirebaseRepo {
         void onComplete(String message, Exception e);
     }
 
-    //Interface to check email
     public interface OnEmailCheckListener {
         void onComplete(boolean emailExists, String message, Exception e);
+    }
+
+    public interface OnRegisterListener {
+        void onSuccess();
+        void onAuthFailure(Exception e);
+        void onDbFailure(Exception e);
+    }
+
+    public interface onLoadedUserListener {
+        void onComplete(User user, Exception e);
     }
 
     public FirebaseRepo() {
@@ -88,9 +99,8 @@ public class FirebaseRepo {
                             return;
                         }
 
-                        
-
                         Map<String, Object> data = new HashMap<>();
+                        data.put("avatarId", "anh1");
                         data.put("name", name);
                         data.put("email", email);
 
@@ -111,9 +121,38 @@ public class FirebaseRepo {
                             listener.onAuthFailure(new Exception("Đăng ký thất bại"));
                         }
                     }
-
-
                 });
 
+    }
+
+    public void loadCurrentUserProfile(onLoadedUserListener listener){
+        User user = new User();
+        FirebaseUser currentUser = this.getCurrentUser();
+        if(currentUser != null){
+            user.setEmail(currentUser.getEmail());
+            user.setUid(currentUser.getUid());
+
+            db.collection("users").document(user.getUid())
+                    .get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        if(listener == null) { return; }
+                        if (documentSnapshot.exists()) {
+                            String name = documentSnapshot.getString("name");
+                            String avatarId = documentSnapshot.getString("avatarId");
+
+                            user.setName(name != null ? name : "Name not set");
+                            user.setAvatarId(avatarId);
+                            listener.onComplete(user, null);
+                        } else {
+                            listener.onComplete(user, new Exception("Không tìm thấy thông tin người dùng."));
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        listener.onComplete(user, e);
+                    });
+        }
+        else{
+            listener.onComplete(null, new Exception("User not logged in"));
+        }
     }
 }

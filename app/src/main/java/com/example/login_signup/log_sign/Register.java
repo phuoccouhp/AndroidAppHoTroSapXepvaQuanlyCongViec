@@ -4,12 +4,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Patterns;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.login_signup.R;
+import com.example.login_signup.classes.FirebaseRepo;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -20,23 +22,25 @@ import java.util.Map;
 public class Register extends AppCompatActivity {
 
     private EditText etName, etOldPass, etConfirm;
-
-    private FirebaseAuth mAuth;
-    private FirebaseFirestore db;
-
+    private Button btnConfirm;
+    private FirebaseRepo fbRepo;
     private String emailFromSignUp;
+
+    void Init(){
+        etName = findViewById(R.id.etName);
+        etOldPass = findViewById(R.id.etOldPass);
+        etConfirm = findViewById(R.id.etConfirm);
+        btnConfirm = findViewById(R.id.btnConfirm);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        etName = findViewById(R.id.etName);
-        etOldPass = findViewById(R.id.etOldPass);
-        etConfirm = findViewById(R.id.etConfirm);
+        Init();
 
-        mAuth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance();
+        fbRepo = new FirebaseRepo();
 
         emailFromSignUp = getIntent().getStringExtra("email");
         if (TextUtils.isEmpty(emailFromSignUp) ||
@@ -46,7 +50,7 @@ public class Register extends AppCompatActivity {
             return;
         }
 
-        findViewById(R.id.btnConfirm).setOnClickListener(v -> doRegister());
+        btnConfirm.setOnClickListener(v -> doRegister());
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
     }
 

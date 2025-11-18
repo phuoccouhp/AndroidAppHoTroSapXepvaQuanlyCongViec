@@ -26,6 +26,7 @@ import com.example.login_signup.ForgetPassword;
 import com.example.login_signup.HomeActivity;
 import com.example.login_signup.R;
 import com.example.login_signup.classes.FirebaseRepo;
+import com.example.login_signup.classes.User;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;

@@ -13,6 +13,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.login_signup.classes.AvatarUtils;
+import com.example.login_signup.classes.FirebaseRepo;
 import com.example.login_signup.log_sign.Login;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -30,6 +32,7 @@ public class ProfileFragment extends Fragment implements AvatarPickerDialogFragm
     private Button btnLogout;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
+    private FirebaseRepo fbRepo;
 
     public ProfileFragment() {}
 
@@ -44,7 +47,7 @@ public class ProfileFragment extends Fragment implements AvatarPickerDialogFragm
 
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
-
+        fbRepo = new FirebaseRepo();
         
         ivAvatar = view.findViewById(R.id.iv_avatar);
         tvEditAvatar = view.findViewById(R.id.tv_edit_avatar);
@@ -74,34 +77,29 @@ public class ProfileFragment extends Fragment implements AvatarPickerDialogFragm
     }
 
     private void loadUserProfile() {
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser != null) {
-            tvEmail.setText(currentUser.getEmail());
-            String uid = currentUser.getUid();
-            DocumentReference docRef = db.collection("users").document(uid);
+        fbRepo.loadCurrentUserProfile((user, e) ->{
+            if (user == null || (e != null && e.getMessage().equals("User not logged in"))) {
+                goToLoginActivity();
+            }
 
-            docRef.get().addOnSuccessListener(documentSnapshot -> {
-                if (documentSnapshot.exists()) {
-                    // FIX: Changed "fullName" to "name" to match the key used during registration.
-                    String name = documentSnapshot.getString("name");
-                    String avatarId = documentSnapshot.getString("avatarId");
+            tvEmail.setText(user.getEmail());
+            String displayName = user.getName();
+            if (displayName == null || displayName.isEmpty()) {
+                tvName.setText("Name not set");
+            } else {
+                tvName.setText(displayName);
+            }
 
-                    tvName.setText(name != null ? name : "Name not set");
+            String avatarId = user.getAvatarId();
+            if (avatarId.equals("anh1")){
+                int avatarResId = AvatarUtils.getAvatarResourceId(getContext(), avatarId);
+                ivAvatar.setImageResource(avatarResId);
+            }
 
-                    
-                    int avatarResId = AvatarUtils.getAvatarResourceId(getContext(), avatarId);
-                    ivAvatar.setImageResource(avatarResId);
-                } else {
-                    Log.d(TAG, "Không tìm thấy thông tin người dùng.");
-                    tvName.setText("Name not set");
-                    ivAvatar.setImageResource(R.drawable.ic_avatar_1); 
-                }
-            }).addOnFailureListener(e -> {
-                Log.e(TAG, "Lỗi khi lấy thông tin người dùng", e);
-            });
-        } else {
-            goToLoginActivity();
-        }
+            if (e != null) {
+                Log.w(TAG, "Lỗi: " + e.getMessage());
+            }
+        });
     }
 
     @Override

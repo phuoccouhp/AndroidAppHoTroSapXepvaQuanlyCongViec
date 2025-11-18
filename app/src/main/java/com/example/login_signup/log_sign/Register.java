@@ -79,36 +79,27 @@ public class Register extends AppCompatActivity {
             return;
         }
 
-        mAuth.createUserWithEmailAndPassword(emailFromSignUp, pass)
-                .addOnCompleteListener(task -> {
-                    if (!task.isSuccessful()) {
-                        String msg = task.getException() != null ? task.getException().getMessage() : "Đăng ký thất bại";
-                        Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
-                        return;
-                    }
-                    FirebaseUser user = mAuth.getCurrentUser();
-                    if (user == null) {
-                        Toast.makeText(this, "Không lấy được người dùng sau khi tạo", Toast.LENGTH_LONG).show();
-                        return;
-                    }
+        fbRepo.createUserWithEmailAndPassword(name, emailFromSignUp, pass, new FirebaseRepo.OnRegisterListener() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(Register.this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
+                Intent i = new Intent(Register.this, Login.class);
+                startActivity(i);
+                finish();
+            }
 
-                    Map<String, Object> data = new HashMap<>();
-                    data.put("name", name);
-                    data.put("email", emailFromSignUp);
+            @Override
+            public void onAuthFailure(Exception e) {
+                Toast.makeText(Register.this, "Đăng ký thất bại: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            }
 
-                    db.collection("users").document(user.getUid())
-                            .set(data)
-                            .addOnSuccessListener(aVoid -> {
-                                Toast.makeText(this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
-                                Intent i = new Intent(this, Login.class);
-                                startActivity(i);
-                                finish();
-                            })
-                            .addOnFailureListener(e -> {
-                                Toast.makeText(this, "Lưu hồ sơ thất bại: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                                if (mAuth.getCurrentUser() != null) mAuth.getCurrentUser().delete();
-                            });
-                });
+            @Override
+            public void onDbFailure(Exception e) {
+                Toast.makeText(Register.this, "Lưu hồ sơ thất bại: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                //if (mAuth.getCurrentUser() != null) mAuth.getCurrentUser().delete();
+            }
+        });
+
     }
 
     private String val(EditText e) {

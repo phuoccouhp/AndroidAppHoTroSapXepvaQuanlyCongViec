@@ -74,4 +74,46 @@ public class FirebaseRepo {
                     listener.onComplete(false, "Không kiểm tra được email: ", e);
                 });
     }
+
+    public void createUserWithEmailAndPassword(String name, String email, String pass, OnRegisterListener listener){
+        auth.createUserWithEmailAndPassword(email, pass)
+                .addOnCompleteListener(task -> {
+                    if(listener == null){
+                        return;
+                    }
+                    if (task.isSuccessful()) {
+                        FirebaseUser user = auth.getCurrentUser();
+                        if (user == null){
+                            listener.onAuthFailure(new Exception("Không lấy được người dùng sau khi tạo"));
+                            return;
+                        }
+
+                        
+
+                        Map<String, Object> data = new HashMap<>();
+                        data.put("name", name);
+                        data.put("email", email);
+
+                        db.collection("users").document(user.getUid())
+                                .set(data)
+                                .addOnSuccessListener(aVoid -> {
+                                    listener.onSuccess();
+                                })
+                                .addOnFailureListener(e -> {
+                                    listener.onDbFailure(e);
+                                });
+                    }
+                    else{
+                        if(task.getException() != null){
+                            listener.onAuthFailure(task.getException());
+                        }
+                        else{
+                            listener.onAuthFailure(new Exception("Đăng ký thất bại"));
+                        }
+                    }
+
+
+                });
+
+    }
 }

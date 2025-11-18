@@ -1,5 +1,8 @@
 package com.example.login_signup.classes;
 
+import android.util.Log;
+import android.widget.Toast;
+
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -154,5 +157,18 @@ public class FirebaseRepo {
         else{
             listener.onComplete(null, new Exception("User not logged in"));
         }
+    }
+
+    public void updateAvatar(String base64string, OnCompleteCallback callback){
+        FirebaseUser currentUser = this.getCurrentUser();
+        if(currentUser != null){
+            db.collection("users").document(currentUser.getUid())
+                    .update("avatarId", base64string)
+                    .addOnSuccessListener(aVoid -> callback.onComplete("success", null))
+                    .addOnFailureListener(e -> {
+                        callback.onComplete(null, e);
+                    });
+        }
+
     }
 }

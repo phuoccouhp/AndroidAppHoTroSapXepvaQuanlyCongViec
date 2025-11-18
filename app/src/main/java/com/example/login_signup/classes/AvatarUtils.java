@@ -53,10 +53,8 @@ public class AvatarUtils {
         int originalWidth = options.outWidth;
         int originalHeight = options.outHeight;
 
-        // 2. Calculate the optimal 'inSampleSize'
         int inSampleSize = calculateInSampleSize(originalWidth, originalHeight);
 
-        // 3. Decode the image file into a Bitmap, scaling it down
         BitmapFactory.Options decodeOptions = new BitmapFactory.Options();
         decodeOptions.inSampleSize = inSampleSize;
 
@@ -84,16 +82,13 @@ public class AvatarUtils {
         return inSampleSize;
     }
 
-    public Bitmap convertBase64ToBitmap(String base64String) {
+    public static Bitmap convertBase64ToBitmap(String base64String) {
         try {
-            // 1. Decode the Base64 string into a byte array
             byte[] decodedBytes = Base64.decode(base64String, Base64.DEFAULT);
 
-            // 2. Use BitmapFactory to convert the byte array into a Bitmap
             return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
 
         } catch (IllegalArgumentException e) {
-            // This can happen if the string is not valid Base64
             e.printStackTrace();
             return null;
         }

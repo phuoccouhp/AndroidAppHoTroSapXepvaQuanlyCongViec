@@ -1,7 +1,13 @@
 package com.example.login_signup;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -21,6 +27,9 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.io.IOException;
+import java.util.Objects;
+
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ProfileFragment extends Fragment implements AvatarPickerDialogFragment.AvatarPickerListener {
@@ -33,6 +42,8 @@ public class ProfileFragment extends Fragment implements AvatarPickerDialogFragm
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
     private FirebaseRepo fbRepo;
+    private ActivityResultLauncher<String> selectImageLauncher;
+    private Uri replaceAvatar;
 
     public ProfileFragment() {}
 
@@ -59,10 +70,40 @@ public class ProfileFragment extends Fragment implements AvatarPickerDialogFragm
         
         loadUserProfile();
 
+
+        selectImageLauncher = registerForActivityResult(
+                new ActivityResultContracts.GetContent(),
+                new ActivityResultCallback<Uri>() {
+                    @Override
+                    public void onActivityResult(Uri uri) {
+                        if (uri != null) {
+                            replaceAvatar = uri;
+                        }
+                    }
+                }
+        );
         
         View.OnClickListener avatarClickListener = v -> {
-            AvatarPickerDialogFragment dialog = new AvatarPickerDialogFragment();
-            dialog.show(getChildFragmentManager(), "AvatarPicker");
+            selectImageLauncher.launch("image/*");
+            if(replaceAvatar != null){
+                String convert = null;
+                try {
+                    convert = AvatarUtils.convertImageToBase64Resized(getContext(), replaceAvatar);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                String finalConvert = convert;
+                fbRepo.updateAvatar(convert, (message, e) -> {
+                    if(e == null){
+                        Bitmap bitmap = AvatarUtils.convertBase64ToBitmap(finalConvert);
+                        ivAvatar.setImageBitmap(bitmap);
+                    }
+                    else{
+                        Toast.makeText(getContext(), "Không thể cập nhật avatar.", Toast.LENGTH_LONG).show();
+                        loadUserProfile();
+                    }
+                });
+            }
         };
         ivAvatar.setOnClickListener(avatarClickListener);
         tvEditAvatar.setOnClickListener(avatarClickListener);
@@ -95,6 +136,10 @@ public class ProfileFragment extends Fragment implements AvatarPickerDialogFragm
                 int avatarResId = AvatarUtils.getAvatarResourceId(getContext(), avatarId);
                 ivAvatar.setImageResource(avatarResId);
             }
+            else{
+                Bitmap bitmap = AvatarUtils.convertBase64ToBitmap(avatarId);
+                ivAvatar.setImageBitmap(bitmap);
+            }
 
             if (e != null) {
                 Log.w(TAG, "Lỗi: " + e.getMessage());
@@ -104,11 +149,11 @@ public class ProfileFragment extends Fragment implements AvatarPickerDialogFragm
 
     @Override
     public void onAvatarSelected(String avatarId) {
-        
+
         int avatarResId = AvatarUtils.getAvatarResourceId(getContext(), avatarId);
         ivAvatar.setImageResource(avatarResId);
 
-        
+
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
             String uid = currentUser.getUid();
@@ -118,7 +163,7 @@ public class ProfileFragment extends Fragment implements AvatarPickerDialogFragm
                     .addOnFailureListener(e -> {
                         Log.w(TAG, "Lỗi khi cập nhật avatar", e);
                         Toast.makeText(getContext(), "Không thể cập nhật avatar.", Toast.LENGTH_SHORT).show();
-                        loadUserProfile(); 
+                        loadUserProfile();
                     });
         }
     }

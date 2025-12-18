@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,6 +22,13 @@ import com.example.login_signup.NotificationHelper;
 import com.example.login_signup.R;
 import com.example.login_signup.TaskReminderReceiver;
 import com.example.login_signup.classes.Task;
+import com.google.ai.client.generativeai.GenerativeModel;
+import com.google.ai.client.generativeai.java.GenerativeModelFutures;
+import com.google.ai.client.generativeai.type.Content;
+import com.google.ai.client.generativeai.type.GenerateContentResponse;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -39,6 +47,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.Executor;
 
 public class ChatActivity extends AppCompatActivity {
 
@@ -68,6 +77,10 @@ public class ChatActivity extends AppCompatActivity {
     private CollectionReference messagesRef;
     private CollectionReference tasksRef;
     private String sessionId;
+
+    private GenerativeModelFutures model;
+    private Executor mainExecutor;
+    private static final String GEMINI_API_KEY = "AIzaSyDoIOAu5Nlu9IDin4-Q8QcntTwuR4-y43o";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,6 +112,25 @@ public class ChatActivity extends AppCompatActivity {
                 sendAiMessage("Hello! I am your virtual assistant. You can ask me to:\n- Create a new task\n- Show, edit, or delete tasks\n- Mark a task as completed");
             }
         });
+
+        String systemInstruction = "You are a helpful Task Assistant app. " +
+                "Analyze the user's message. " +
+                "If the user clearly wants to CREATE/ADD a task, reply ONLY with the text: 'INTENT_ADD'. " +
+                "If the user wants to DELETE/REMOVE a task, reply ONLY with: 'INTENT_DELETE'. " +
+                "If the user wants to EDIT/CHANGE a task, reply ONLY with: 'INTENT_EDIT'. " +
+                "If the user wants to COMPLETE/FINISH a task, reply ONLY with: 'INTENT_COMPLETE'. " +
+                "If the user wants to SEE/LIST tasks, reply ONLY with: 'INTENT_LIST'. " +
+                "Otherwise, reply conversationally and helpfully to the user.";
+
+        GenerativeModel gm = new GenerativeModel(
+                "gemma-3-27b-it",
+                GEMINI_API_KEY,
+                null,
+                null
+        );
+
+        model = GenerativeModelFutures.from(gm);
+        mainExecutor = ContextCompat.getMainExecutor(this);
     }
     
     private void setupRecyclerView() {
@@ -164,13 +196,69 @@ public class ChatActivity extends AppCompatActivity {
             return;
         }
 
+        if (currentAiState != AiState.IDLE) {
+            handleActiveStates(text, textLower);
+            return;
+        }
+
+        callGeminiToClassifyIntent(text);
+    }
+
+    private void callGeminiToClassifyIntent(String userText) {
+        String prompt = "User says: \"" + userText + "\"\n\n" +
+                "Instructions: You are a Task Manager AI.\n" +
+                "- If user wants to CREATE a task, output exactly: INTENT_ADD\n" +
+                "- If user wants to DELETE a task, output exactly: INTENT_DELETE\n" +
+                "- If user wants to EDIT a task, output exactly: INTENT_EDIT\n" +
+                "- If user wants to COMPLETE a task, output exactly: INTENT_COMPLETE\n" +
+                "- If user wants to SHOW/LIST tasks, output exactly: INTENT_LIST\n" +
+                "- Otherwise, provide a friendly, helpful conversational reply.";
+
+        Content content = new Content.Builder().addText(prompt).build();
+        ListenableFuture<GenerateContentResponse> response = model.generateContent(content);
+
+        Futures.addCallback(response, new FutureCallback<GenerateContentResponse>() {
+            @Override
+            public void onSuccess(GenerateContentResponse result) {
+                String aiReply = result.getText().trim();
+                handleGeminiResponse(aiReply, userText);
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                t.printStackTrace();
+                sendAiMessage("Sorry, I'm having trouble connecting to my brain right now.");
+            }
+        }, mainExecutor);
+    }
+
+    private void handleGeminiResponse(String aiReply, String originalUserText) {
+        if (aiReply.contains("INTENT_ADD")) {
+            currentAiState = AiState.AWAITING_TASK_TITLE;
+            sendAiMessage("Sure! What is the title of the new task?");
+        } else if (aiReply.contains("INTENT_DELETE")) {
+            currentAiState = AiState.AWAITING_DELETE_SELECTION;
+            sendAiMessage("I can help delete. What is the task title?");
+        } else if (aiReply.contains("INTENT_EDIT")) {
+            currentAiState = AiState.AWAITING_EDIT_SELECTION;
+            sendAiMessage("Okay. Which task do you want to edit?");
+        } else if (aiReply.contains("INTENT_COMPLETE")) {
+            currentAiState = AiState.AWAITING_COMPLETE_SELECTION;
+            sendAiMessage("Good job! Which task did you finish?");
+        } else if (aiReply.contains("INTENT_LIST")) {
+            showTasksFromFirestore();
+        } else {
+            sendAiMessage(aiReply);
+        }
+    }
+
+    private void handleActiveStates(String text, String textLower) {
         if (currentAiState == AiState.AWAITING_CLARIFICATION) {
             handleClarification(text);
             return;
         }
 
         switch (currentAiState) {
-            case IDLE:                      handleIdleState(textLower); break;
             case AWAITING_TASK_TITLE:       context.put("title", text); askForCategory(); break;
             case AWAITING_TASK_CATEGORY:
                 String normalizedCategory = normalizeCategory(textLower);
@@ -186,6 +274,7 @@ public class ChatActivity extends AppCompatActivity {
             case AWAITING_EDIT_SELECTION:   findTaskByTitle(text, "edit"); break;
             case AWAITING_EDIT_FIELD:       handleEditFieldSelection(textLower); break;
             case AWAITING_NEW_VALUE:        handleNewValue(text); break;
+            default: break;
         }
     }
 
@@ -203,26 +292,6 @@ public class ChatActivity extends AppCompatActivity {
         return "Personal"; 
     }
 
-    
-    private void handleIdleState(String text) {
-        if (text.matches(".*\\b(add|create|new|make|tạo|tạo mới|thêm)\\b.*")) {
-            currentAiState = AiState.AWAITING_TASK_TITLE;
-            sendAiMessage("Great! What is the title of the new task?");
-        } else if (text.matches(".*\\b(delete|remove|get rid of|xoá)\\b.*")) {
-            currentAiState = AiState.AWAITING_DELETE_SELECTION;
-            sendAiMessage("I can do that. What is the title of the task you want to delete?");
-        } else if (text.matches(".*\\b(edit|change|update|sửa|fix|chỉnh)\\b.*.*")) {
-            currentAiState = AiState.AWAITING_EDIT_SELECTION;
-            sendAiMessage("Sure. What is the title of the task you want to edit?");
-        } else if (text.matches(".*\\b(complete|finish|done)\\b.*.*")) {
-            currentAiState = AiState.AWAITING_COMPLETE_SELECTION;
-            sendAiMessage("Excellent! What is the title of the task you completed?");
-        } else if (text.matches(".*\\b(show|list|view|what are|tasks|hiện)\\b.*.*")) {
-            showTasksFromFirestore();
-        } else {
-            sendAiMessage("Sorry, I don't understand that yet. I can help you add, show, edit, delete or complete tasks.");
-        }
-    }
 
     private void askForCategory() { currentAiState = AiState.AWAITING_TASK_CATEGORY; sendAiMessage("Got it. What category is the task \"" + context.get("title") + "\"? (e.g., Work, Personal)"); }
     private void askForNote() { currentAiState = AiState.AWAITING_TASK_NOTE; sendAiMessage("Okay. Any additional notes? (or say 'skip')"); }
@@ -346,30 +415,61 @@ public class ChatActivity extends AppCompatActivity {
         });
     }
 
-    private void findTaskByTitle(String title, String action) {
+    private void findTaskByTitle(String inputTitle, String action) {
         FirebaseUser user = auth.getCurrentUser();
         if (user == null) { resetConversation(); return; }
 
-        tasksRef.whereEqualTo("uid", user.getUid()).whereGreaterThanOrEqualTo("title", title).whereLessThanOrEqualTo("title", title + "\uf8ff")
-        .get().addOnSuccessListener(queryDocumentSnapshots -> {
-            if (queryDocumentSnapshots.isEmpty()) {
-                sendAiMessage("I couldn't find any task with a similar title. Please try again.");
-                resetConversation();
-            } else if (queryDocumentSnapshots.size() == 1) {
-                performActionOnTask(queryDocumentSnapshots.getDocuments().get(0), action);
-            } else {
-                currentAiState = AiState.AWAITING_CLARIFICATION;
-                context.put("action", action);
-                List<DocumentSnapshot> docs = queryDocumentSnapshots.getDocuments();
-                context.put("clarificationDocs", docs);
-                StringBuilder sb = new StringBuilder("I found multiple tasks. Which one did you mean?\n");
-                for (int i = 0; i < docs.size(); i++) {
-                    sb.append((i + 1)).append(". ").append(docs.get(i).getString("title")).append(" (due ").append(formatDate(docs.get(i).getDate("taskDate"))).append(")\n");
-                }
-                sb.append("Please reply with the number (e.g., '1').");
-                sendAiMessage(sb.toString());
-            }
-        });
+        tasksRef.whereEqualTo("uid", user.getUid())
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (queryDocumentSnapshots.isEmpty()) {
+                        sendAiMessage("You don't have any tasks to " + action + ".");
+                        resetConversation();
+                        return;
+                    }
+
+                    List<DocumentSnapshot> matchedDocs = new ArrayList<>();
+                    String searchKey = inputTitle.toLowerCase().trim();
+
+                    for (DocumentSnapshot doc : queryDocumentSnapshots) {
+                        String dbTitle = doc.getString("title");
+                        if (dbTitle != null) {
+                            String dbTitleLower = dbTitle.toLowerCase();
+
+                            if (dbTitleLower.contains(searchKey)) {
+                                matchedDocs.add(doc);
+                            }
+                        }
+                    }
+
+                    if (matchedDocs.isEmpty()) {
+                        sendAiMessage("I couldn't find any task containing \"" + inputTitle + "\". Please try again.");
+                        resetConversation();
+                    } else if (matchedDocs.size() == 1) {
+                        performActionOnTask(matchedDocs.get(0), action);
+                    } else {
+                        currentAiState = AiState.AWAITING_CLARIFICATION;
+                        context.put("action", action);
+                        context.put("clarificationDocs", matchedDocs);
+
+                        StringBuilder sb = new StringBuilder("I found multiple tasks matching \"" + inputTitle + "\". Which one?\n");
+                        for (int i = 0; i < matchedDocs.size(); i++) {
+                            DocumentSnapshot doc = matchedDocs.get(i);
+                            Date date = doc.getDate("taskDate");
+                            String dateStr = (date != null) ? formatDate(date) : "No date";
+
+                            sb.append((i + 1)).append(". ")
+                                    .append(doc.getString("title"))
+                                    .append(" (due ").append(dateStr).append(")\n");
+                        }
+                        sb.append("Reply with the number (e.g., '1').");
+                        sendAiMessage(sb.toString());
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    sendAiMessage("Error searching for tasks: " + e.getMessage());
+                    resetConversation();
+                });
     }
 
     private void handleClarification(String text) {

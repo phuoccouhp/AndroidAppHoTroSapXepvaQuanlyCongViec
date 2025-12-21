@@ -104,7 +104,7 @@ public class HomeActivity extends AppCompatActivity {
 
                     updateStreakInFirebase(userRef, currentStreak + 1, todayStr);
                 } else {
-                   
+
                     updateStreakInFirebase(userRef, 1, todayStr);
                 }
             }

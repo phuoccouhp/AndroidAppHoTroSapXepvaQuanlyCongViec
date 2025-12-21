@@ -105,7 +105,7 @@ public class AchievementsFragment extends Fragment {
         List<Achievement> list = new ArrayList<>();
 
 
-        int colorCreate = Color.parseColor("#2196F3"); // Blue
+        int colorCreate = Color.parseColor("#2196F3"); 
 
         list.add(new Achievement(R.drawable.baseline_flag_24, colorCreate,
                 "Khởi Đầu", "Tạo công việc đầu tiên",
@@ -115,11 +115,11 @@ public class AchievementsFragment extends Fragment {
                 "Lập Kế Hoạch", "Tạo 10 công việc",
                 Math.min(totalTasksCreated, 10), 10));
 
-        list.add(new Achievement(R.drawable.baseline_rocket_launch_24, Color.parseColor("#673AB7"), // Purple
+        list.add(new Achievement(R.drawable.baseline_rocket_launch_24, Color.parseColor("#673AB7"), 
                 "Người Bận Rộn", "Tạo 50 công việc",
                 Math.min(totalTasksCreated, 50), 50));
 
-        list.add(new Achievement(R.drawable.baseline_rocket_launch_24, Color.parseColor("#9C27B0"), // Deep Purple
+        list.add(new Achievement(R.drawable.baseline_rocket_launch_24, Color.parseColor("#9C27B0"), 
                 "Chuyên Gia Task", "Tạo 100 công việc",
                 Math.min(totalTasksCreated, 100), 100));
 
@@ -133,11 +133,11 @@ public class AchievementsFragment extends Fragment {
                 "Năng Suất", "Hoàn thành 10 công việc",
                 Math.min(totalTasksCompleted, 10), 10));
 
-        list.add(new Achievement(R.drawable.baseline_emoji_events_24, Color.parseColor("#FFC107"), // Gold (Xuất sắc thì cho màu vàng)
+        list.add(new Achievement(R.drawable.baseline_emoji_events_24, Color.parseColor("#FFC107"), 
                 "Xuất Sắc", "Hoàn thành 50 công việc",
                 Math.min(totalTasksCompleted, 50), 50));
 
-        // 3. Nhóm Streak (Màu Cam/Đỏ Lửa)
+       
         int colorFire = Color.parseColor("#FF5722");
 
         list.add(new Achievement(R.drawable.ic_fire_24, colorFire,
@@ -148,7 +148,7 @@ public class AchievementsFragment extends Fragment {
                 "Kiên Trì", "Chuỗi 7 ngày liên tiếp",
                 Math.min(currentStreak, 7), 7));
 
-        list.add(new Achievement(R.drawable.baseline_emoji_events_24, Color.parseColor("#FFD700"), // Gold
+        list.add(new Achievement(R.drawable.baseline_emoji_events_24, Color.parseColor("#FFD700"),
                 "Thói Quen Thép", "Chuỗi 30 ngày liên tiếp",
                 Math.min(currentStreak, 30), 30));
 

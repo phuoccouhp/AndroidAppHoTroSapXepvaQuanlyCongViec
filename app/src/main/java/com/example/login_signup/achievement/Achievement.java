@@ -1,4 +1,4 @@
-package com.example.login_signup;
+package com.example.login_signup.achievement;
 
 public class Achievement {
     int iconResId;

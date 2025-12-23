@@ -1,4 +1,4 @@
-package com.example.login_signup;
+package com.example.login_signup.achievement;
 
 import android.graphics.Color;
 import android.graphics.PorterDuff; // Import thêm
@@ -10,6 +10,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.login_signup.R;
+
 import java.util.List;
 
 public class AchievementsAdapter extends RecyclerView.Adapter<AchievementsAdapter.ViewHolder> {

@@ -32,15 +32,13 @@ import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class ProfileFragment extends Fragment implements AvatarPickerDialogFragment.AvatarPickerListener {
+public class ProfileFragment extends Fragment {
 
     private static final String TAG = "ProfileFragment";
 
     private TextView tvName, tvEmail, tvChangePass, tvEditAvatar;
     private CircleImageView ivAvatar;
     private Button btnLogout;
-    private FirebaseAuth mAuth;
-    private FirebaseFirestore db;
     private FirebaseRepo fbRepo;
     private ActivityResultLauncher<String> selectImageLauncher;
     private Uri replaceAvatar;
@@ -56,8 +54,6 @@ public class ProfileFragment extends Fragment implements AvatarPickerDialogFragm
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mAuth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance();
         fbRepo = new FirebaseRepo();
         
         ivAvatar = view.findViewById(R.id.iv_avatar);
@@ -77,7 +73,7 @@ public class ProfileFragment extends Fragment implements AvatarPickerDialogFragm
                     @Override
                     public void onActivityResult(Uri uri) {
                         if (uri != null) {
-                            replaceAvatar = uri;
+                            handleImageSelection(uri);
                         }
                     }
                 }
@@ -85,91 +81,73 @@ public class ProfileFragment extends Fragment implements AvatarPickerDialogFragm
         
         View.OnClickListener avatarClickListener = v -> {
             selectImageLauncher.launch("image/*");
-            if(replaceAvatar != null){
-                String convert = null;
-                try {
-                    convert = AvatarUtils.convertImageToBase64Resized(getContext(), replaceAvatar);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                String finalConvert = convert;
-                fbRepo.updateAvatar(convert, (message, e) -> {
-                    if(e == null){
-                        Bitmap bitmap = AvatarUtils.convertBase64ToBitmap(finalConvert);
-                        ivAvatar.setImageBitmap(bitmap);
-                    }
-                    else{
-                        Toast.makeText(getContext(), "Không thể cập nhật avatar.", Toast.LENGTH_LONG).show();
-                        loadUserProfile();
-                    }
-                });
-            }
         };
         ivAvatar.setOnClickListener(avatarClickListener);
         tvEditAvatar.setOnClickListener(avatarClickListener);
 
         
         tvChangePass.setOnClickListener(v -> {
-            if (mAuth.getCurrentUser() != null) {
+            if (fbRepo.getCurrentUser() != null) {
                 startActivity(new Intent(requireContext(), ChangePassword.class));
             }
         });
         btnLogout.setOnClickListener(v -> logoutUser());
     }
 
+    private void handleImageSelection(Uri uri) {
+        try {
+            String convert = AvatarUtils.convertImageToBase64Resized(getContext(), uri);
+
+            fbRepo.updateAvatar(convert, (message, e) -> {
+                if(e == null){
+                    Bitmap bitmap = AvatarUtils.convertBase64ToBitmap(convert);
+                    ivAvatar.setImageBitmap(bitmap);
+                    Toast.makeText(getContext(), "Cập nhật avatar thành công.", Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    Toast.makeText(getContext(), "Không thể cập nhật avatar.", Toast.LENGTH_LONG).show();
+                    loadUserProfile();
+                }
+            });
+        } catch (IOException e) {
+            Log.e(TAG, "Error converting image", e);
+            Toast.makeText(getContext(), "Lỗi xử lý ảnh", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private void loadUserProfile() {
         fbRepo.loadCurrentUserProfile((user, e) ->{
-            if (user == null || (e != null && e.getMessage().equals("User not logged in"))) {
+            if (getContext() == null) return;
+
+            if (user == null || (e != null && "User not logged in".equals(e.getMessage()))) {
                 goToLoginActivity();
-            }
-
-            tvEmail.setText(user.getEmail());
-            String displayName = user.getName();
-            if (displayName == null || displayName.isEmpty()) {
-                tvName.setText("Name not set");
-            } else {
-                tvName.setText(displayName);
-            }
-
-            String avatarId = user.getAvatarId();
-            if (avatarId.equals("anh1")){
-                int avatarResId = AvatarUtils.getAvatarResourceId(getContext(), avatarId);
-                ivAvatar.setImageResource(avatarResId);
-            }
-            else{
-                Bitmap bitmap = AvatarUtils.convertBase64ToBitmap(avatarId);
-                ivAvatar.setImageBitmap(bitmap);
+                return;
             }
 
             if (e != null) {
                 Log.w(TAG, "Lỗi: " + e.getMessage());
+                return;
+            }
+
+            tvEmail.setText(user.getEmail());
+            String displayName = user.getName();
+            tvName.setText((displayName == null || displayName.isEmpty()) ? "Name not set" : displayName);
+
+            String avatarId = user.getAvatarId();
+            if (avatarId != null) {
+                if (avatarId.equals("anh1")) {
+                    int avatarResId = AvatarUtils.getAvatarResourceId(getContext(), avatarId);
+                    ivAvatar.setImageResource(avatarResId);
+                } else {
+                    Bitmap bitmap = AvatarUtils.convertBase64ToBitmap(avatarId);
+                    ivAvatar.setImageBitmap(bitmap);
+                }
             }
         });
     }
 
-    @Override
-    public void onAvatarSelected(String avatarId) {
-
-        int avatarResId = AvatarUtils.getAvatarResourceId(getContext(), avatarId);
-        ivAvatar.setImageResource(avatarResId);
-
-
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser != null) {
-            String uid = currentUser.getUid();
-            db.collection("users").document(uid)
-                    .update("avatarId", avatarId)
-                    .addOnSuccessListener(aVoid -> Log.d(TAG, "Cập nhật avatar thành công."))
-                    .addOnFailureListener(e -> {
-                        Log.w(TAG, "Lỗi khi cập nhật avatar", e);
-                        Toast.makeText(getContext(), "Không thể cập nhật avatar.", Toast.LENGTH_SHORT).show();
-                        loadUserProfile();
-                    });
-        }
-    }
-
     private void logoutUser() {
-        mAuth.signOut();
+        fbRepo.signOut();
         goToLoginActivity();
     }
 

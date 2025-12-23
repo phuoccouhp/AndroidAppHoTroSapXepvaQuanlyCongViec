@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageButton; // Import ImageButton
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -11,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.login_signup.R;
+import com.example.login_signup.classes.FirebaseRepo;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -30,94 +33,67 @@ public class ChatHistoryActivity extends AppCompatActivity {
     private List<ChatSession> sessionList = new ArrayList<>();
     private ImageButton btnBack;
 
-    private FirebaseFirestore db;
-    private FirebaseAuth auth;
+    private FirebaseRepo fbRepo;
+
+    void initViews(){
+        recyclerViewChatHistory = findViewById(R.id.recyclerViewChatHistory);
+        btnBack = findViewById(R.id.btn_back);
+        FloatingActionButton fabNewChat = findViewById(R.id.fabNewChat);
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerViewChatHistory.setLayoutManager(layoutManager);
+        adapter = new ChatHistoryAdapter(sessionList);
+        recyclerViewChatHistory.setAdapter(adapter);
+
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerViewChatHistory.getContext(), layoutManager.getOrientation());
+        dividerItemDecoration.setDrawable(ContextCompat.getDrawable(this, R.drawable.list_divider));
+        recyclerViewChatHistory.addItemDecoration(dividerItemDecoration);
+
+        btnBack.setOnClickListener(v -> finish());
+        fabNewChat.setOnClickListener(v -> createNewChatSession());
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_history);
 
-        db = FirebaseFirestore.getInstance();
-        auth = FirebaseAuth.getInstance();
+        fbRepo = new FirebaseRepo();
 
-        recyclerViewChatHistory = findViewById(R.id.recyclerViewChatHistory);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        recyclerViewChatHistory.setLayoutManager(layoutManager);
-        adapter = new ChatHistoryAdapter(sessionList);
-        recyclerViewChatHistory.setAdapter(adapter);
-
-        btnBack = findViewById(R.id.btn_back);
-        btnBack.setOnClickListener(v -> finish());
-
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerViewChatHistory.getContext(), layoutManager.getOrientation());
-        dividerItemDecoration.setDrawable(ContextCompat.getDrawable(this, R.drawable.list_divider));
-        recyclerViewChatHistory.addItemDecoration(dividerItemDecoration);
-
-        FloatingActionButton fabNewChat = findViewById(R.id.fabNewChat);
-        fabNewChat.setOnClickListener(v -> createNewChatSession());
-
+        initViews();
         loadChatSessions();
     }
 
     private void loadChatSessions() {
-        FirebaseUser currentUser = auth.getCurrentUser();
-        if (currentUser == null) {
-            Log.e(TAG, "User not logged in");
-            return;
-        }
+        fbRepo.listenForChatSessions(new FirebaseRepo.OnChatSessionsListener() {
+            @Override
+            public void onSessionsLoaded(List<ChatSession> sessions) {
+                sessionList.clear();
+                sessionList.addAll(sessions);
+                adapter.notifyDataSetChanged();
+            }
 
-        db.collection("chat_sessions")
-                .whereEqualTo("userId", currentUser.getUid())
-                .orderBy("lastUpdated", Query.Direction.DESCENDING)
-                .addSnapshotListener((value, error) -> {
-                    if (error != null) {
-                        Log.e(TAG, "Error loading chat sessions", error);
-                        return;
-                    }
-
-                    sessionList.clear();
-                    for (QueryDocumentSnapshot doc : value) {
-                        ChatSession session = doc.toObject(ChatSession.class);
-                        session.setId(doc.getId());
-                        sessionList.add(session);
-                    }
-                    adapter.notifyDataSetChanged();
-                });
+            @Override
+            public void onError(Exception e) {
+                Log.e(TAG, "Error loading chat sessions", e);
+            }
+        });
     }
 
     private void createNewChatSession() {
-        FirebaseUser currentUser = auth.getCurrentUser();
-        if (currentUser == null) {
-            return;
-        }
+        fbRepo.createNewChatSession(new FirebaseRepo.OnCreateSessionListener() {
+            @Override
+            public void onSuccess(ChatSession newSession, String documentId) {
+                Intent intent = new Intent(ChatHistoryActivity.this, ChatActivity.class);
+                intent.putExtra("CHAT_SESSION_ID", documentId);
+                intent.putExtra("CHAT_SESSION_NAME", newSession.getName());
+                startActivity(intent);
+            }
 
-        db.collection("chat_sessions")
-                .whereEqualTo("userId", currentUser.getUid())
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    int newChatNumber = queryDocumentSnapshots.size() + 1;
-                    String chatName = "Chat-" + newChatNumber;
-
-                    ChatSession newSession = new ChatSession(chatName, currentUser.getUid());
-                    newSession.setLastMessage("New chat started...");
-
-                    db.collection("chat_sessions")
-                            .add(newSession)
-                            .addOnSuccessListener(documentReference -> {
-                                newSession.setId(documentReference.getId());
-                                newSession.setLastUpdated(new Date()); 
-                                sessionList.add(0, newSession); 
-                                adapter.notifyItemInserted(0);
-                                recyclerViewChatHistory.scrollToPosition(0);
-                                
-                                Intent intent = new Intent(ChatHistoryActivity.this, ChatActivity.class);
-                                intent.putExtra("CHAT_SESSION_ID", documentReference.getId());
-                                intent.putExtra("CHAT_SESSION_NAME", chatName);
-                                startActivity(intent);
-                            })
-                            .addOnFailureListener(e -> Log.e(TAG, "Error creating new chat session", e));
-                })
-                .addOnFailureListener(e -> Log.e(TAG, "Error counting chat sessions", e));
+            @Override
+            public void onFailure(Exception e) {
+                Log.e(TAG, "Error creating new chat session", e);
+            }
+        });
     }
 }

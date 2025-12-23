@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.login_signup.classes.FirebaseRepo;
 import com.example.login_signup.classes.Task;
 import com.example.login_signup.task.TaskAdapter;
 import com.example.login_signup.task.TaskDetailFragment;
@@ -24,8 +25,7 @@ public class CalendarFragment extends Fragment {
     private RecyclerView recyclerView;
     private TaskAdapter adapter;
     private List<Task> taskList = new ArrayList<>();
-    private FirebaseFirestore db;
-    private FirebaseAuth auth;
+    private FirebaseRepo fbRepo;
     private Date selectedDate = new Date();
 
     private TextView tvTaskListLabel;
@@ -45,8 +45,7 @@ public class CalendarFragment extends Fragment {
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        db = FirebaseFirestore.getInstance();
-        auth = FirebaseAuth.getInstance();
+        fbRepo = new FirebaseRepo();
 
         adapter = new TaskAdapter(taskList,
                 task -> {
@@ -86,11 +85,9 @@ public class CalendarFragment extends Fragment {
     }
 
     private void loadTasksForDate(Date dateToLoad) {
-        String uid = auth.getCurrentUser() != null ? auth.getCurrentUser().getUid() : null;
-        if (uid == null) return;
-
         SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         String selectedDayString = sdfDate.format(dateToLoad);
+
         if (selectedDayString.equals(todayDateString)) {
             tvTaskListLabel.setText("Your Task for Today");
         } else {
@@ -98,68 +95,32 @@ public class CalendarFragment extends Fragment {
             tvTaskListLabel.setText("Task for " + sdfDisplay.format(dateToLoad));
         }
 
-        db.collection("tasks")
-            .whereEqualTo("uid", uid)
-            .get()
-            .addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    taskList.clear();
+        fbRepo.getTasksForDate(dateToLoad, new FirebaseRepo.OnTasksLoadedListener() {
+            @Override
+            public void onTasksLoaded(List<Task> tasks) {
+                taskList.clear();
+                taskList.addAll(tasks);
+                adapter.notifyDataSetChanged();
+            }
 
-                    SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm", Locale.getDefault());
-
-                    for (QueryDocumentSnapshot doc : task.getResult()) {
-                        Object rawDate = doc.get("taskDate");
-                        if (!(rawDate instanceof com.google.firebase.Timestamp)) continue;
-
-                        Date taskDate = ((com.google.firebase.Timestamp) rawDate).toDate();
-                        String taskDayString = sdfDate.format(taskDate);
-
-                        if (taskDayString.equals(selectedDayString)) {
-                            String id = doc.getId();
-                            String title = doc.getString("title");
-                            String category = doc.getString("category");
-
-
-                            String noteContent = doc.getString("note");
-                            if (noteContent == null) {
-                                noteContent = doc.getString("notes");
-                            }
-
-                            boolean completed = doc.getBoolean("completed") != null && doc.getBoolean("completed");
-                            String timeStr = sdfTime.format(taskDate);
-                            String dateStr = sdfDate.format(taskDate);
-
-                            taskList.add(new Task(id, title, category, timeStr, completed, dateStr, noteContent));
-                        }
-                    }
-                    adapter.notifyDataSetChanged();
-                } else {
-                    if (getContext() != null) {
-                        Toast.makeText(getContext(), "Lỗi tải dữ liệu", Toast.LENGTH_SHORT).show();
-                    }
+            @Override
+            public void onError(Exception e) {
+                if (getContext() != null) {
+                    Toast.makeText(getContext(), "Lỗi tải dữ liệu: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
-            });
+            }
+        });
     }
     private void deleteTaskFromFirestore(Task task) {
-        if (task.getId() == null || task.getId().isEmpty()) {
-            if (getContext() != null) {
-                Toast.makeText(getContext(), "Error: Task ID is missing", Toast.LENGTH_SHORT).show();
-            }
-            return;
-        }
+        fbRepo.deleteTask(task.getId(), (message, e) -> {
+            if (getContext() == null) return;
 
-        db.collection("tasks").document(task.getId())
-                .delete()
-                .addOnSuccessListener(aVoid -> {
-                    if (getContext() != null) {
-                        Toast.makeText(getContext(), "Task deleted", Toast.LENGTH_SHORT).show();
-                    }
-                    loadTasksForDate(selectedDate);
-                })
-                .addOnFailureListener(e -> {
-                    if (getContext() != null) {
-                        Toast.makeText(getContext(), "Error deleting task: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
+            if (e != null) {
+                Toast.makeText(getContext(), "Error deleting task: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                loadTasksForDate(selectedDate);
+            }
+        });
     }
 }

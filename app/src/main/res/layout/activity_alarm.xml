@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#A6000000"
     android:gravity="center"
-    android:padding="32dp"
+    android:padding="30dp"
+    android:background="@drawable/background"
     tools:context=".AlarmActivity">
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:cardCornerRadius="28dp"
-        app:cardElevation="16dp"
+        app:cardUseCompatPadding="true"
         app:cardBackgroundColor="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -36,7 +37,7 @@
                 app:tint="@color/pastel_blue_dark" />
 
             <TextView
-                android:id="@+id/tvAlarmHeader"
+                android:id="@+id/tvTaskTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/smoochsans_bold"
@@ -48,7 +49,7 @@
                 app:layout_constraintTop_toBottomOf="@id/imgAlarm" />
 
             <TextView
-                android:id="@+id/tvTaskTitle"
+                android:id="@+id/tvDayOfWeek"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
@@ -58,7 +59,7 @@
                 android:textSize="22sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tvAlarmHeader"
+                app:layout_constraintTop_toBottomOf="@id/tvTaskTitle"
                 tools:text="Submit the project report to the board" />
 
             <View
@@ -69,7 +70,7 @@
                 android:background="#E0E0E0"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tvTaskTitle" />
+                app:layout_constraintTop_toBottomOf="@id/tvDayOfWeek" />
 
             <TextView
                 android:id="@+id/tvTaskCategory"

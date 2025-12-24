@@ -27,7 +27,7 @@ public class AlarmActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_alarm);
 
-        TextView tvTaskTitle = findViewById(R.id.tvTaskTitle);
+        TextView tvTaskTitle = findViewById(R.id.tvDayOfWeek);
         TextView tvTaskCategory = findViewById(R.id.tvTaskCategory);
         TextView tvTaskNote = findViewById(R.id.tvTaskNote);
         Button btnStopAlarm = findViewById(R.id.btnStopAlarm);

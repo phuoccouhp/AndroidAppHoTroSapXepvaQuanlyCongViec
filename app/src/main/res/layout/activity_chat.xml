@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -45,50 +46,46 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvChat"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/toolbar"
-        android:layout_above="@id/containerInput"
+        android:layout_height="wrap_content"
         android:padding="8dp"
-        android:clipToPadding="false" />
+        android:clipToPadding="false"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
-    <FrameLayout
+    <LinearLayout
         android:id="@+id/containerInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:padding="12dp"
-        android:background="@color/white">
-
-        <LinearLayout
-            android:id="@+id/layoutInput"
-            android:layout_width="match_parent"
+        android:background="@color/white"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+        
+        <EditText
+            android:id="@+id/etMessage"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:layout_weight="1"
+            android:background="@drawable/edit_text_background"
+            android:hint="Type a message..."
+            android:inputType="textMultiLine"
+            android:maxLines="5"
+            android:padding="16dp"
+            android:layout_marginEnd="10dp"
+            android:textColor="@android:color/black"
+            android:textColorHint="#8A8A8A" />
 
-            <EditText
-                android:id="@+id/etMessage"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@drawable/edit_text_background"
-                android:hint="Type a message..."
-                android:inputType="textMultiLine"
-                android:maxLines="5"
-                android:padding="16dp"
-                android:layout_marginEnd="10dp"
-                android:textColor="@android:color/black"
-                android:textColorHint="#8A8A8A" />
-
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/btnSend"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_send"
-                app:backgroundTint="@color/colorPrimary"
-                app:tint="@color/white"
-                app:elevation="2dp"
-                app:fabSize="mini"/>
-        </LinearLayout>
-    </FrameLayout>
-</RelativeLayout>
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/btnSend"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_send"
+            app:backgroundTint="@color/colorPrimary"
+            app:tint="@color/white"
+            app:elevation="2dp"
+            app:fabSize="mini"/>
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

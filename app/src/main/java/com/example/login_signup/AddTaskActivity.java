@@ -4,6 +4,8 @@ import android.app.AlarmManager;
 import android.app.DatePickerDialog;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.media.RingtoneManager;
@@ -33,7 +35,7 @@ import java.util.Map;
 public class AddTaskActivity extends AppCompatActivity {
 
     private EditText etTaskName, etNotes;
-    private Spinner spinnerCategories, spinnerVibration;
+    private Spinner spinnerCategories, spinnerVibration, spinnerPriority;
     private Button btnSetDueDate, btnSetTime, btnSetReminder, btnSelectRingtone;
     private FloatingActionButton btnSaveTask;
     private ImageButton btnBack;
@@ -79,6 +81,7 @@ public class AddTaskActivity extends AppCompatActivity {
         etNotes = findViewById(R.id.etNotes);
         spinnerCategories = findViewById(R.id.spinnerCategories);
         spinnerVibration = findViewById(R.id.spinnerVibration);
+        spinnerPriority = findViewById(R.id.spinnerPriority);
         btnSetDueDate = findViewById(R.id.btnSetDueDate);
         btnSetTime = findViewById(R.id.btnSetTime);
         btnSetReminder = findViewById(R.id.btnSetReminder);
@@ -97,6 +100,11 @@ public class AddTaskActivity extends AppCompatActivity {
         ArrayAdapter<String> vibrationsAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_dropdown_item, vibrations);
         spinnerVibration.setAdapter(vibrationsAdapter);
+
+        String[] priorities = {"Basic", "High"};
+        ArrayAdapter<String> priorityAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_dropdown_item, priorities);
+        spinnerPriority.setAdapter(priorityAdapter);
     }
 
     private void setupListeners() {
@@ -169,6 +177,7 @@ public class AddTaskActivity extends AppCompatActivity {
         taskData.put("uid", userId);
         taskData.put("title", name);
         taskData.put("category", spinnerCategories.getSelectedItem().toString());
+        taskData.put("priority", spinnerPriority.getSelectedItem().toString());
         taskData.put("notes", noteContent);
         taskData.put("reminder", reminderOn);
         taskData.put("completed", false);
@@ -193,6 +202,14 @@ public class AddTaskActivity extends AppCompatActivity {
 
                         scheduleAlarmsForTask(this, taskToSchedule);
                     }
+
+                    Intent widgetUpdateIntent = new Intent(this, TaskWidgetProvider.class);
+                    widgetUpdateIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+                    int[] ids = AppWidgetManager.getInstance(getApplication()).getAppWidgetIds(
+                            new ComponentName(getApplication(), TaskWidgetProvider.class));
+                    widgetUpdateIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
+                    sendBroadcast(widgetUpdateIntent);
+
                     finish();
                 })
                 .addOnFailureListener(e -> Toast.makeText(this, "Error saving task", Toast.LENGTH_SHORT).show());

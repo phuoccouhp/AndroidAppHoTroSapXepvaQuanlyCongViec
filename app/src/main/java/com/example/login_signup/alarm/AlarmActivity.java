@@ -9,6 +9,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.login_signup.R;
+import com.example.login_signup.alarm.AlarmService;
 
 public class AlarmActivity extends AppCompatActivity {
 
@@ -22,17 +23,17 @@ public class AlarmActivity extends AppCompatActivity {
         } else {
             getWindow().addFlags(
                     WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
-                    WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
-                    WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                            WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
+                            WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
             );
         }
 
         setContentView(R.layout.activity_alarm);
 
-        TextView tvTaskTitle = findViewById(R.id.tv_alarm_task_title);
-        TextView tvTaskCategory = findViewById(R.id.tv_alarm_task_category);
-        TextView tvTaskNote = findViewById(R.id.tv_alarm_task_note);
-        Button btnStopAlarm = findViewById(R.id.btn_stop_alarm);
+        TextView tvTaskTitle = findViewById(R.id.tvDayOfWeek);
+        TextView tvTaskCategory = findViewById(R.id.tvTaskCategory);
+        TextView tvTaskNote = findViewById(R.id.tvTaskNote);
+        Button btnStopAlarm = findViewById(R.id.btnStopAlarm);
 
         String taskTitle = getIntent().getStringExtra("title");
         String taskCategory = getIntent().getStringExtra("category");

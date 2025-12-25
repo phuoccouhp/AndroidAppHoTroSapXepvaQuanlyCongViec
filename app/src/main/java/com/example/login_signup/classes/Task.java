@@ -18,13 +18,15 @@ public class Task implements Serializable {
     private String vibration;
     private String ringtone;
 
+    private String priority;
+
     @Exclude private String time;
     @Exclude private String date;
 
     public Task() {
     }
 
-    public Task(String id, String title, String category, String time, boolean completed, String date, String note) {
+    public Task(String id, String title, String category, String time, boolean completed, String date, String note, String priority) {
         this.id = id;
         this.title = title;
         this.category = category;
@@ -32,6 +34,7 @@ public class Task implements Serializable {
         this.completed = completed;
         this.date = date;
         this.note = note;
+        this.priority = priority;
     }
 
     @Exclude
@@ -64,6 +67,9 @@ public class Task implements Serializable {
 
     public String getRingtone() { return ringtone; }
     public void setRingtone(String ringtone) { this.ringtone = ringtone; }
+
+    public String getPriority() { return priority != null ? priority : "Basic"; }
+    public void setPriority(String priority) { this.priority = priority; }
 
     @Exclude
     public String getTime() { return time; }

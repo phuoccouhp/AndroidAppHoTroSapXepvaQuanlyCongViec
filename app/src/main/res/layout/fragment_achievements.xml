@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background"
     android:fillViewport="true"
     android:padding="16dp">
 
@@ -22,9 +22,11 @@
                 android:id="@+id/tvLevelLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="LEVEL HIỆN TẠI"
-                android:textColor="#DDDDDD"
-                android:textSize="12sp"
+                android:text="Current level"
+                android:textColor="#EEEEEE"
+                android:textAllCaps="true"
+                android:textStyle="bold"
+                android:textSize="13sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -33,9 +35,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="1"
-                android:textColor="@android:color/white"
                 android:textSize="50sp"
-                android:textStyle="bold"
+                android:fontFamily="@font/smoochsans_bold"
+                android:textColor="@color/white"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tvLevelLabel" />
 
@@ -43,7 +45,7 @@
                 android:id="@+id/tvNextLevelInfo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Cần thêm task để lên cấp"
+                android:text="More tasks are needed to level up!"
                 android:textColor="#EEEEEE"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tvCurrentLevel" />
@@ -57,7 +59,6 @@
                 android:max="10"
                 android:progressDrawable="@drawable/custom_progress_bar"
                 app:layout_constraintTop_toBottomOf="@id/tvNextLevelInfo" />
-
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <LinearLayout
@@ -84,35 +85,74 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Chuỗi ngày liên tiếp"
-                    android:textColor="#757575" />
+                    android:text="Current streak:"
+                    android:textSize="13sp"
+                    android:textColor="#64748B" />
 
                 <TextView
                     android:id="@+id/tvStreakDays"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="0 Ngày"
+                    android:text="0 Days"
                     android:textColor="@color/black"
                     android:textSize="20sp"
                     android:textStyle="bold" />
             </LinearLayout>
         </LinearLayout>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="12dp"
-            android:text="Danh Sách Thành Tích"
-            android:textColor="@color/black"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvAchievements"
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:nestedScrollingEnabled="false" />
+            android:layout_marginTop="24dp"
+            app:cardCornerRadius="20dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="#E0E0E0"
+            app:cardBackgroundColor="@color/white">
 
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp">
+
+                <LinearLayout
+                    android:id="@+id/layoutDailyTask"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="26dp"
+                        android:src="@drawable/baseline_assignment_24"
+                        app:tint="@color/oxford_blue"/>
+
+                    <TextView
+                        android:id="@+id/tvDailyTask"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:text="Daily tasks"
+                        android:textColor="@color/oxford_blue"
+                        android:textSize="20sp"
+                        android:fontFamily="@font/smoochsans_bold" />
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvAchievements"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    app:layout_constraintTop_toBottomOf="@id/layoutDailyTask"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constrainedHeight="true"
+                    app:layout_constraintHeight_max="270dp"
+                    tools:listitem="@layout/item_achievement" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

@@ -7,7 +7,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:clipToPadding="false"
-    android:background="@drawable/background"
     app:layout_constraintTop_toBottomOf="@id/btnHistory"
     app:layout_constraintBottom_toBottomOf="parent"
     tools:context=".TasksFragment">
@@ -240,25 +239,25 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintStart_toStartOf="parent">
 
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/baseline_priority_high_24"
+                        app:tint="#FF6F00"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical">
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/baseline_priority_high_24"
-                            app:tint="#FF6F00"/>
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="High Priority Tasks"
-                            android:textSize="20sp"
-                            android:layout_marginStart="4dp"
-                            android:fontFamily="@font/smoochsans_bold"
-                            android:textColor="#FF6F00" />
-                    </LinearLayout>
+                        android:layout_marginStart="4dp"
+                        android:text="High Priority Tasks"
+                        android:textSize="20sp"
+                        android:textColor="#FF6F00"
+                        android:fontFamily="@font/smoochsans_bold" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
 
                     <ImageButton
                         android:id="@+id/btnFilterHigh"
@@ -306,25 +305,25 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintStart_toStartOf="parent">
 
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/baseline_close_24"
+                        app:tint="#D32F2F"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical">
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/baseline_close_24"
-                            app:tint="#D32F2F"/>
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Incomplete Tasks"
-                            android:textSize="20sp"
-                            android:layout_marginStart="4dp"
-                            android:fontFamily="@font/smoochsans_bold"
-                            android:textColor="#C62828" />
-                    </LinearLayout>
+                        android:text="Incomplete Tasks"
+                        android:textSize="20sp"
+                        android:layout_marginStart="4dp"
+                        android:fontFamily="@font/smoochsans_bold"
+                        android:textColor="#C62828" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
 
                     <ImageButton
                         android:id="@+id/btnFilterIncomplete"
@@ -373,25 +372,25 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintStart_toStartOf="parent">
 
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/baseline_check_24"
+                        app:tint="#2E7D32"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical">
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/baseline_check_24"
-                            app:tint="#2E7D32"/>
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Completed Tasks"
-                            android:textSize="20sp"
-                            android:layout_marginStart="4dp"
-                            android:fontFamily="@font/smoochsans_bold"
-                            android:textColor="#1B5E20" />
-                    </LinearLayout>
+                        android:text="Completed Tasks"
+                        android:textSize="20sp"
+                        android:layout_marginStart="4dp"
+                        android:fontFamily="@font/smoochsans_bold"
+                        android:textColor="#1B5E20" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
 
                     <ImageButton
                         android:id="@+id/btnFilterCompleted"

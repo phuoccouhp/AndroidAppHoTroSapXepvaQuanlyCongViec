@@ -34,8 +34,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:gravity="center_vertical"
             android:paddingVertical="10dp"
-            android:paddingHorizontal="32dp">
+            android:paddingHorizontal="20dp">
 
             <ImageButton
                 android:id="@+id/btnHome"
@@ -44,7 +45,7 @@
                 android:src="@drawable/sharp_home_24"
                 android:background="@drawable/custom_ripple"
                 app:tint="@drawable/nav_icon_tint_selector"
-                android:padding="8dp"
+                android:padding="10dp"
                 android:contentDescription="Home" />
 
             <ImageButton
@@ -54,9 +55,13 @@
                 android:src="@drawable/outline_calendar_month_24"
                 android:background="@drawable/custom_ripple"
                 app:tint="@drawable/nav_icon_tint_selector"
-                android:padding="8dp"
-                android:layout_marginStart="36dp"
+                android:padding="10dp"
+                android:layout_marginStart="12dp"
                 android:contentDescription="Calendar" />
+
+            <View
+                android:layout_width="100dp"
+                android:layout_height="1dp" />
 
             <ImageButton
                 android:id="@+id/btnDocuments"
@@ -65,8 +70,7 @@
                 android:src="@drawable/outline_edit_document_24"
                 android:background="@drawable/custom_ripple"
                 app:tint="@drawable/nav_icon_tint_selector"
-                android:padding="8dp"
-                android:layout_marginStart="36dp"
+                android:padding="10dp"
                 android:contentDescription="Documents" />
 
             <ImageButton
@@ -76,10 +80,29 @@
                 android:src="@drawable/baseline_manage_accounts_24"
                 android:background="@drawable/custom_ripple"
                 app:tint="@drawable/nav_icon_tint_selector"
-                android:padding="8dp"
-                android:layout_marginStart="36dp"
+                android:padding="10dp"
+                android:layout_marginStart="12dp"
                 android:contentDescription="Settings" />
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btnFabAdd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:src="@drawable/baseline_add_24"
+        app:elevation="0dp"
+        app:pressedTranslationZ="0dp"
+        app:fabCustomSize="64dp"
+        app:maxImageSize="32dp"
+        app:tint="@android:color/white"
+        app:backgroundTint="@color/pastel_blue_dark"
+        app:shapeAppearanceOverlay="@style/ShapeAppearance.App.CircleImageView"
+        app:layout_constraintBottom_toBottomOf="@id/bottomCardView"
+        app:layout_constraintStart_toStartOf="@id/bottomCardView"
+        app:layout_constraintEnd_toEndOf="@id/bottomCardView"
+        app:layout_constraintTop_toTopOf="@id/bottomCardView" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

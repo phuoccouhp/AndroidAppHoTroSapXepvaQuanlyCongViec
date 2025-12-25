@@ -31,30 +31,19 @@ public class AchievementsAdapter extends RecyclerView.Adapter<AchievementsAdapte
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Achievement item = list.get(position);
-
-
         holder.imgIcon.setImageResource(item.iconResId);
-
 
         if (item.isUnlocked()) {
 
             holder.imgIcon.setColorFilter(item.color, PorterDuff.Mode.SRC_IN);
-
-
             holder.ivStatus.setImageResource(R.drawable.baseline_check_circle_24);
             holder.ivStatus.setColorFilter(Color.parseColor("#4CAF50")); // Xanh lá
-
-
             holder.tvTitle.setTextColor(Color.BLACK);
         } else {
 
             holder.imgIcon.setColorFilter(Color.parseColor("#BDBDBD"), PorterDuff.Mode.SRC_IN);
-
-
             holder.ivStatus.setImageResource(R.drawable.baseline_lock_24);
             holder.ivStatus.setColorFilter(Color.parseColor("#BDBDBD")); // Xám
-
-
             holder.tvTitle.setTextColor(Color.GRAY);
         }
 

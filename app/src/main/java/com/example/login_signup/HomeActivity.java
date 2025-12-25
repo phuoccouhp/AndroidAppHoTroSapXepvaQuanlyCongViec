@@ -14,12 +14,15 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class HomeActivity extends AppCompatActivity {
 
     private List<ImageButton> navButtons;
+    private FloatingActionButton btnFabAdd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +34,12 @@ public class HomeActivity extends AppCompatActivity {
         navButtons.add(findViewById(R.id.btnCalendar));
         navButtons.add(findViewById(R.id.btnDocuments));
         navButtons.add(findViewById(R.id.btnProfile));
+
+        btnFabAdd = findViewById(R.id.btnFabAdd);
+        btnFabAdd.setOnClickListener(v -> {
+            Intent intent = new Intent(HomeActivity.this, AddTaskActivity.class);
+            startActivity(intent);
+        });
 
         navButtons.get(0).setOnClickListener(v -> loadFragment(new HomeFragment(), v));
         navButtons.get(1).setOnClickListener(v -> loadFragment(new CalendarFragment(), v));

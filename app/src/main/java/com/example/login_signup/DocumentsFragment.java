@@ -2,6 +2,7 @@ package com.example.login_signup;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.*;
 import android.widget.*;
@@ -14,9 +15,11 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.login_signup.achievement.AchievementsFragment;
 import com.example.login_signup.classes.FirebaseRepo;
 import com.example.login_signup.classes.Task;
 import com.example.login_signup.task.TaskAdapter;
+import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.*;
 
@@ -25,18 +28,8 @@ import java.util.*;
 
 public class DocumentsFragment extends Fragment {
 
-    private RecyclerView recyclerViewToday, recyclerViewFuture;
-    private TaskAdapter adapterToday, adapterFuture;
-
-    private List<Task> allTasks = new ArrayList<>();
-    private List<Task> todayTasks = new ArrayList<>();
-    private List<Task> futureTasks = new ArrayList<>();
-
-    private FirebaseRepo fbRepo;
-    private String selectedCategory = null;
-    private ImageButton btnAll, btnWork, btnPersonal, btnHealth, btnShopping;
-
-    private String todayDateString;
+    private MaterialButtonToggleGroup toggleGroup;
+    private Button btnTabHome, btnTabAchievements, btnTabAnalysis;
 
     @Nullable
     @Override

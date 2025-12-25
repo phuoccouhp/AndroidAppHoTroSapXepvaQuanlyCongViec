@@ -24,11 +24,13 @@ import java.util.Random;
 import android.widget.ProgressBar;
 import android.view.View;
 
+import com.example.login_signup.log_sign.Login;
+
 public class MainActivity extends AppCompatActivity {
     private static final int SPLASH_TIME_OUT = 3000;
     Animation bottomToTopAnim;
-    TextView tvTaskify, tvWelcome, tvSlogan;
-    ImageView imgTaskify;
+    TextView lbTodo, textWelcome, textQuote;
+    ImageView imageBusiness;
     ProgressBar progressBar;
     private boolean isSplashScreenStarted = false;
 
@@ -41,10 +43,6 @@ public class MainActivity extends AppCompatActivity {
         textWelcome = findViewById(R.id.text_welcome);
         textQuote = findViewById(R.id.text_quote);
         imageBusiness = findViewById(R.id.image_business);
-        tvTasktify = findViewById(R.id.tvTaskify);
-        tvWelcome = findViewById(R.id.tvWelcome);
-        tvSlogan = findViewById(R.id.tvSlogan);
-        imgTaskify = findViewById(R.id.imgTaskify);
         progressBar = findViewById(R.id.progressBar);
     }
 
@@ -52,15 +50,15 @@ public class MainActivity extends AppCompatActivity {
         String[] quote = getResources().getStringArray(R.array.inspirational_quotes);
         Random random = new Random();
         int randomIndex = random.nextInt(quote.length);
-        tvSlogan.setText(quote[randomIndex]);
+        textQuote.setText(quote[randomIndex]);
     }
 
     private void startAnim() {
         bottomToTopAnim = AnimationUtils.loadAnimation(this, R.anim.bottom_to_top);
-        tvTaskify.startAnimation(bottomToTopAnim);
-        imgTaskify.startAnimation(bottomToTopAnim);
-        tvWelcome.startAnimation(bottomToTopAnim);
-        tvSlogan.startAnimation(bottomToTopAnim);
+        lbTodo.startAnimation(bottomToTopAnim);
+        imageBusiness.startAnimation(bottomToTopAnim);
+        textWelcome.startAnimation(bottomToTopAnim);
+        textQuote.startAnimation(bottomToTopAnim);
     }
 
     private void startSplashScreen() {
@@ -70,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         isSplashScreenStarted = true;
         progressBar.setVisibility(View.VISIBLE);
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+            Intent intent = new Intent(MainActivity.this, Login.class);
             startActivity(intent);
             finish();
         }, SPLASH_TIME_OUT);
@@ -83,23 +81,26 @@ public class MainActivity extends AppCompatActivity {
         Init();
         setupRandom();
         startAnim();
+
+        handlePermissionsAndNavigation();
+    }
+
+    private void handlePermissionsAndNavigation() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+        } else {
+            startSplashScreen();
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        if (isSplashScreenStarted) {
-            return;
-        }
+        checkExactAlarmPermission();
+    }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
-                return;
-            }
-        }
-
+    private void checkExactAlarmPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
             if (alarmManager != null && !alarmManager.canScheduleExactAlarms()) {
@@ -107,9 +108,7 @@ public class MainActivity extends AppCompatActivity {
                 if (getPackageManager().resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY) != null) {
                     startActivity(intent);
                 }
-                return;
             }
         }
-        startSplashScreen();
     }
 }

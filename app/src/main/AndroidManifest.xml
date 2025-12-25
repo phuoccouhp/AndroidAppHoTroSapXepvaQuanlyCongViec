@@ -45,7 +45,7 @@
         </receiver>
 
         <receiver
-            android:name=".TaskWidgetProvider"
+            android:name=".task.TaskWidgetProvider"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -76,7 +76,7 @@
             android:windowSoftInputMode="adjustPan"
             android:exported="false" />
         <activity
-            android:name="com.example.login_signup.task.TaskDetailFragment"
+            android:name=".task.TaskDetailActivity"
             android:exported="false" />
         <activity
             android:name=".task.AddTaskActivity"
@@ -85,9 +85,6 @@
         <activity
             android:name=".ChangePassword"
             android:windowSoftInputMode="adjustPan"
-            android:exported="false" />
-        <activity
-            android:name=".Profile"
             android:exported="false" />
         <activity
             android:name=".ForgetPassword"

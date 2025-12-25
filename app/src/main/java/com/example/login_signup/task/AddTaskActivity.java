@@ -86,6 +86,7 @@ public class AddTaskActivity extends AppCompatActivity {
         etNotes = findViewById(R.id.etNotes);
         spinnerCategories = findViewById(R.id.spinnerCategories);
         spinnerVibration = findViewById(R.id.spinnerVibration);
+        spinnerPriority = findViewById(R.id.spinnerPriority);
         btnSetDueDate = findViewById(R.id.btnSetDueDate);
         btnSetTime = findViewById(R.id.btnSetTime);
         btnSetReminder = findViewById(R.id.btnSetReminder);

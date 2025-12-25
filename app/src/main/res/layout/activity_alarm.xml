@@ -8,7 +8,7 @@
     android:gravity="center"
     android:padding="30dp"
     android:background="@drawable/background"
-    tools:context=".AlarmActivity">
+    tools:context=".alarm.AlarmActivity">
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"

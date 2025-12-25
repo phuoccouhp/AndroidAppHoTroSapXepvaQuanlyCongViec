@@ -21,6 +21,10 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.login_signup.classes.Task;
+import com.example.login_signup.task.TaskAdapter;
+import com.example.login_signup.task.TaskDetailActivity;
+import com.example.login_signup.task.TaskWidgetProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;

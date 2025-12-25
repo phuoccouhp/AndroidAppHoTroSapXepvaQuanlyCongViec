@@ -8,18 +8,32 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.text.SimpleDateFormat;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.example.login_signup.task.AddTaskActivity;
+
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class HomeActivity extends AppCompatActivity {
 
     private List<ImageButton> navButtons;
+    private FloatingActionButton btnFabAdd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,10 +41,16 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
 
         navButtons = new ArrayList<>();
-        navButtons.add(findViewById(R.id.nav_home_button));
-        navButtons.add(findViewById(R.id.nav_calendar_button));
-        navButtons.add(findViewById(R.id.nav_documents_button));
-        navButtons.add(findViewById(R.id.nav_settings_button));
+        navButtons.add(findViewById(R.id.btnHome));
+        navButtons.add(findViewById(R.id.btnCalendar));
+        navButtons.add(findViewById(R.id.btnDocuments));
+        navButtons.add(findViewById(R.id.btnProfile));
+
+        btnFabAdd = findViewById(R.id.btnFabAdd);
+        btnFabAdd.setOnClickListener(v -> {
+            Intent intent = new Intent(HomeActivity.this, AddTaskActivity.class);
+            startActivity(intent);
+        });
 
         navButtons.get(0).setOnClickListener(v -> loadFragment(new HomeFragment(), v));
         navButtons.get(1).setOnClickListener(v -> loadFragment(new CalendarFragment(), v));
@@ -68,7 +88,7 @@ public class HomeActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
             if (!pm.isIgnoringBatteryOptimizations(getPackageName())) {
-                 new AlertDialog.Builder(this)
+                new AlertDialog.Builder(this)
                         .setTitle("Important: Allow Background Activity")
                         .setMessage("For alarms to work correctly even when the app is closed, please allow the app to run in the background without restrictions. 'Unrestricted' is the recommended setting.")
                         .setPositiveButton("Go to Settings", (dialog, which) -> {
@@ -100,7 +120,7 @@ public class HomeActivity extends AppCompatActivity {
     private void loadFragment(Fragment fragment, View selectedButton) {
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.fragment_container, fragment)
+                .replace(R.id.fragmentContainer, fragment)
                 .commit();
 
         updateNavButtons(selectedButton);

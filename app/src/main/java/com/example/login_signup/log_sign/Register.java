@@ -1,0 +1,112 @@
+package com.example.login_signup.log_sign;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Patterns;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.login_signup.R;
+import com.example.login_signup.classes.FirebaseRepo;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Register extends AppCompatActivity {
+
+    private EditText etName, etOldPass, etConfirm;
+    private Button btnConfirm;
+    private FirebaseRepo fbRepo;
+    private String emailFromSignUp;
+
+    void Init(){
+        etName = findViewById(R.id.etName);
+        etOldPass = findViewById(R.id.etOldPass);
+        etConfirm = findViewById(R.id.etConfirm);
+        btnConfirm = findViewById(R.id.btnConfirm);
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_register);
+
+        Init();
+
+        fbRepo = new FirebaseRepo();
+
+        emailFromSignUp = getIntent().getStringExtra("email");
+        if (TextUtils.isEmpty(emailFromSignUp) ||
+                !Patterns.EMAIL_ADDRESS.matcher(emailFromSignUp).matches()) {
+            Toast.makeText(this, "Thiếu hoặc sai email, hãy quay lại nhập lại.", Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
+
+        btnConfirm.setOnClickListener(v -> doRegister());
+        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+    }
+
+    private void doRegister() {
+        String name = val(etName);
+        String pass = val(etOldPass);
+        String cf   = val(etConfirm);
+
+        if (TextUtils.isEmpty(name))
+        {
+            etName.setError("Nhập tên");
+            etName.requestFocus();
+            return;
+        }
+        if (TextUtils.isEmpty(pass))
+        {
+            etOldPass.setError("Nhập mật khẩu");
+            etOldPass.requestFocus();
+            return;
+        }
+        if (pass.length() < 6)
+        {
+            etOldPass.setError("Mật khẩu ≥ 6 ký tự");
+            etOldPass.requestFocus(); return;
+        }
+        if (!TextUtils.equals(pass, cf))
+        {
+            etConfirm.setError("Không khớp");
+            etConfirm.requestFocus();
+            return;
+        }
+
+        fbRepo.createUserWithEmailAndPassword(name, emailFromSignUp, pass, new FirebaseRepo.OnRegisterListener() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(Register.this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
+                Intent i = new Intent(Register.this, Login.class);
+                startActivity(i);
+                finish();
+            }
+
+            @Override
+            public void onAuthFailure(Exception e) {
+                Toast.makeText(Register.this, "Đăng ký thất bại: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onDbFailure(Exception e) {
+                Toast.makeText(Register.this, "Lưu hồ sơ thất bại: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                //if (mAuth.getCurrentUser() != null) mAuth.getCurrentUser().delete();
+            }
+        });
+
+    }
+
+    private String val(EditText e) {
+        return e.getText() == null ? "" : e.getText().toString().trim();
+    }
+}

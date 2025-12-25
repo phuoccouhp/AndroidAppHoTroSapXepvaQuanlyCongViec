@@ -6,6 +6,9 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.example.login_signup.chat.ChatHistoryActivity;
+import com.example.login_signup.task.AddTaskActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class HomeFragment extends Fragment {
@@ -15,13 +18,13 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
-        FloatingActionButton fabAddTask = view.findViewById(R.id.fab_add_task);
+        FloatingActionButton fabAddTask = view.findViewById(R.id.btnAddTask);
         fabAddTask.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), AddTaskActivity.class);
             startActivity(intent);
         });
 
-        FloatingActionButton fabAiChat = view.findViewById(R.id.fab_ai_chat);
+        FloatingActionButton fabAiChat = view.findViewById(R.id.btnAIChat);
         fabAiChat.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), ChatHistoryActivity.class);
             startActivity(intent);

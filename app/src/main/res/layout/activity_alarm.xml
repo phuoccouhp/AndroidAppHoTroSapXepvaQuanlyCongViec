@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
-    android:padding="0dp"
-
-    tools:context=".AlarmActivity">
+    android:padding="30dp"
+    android:background="@drawable/background"
+    tools:context=".alarm.AlarmActivity">
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:cardCornerRadius="0dp"
-        app:cardElevation="0dp"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="28dp"
+        app:cardUseCompatPadding="true"
         app:cardBackgroundColor="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -22,111 +23,102 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/background"
-
-            android:padding="40dp">
+            android:layout_height="wrap_content"
+            android:padding="24dp">
 
             <ImageView
-                android:id="@+id/iv_alarm_icon"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
+                android:id="@+id/imgAlarm"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
                 android:src="@drawable/baseline_notifications_24"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.15"
                 app:tint="@color/pastel_blue_dark" />
 
             <TextView
-                android:id="@+id/tv_alarm_header"
+                android:id="@+id/tvTaskTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
                 android:fontFamily="@font/smoochsans_bold"
                 android:text="TASK DUE!"
                 android:textColor="@color/oxford_blue"
-                android:textSize="32sp"
+                android:textSize="28sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/iv_alarm_icon" />
+                app:layout_constraintTop_toBottomOf="@id/imgAlarm" />
 
             <TextView
-                android:id="@+id/tv_alarm_task_title"
+                android:id="@+id/tvDayOfWeek"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="8dp"
                 android:fontFamily="@font/smoochsans_medium"
                 android:gravity="center"
                 android:textColor="@android:color/black"
-                android:textSize="24sp"
+                android:textSize="22sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_alarm_header"
+                app:layout_constraintTop_toBottomOf="@id/tvTaskTitle"
                 tools:text="Submit the project report to the board" />
 
             <View
-                android:id="@+id/divider"
+                android:id="@+id/viewDivider"
                 android:layout_width="0dp"
                 android:layout_height="1dp"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="24dp"
                 android:background="#E0E0E0"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_alarm_task_title" />
+                app:layout_constraintTop_toBottomOf="@id/tvDayOfWeek" />
 
             <TextView
-                android:id="@+id/tv_alarm_task_category"
+                android:id="@+id/tvTaskCategory"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="24dp"
                 android:drawableStart="@drawable/baseline_work_24"
                 android:drawablePadding="12dp"
                 android:gravity="center_vertical"
                 android:textColor="#424242"
-                android:textSize="20sp"
+                android:textSize="18sp"
                 app:drawableTint="#8A8A8A"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/divider"
+                app:layout_constraintTop_toBottomOf="@id/viewDivider"
                 tools:text="Category: Work" />
 
             <TextView
-                android:id="@+id/tv_alarm_task_note"
+                android:id="@+id/tvTaskNote"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="16dp"
                 android:drawableStart="@drawable/outline_edit_document_24"
                 android:drawablePadding="12dp"
                 android:gravity="center_vertical"
                 android:textColor="#424242"
-                android:textSize="20sp"
+                android:textSize="18sp"
                 app:drawableTint="#8A8A8A"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_alarm_task_category"
+                app:layout_constraintTop_toBottomOf="@id/tvTaskCategory"
                 tools:text="Note: Don't forget to attach the TPS reports and the cover sheet."/>
 
-            <Button
-                android:id="@+id/btn_stop_alarm"
-                style="/BlueButtonStyle"
-
-                android:layout_width="0dp"
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnStopAlarm"
+                android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:layout_marginTop="40dp"
-                android:layout_marginBottom="40dp"
-                android:backgroundTint="@color/pastel_blue_medium"
-                android:fontFamily="@font/smoochsans_bold"
+                android:layout_marginTop="32dp"
+                android:background="@drawable/bg_dialog_rounded"
+                android:backgroundTint="@color/pastel_blue_dark"
                 android:text="Dismiss"
                 android:textColor="@color/white"
-                android:textSize="20sp"
-                app:cornerRadius="16dp"
+                android:textSize="28sp"
+                android:fontFamily="@font/smoochsans_bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tv_alarm_task_note" />
+                app:layout_constraintTop_toBottomOf="@+id/tvTaskNote" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-
     </androidx.cardview.widget.CardView>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

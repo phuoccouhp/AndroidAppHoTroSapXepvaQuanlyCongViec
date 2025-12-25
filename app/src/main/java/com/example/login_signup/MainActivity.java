@@ -15,7 +15,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,17 +24,18 @@ import java.util.Random;
 import android.widget.ProgressBar;
 import android.view.View;
 
+import com.example.login_signup.log_sign.Login;
+
 public class MainActivity extends AppCompatActivity {
     private static final int SPLASH_TIME_OUT = 3000;
     Animation bottomToTopAnim;
     TextView lbTodo, textWelcome, textQuote;
     ImageView imageBusiness;
     ProgressBar progressBar;
+    private boolean isSplashScreenStarted = false;
 
     private final ActivityResultLauncher<String> requestPermissionLauncher = registerForActivityResult(
             new ActivityResultContracts.RequestPermission(), isGranted -> {
-                
-                startSplashScreen();
             });
 
     private void Init() {
@@ -61,6 +62,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startSplashScreen() {
+        if (isSplashScreenStarted) {
+            return;
+        }
+        isSplashScreenStarted = true;
         progressBar.setVisibility(View.VISIBLE);
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             Intent intent = new Intent(MainActivity.this, Login.class);
@@ -77,16 +82,13 @@ public class MainActivity extends AppCompatActivity {
         setupRandom();
         startAnim();
 
-        
         handlePermissionsAndNavigation();
     }
 
     private void handlePermissionsAndNavigation() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-            
             requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
         } else {
-            
             startSplashScreen();
         }
     }
@@ -94,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        
+
         checkExactAlarmPermission();
     }
 
@@ -102,8 +104,6 @@ public class MainActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
             if (alarmManager != null && !alarmManager.canScheduleExactAlarms()) {
-                
-                
                 Intent intent = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, Uri.parse("package:" + getPackageName()));
                 if (getPackageManager().resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY) != null) {
                     startActivity(intent);

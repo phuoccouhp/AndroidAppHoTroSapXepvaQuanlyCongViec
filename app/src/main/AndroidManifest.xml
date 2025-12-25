@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
@@ -31,7 +30,7 @@
         android:theme="@style/Theme.Login_Signup">
 
         <service 
-            android:name=".AlarmService" />
+            android:name=".alarm.AlarmService" />
 
         <receiver
             android:name=".TaskReminderReceiver"
@@ -40,51 +39,71 @@
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/task_widget_info" />
+        </receiver>
+
+        <receiver
+            android:name=".task.TaskWidgetProvider"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.example.login_signup.ACTION_AUTO_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/task_widget_info" />
         </receiver>
 
         <activity
-            android:name=".AlarmActivity"
+            android:name=".alarm.AlarmActivity"
             android:theme="@style/Theme.App.Alarm"
             android:showWhenLocked="true"
             android:turnScreenOn="true" />
 
         <activity
-            android:name=".ChatHistoryActivity"
+            android:name=".chat.ChatHistoryActivity"
             android:exported="false" />
             
         <activity
-            android:name=".ChatActivity"
+            android:name=".chat.ChatActivity"
+            android:windowSoftInputMode="adjustPan"
             android:exported="false" />
 
         <activity
             android:name=".HomeActivity"
+            android:windowSoftInputMode="adjustPan"
             android:exported="false" />
         <activity
-            android:name="com.example.login_signup.TaskDetailFragment"
+            android:name=".task.TaskDetailActivity"
             android:exported="false" />
         <activity
-            android:name=".AddTaskActivity"
+            android:name=".task.AddTaskActivity"
+            android:windowSoftInputMode="adjustPan"
             android:exported="false" />
         <activity
             android:name=".ChangePassword"
-            android:exported="false" />
-        <activity
-            android:name=".Profile"
+            android:windowSoftInputMode="adjustPan"
             android:exported="false" />
         <activity
             android:name=".ForgetPassword"
+            android:windowSoftInputMode="adjustPan"
             android:exported="false" />
         <activity
-            android:name=".NewPassword"
+            android:name=".log_sign.NewPassword"
+            android:windowSoftInputMode="adjustPan"
             android:exported="false" />
         <activity
-            android:name=".Login"
+            android:name=".log_sign.Login"
+            android:windowSoftInputMode="adjustPan"
             android:exported="false" />
         <activity
-            android:name=".SignUp"
+            android:name=".log_sign.SignUp"
+            android:windowSoftInputMode="adjustPan"
             android:exported="false" />
         <activity
-            android:name=".Register"
+            android:name=".log_sign.Register"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

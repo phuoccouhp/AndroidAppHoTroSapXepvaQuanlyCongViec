@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:background="@drawable/background"
-    tools:context=".AddTaskActivity">
+    android:background="#F4F7FF"
+    tools:context=".task.AddTaskActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="24dp"
-        android:paddingBottom="100dp"> 
+        android:padding="24dp">
 
         <ImageButton
-            android:id="@+id/btn_back"
+            android:id="@+id/btnBack"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/outline_arrow_back_24"
@@ -25,68 +25,96 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/tv_add_task_title"
+            android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="New Task"
-            android:textSize="32sp"
+            android:textSize="30sp"
             android:fontFamily="@font/smoochsans_bold"
             android:textColor="@color/oxford_blue"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/btn_back" 
-            android:layout_marginTop="16dp"/>
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_save_task"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/baseline_check_24"
-            app:tint="@color/white"
-            app:backgroundTint="@color/pastel_blue_dark"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:contentDescription="Save Task" />
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/et_task_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:textColor="@android:color/black"
-            android:hint="Task Name"
-            android:padding="16dp"
-            android:background="@drawable/bg_dialog_rounded"
-            android:backgroundTint="@color/white"
-            app:layout_constraintTop_toBottomOf="@id/tv_add_task_title"
+            android:layout_marginTop="0dp"
+            app:layout_constraintTop_toTopOf="@id/btnBack"
+            app:layout_constraintBottom_toBottomOf="@id/btnBack"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
         <TextView
-            android:id="@+id/tv_categories_title"
+            android:id="@+id/tvTaskName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:text="Category"
+            android:text="Name task"
             android:textSize="22sp"
             android:fontFamily="@font/smoochsans_bold"
             android:textColor="@color/oxford_blue"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/et_task_name" />
+            app:layout_constraintTop_toBottomOf="@id/btnBack" />
 
-        <Spinner
-            android:id="@+id/spinner_categories"
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etTaskName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="10dp"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
+            android:hint="Task..."
+            android:padding="16dp"
             android:background="@drawable/bg_dialog_rounded"
             android:backgroundTint="@color/white"
-            android:padding="12dp"
-            app:layout_constraintTop_toBottomOf="@id/tv_categories_title"
+            app:layout_constraintTop_toBottomOf="@id/tvTaskName"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/tvTags"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Tag"
+            android:textSize="22sp"
+            android:fontFamily="@font/smoochsans_bold"
+            android:textColor="@color/oxford_blue"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/etTaskName" />
+
+        <Spinner
+            android:id="@+id/spinnerCategories"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/bg_dialog_rounded"
+            android:backgroundTint="@color/white"
+            android:padding="16dp"
+            app:layout_constraintTop_toBottomOf="@id/tvTags"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/spinnerPriority"/>
+
+        <TextView
+            android:id="@+id/tvPriority"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Priority"
+            android:textSize="22sp"
+            android:fontFamily="@font/smoochsans_bold"
+            android:textColor="@color/oxford_blue"
+            app:layout_constraintTop_toTopOf="@id/tvTags"
+            app:layout_constraintStart_toStartOf="@id/spinnerPriority"/>
+
+        <Spinner
+            android:id="@+id/spinnerPriority"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/bg_dialog_rounded"
+            android:backgroundTint="@color/white"
+            android:padding="16dp"
+            app:layout_constraintTop_toTopOf="@id/spinnerCategories"
+            app:layout_constraintStart_toEndOf="@+id/spinnerCategories"
             app:layout_constraintEnd_toEndOf="parent"/>
 
         <TextView
-            android:id="@+id/tv_due_date_title"
+            android:id="@+id/tvDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
@@ -95,27 +123,26 @@
             android:fontFamily="@font/smoochsans_bold"
             android:textColor="@color/oxford_blue"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/spinner_categories" />
+            app:layout_constraintTop_toBottomOf="@id/spinnerCategories" />
 
         <Button
-            android:id="@+id/btn_set_due_date"
+            android:id="@+id/btnSetDueDate"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="10dp"
             android:layout_marginEnd="8dp"
             android:text="Set Date"
             android:drawableLeft="@drawable/outline_calendar_month_24"
             android:backgroundTint="@color/white"
             android:textColor="@color/oxford_blue"
-            app:layout_constraintTop_toBottomOf="@id/tv_due_date_title"
+            app:layout_constraintTop_toBottomOf="@id/tvDate"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/btn_set_time"
+            app:layout_constraintEnd_toStartOf="@id/btnSetTime"
             style="?attr/materialButtonOutlinedStyle"
-            app:cornerRadius="16dp"
-            />
+            app:cornerRadius="16dp" />
 
         <Button
-            android:id="@+id/btn_set_time"
+            android:id="@+id/btnSetTime"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -123,57 +150,56 @@
             android:drawableLeft="@drawable/baseline_access_time_24"
             android:backgroundTint="@color/white"
             android:textColor="@color/oxford_blue"
-            app:layout_constraintTop_toTopOf="@id/btn_set_due_date"
-            app:layout_constraintStart_toEndOf="@id/btn_set_due_date"
+            app:layout_constraintTop_toTopOf="@id/btnSetDueDate"
+            app:layout_constraintStart_toEndOf="@id/btnSetDueDate"
             app:layout_constraintEnd_toEndOf="parent"
             style="?attr/materialButtonOutlinedStyle"
-            app:cornerRadius="16dp"
-            />
+            app:cornerRadius="16dp" />
 
         <TextView
-            android:id="@+id/tv_reminder_title"
+            android:id="@+id/tvReminder"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="16dp"
             android:text="Reminder &amp; Sound"
             android:textSize="22sp"
             android:fontFamily="@font/smoochsans_bold"
             android:textColor="@color/oxford_blue"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/btn_set_due_date" />
+            app:layout_constraintTop_toBottomOf="@id/btnSetDueDate" />
 
         <Button
-            android:id="@+id/btn_set_reminder"
+            android:id="@+id/btnSetReminder"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="10dp"
             android:layout_marginEnd="8dp"
             android:text="Reminder OFF"
             android:drawableLeft="@drawable/baseline_notifications_24"
             android:backgroundTint="@color/white"
             android:textColor="@color/oxford_blue"
-            app:layout_constraintTop_toBottomOf="@id/tv_reminder_title"
+            app:layout_constraintTop_toBottomOf="@id/tvReminder"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/btn_select_ringtone"
+            app:layout_constraintEnd_toStartOf="@id/btnSelectRingtone"
             style="?attr/materialButtonOutlinedStyle"
             app:cornerRadius="16dp" />
 
         <Button
-            android:id="@+id/btn_select_ringtone"
+            android:id="@+id/btnSelectRingtone"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:text="Select Sound"
             android:backgroundTint="@color/white"
             android:textColor="@color/oxford_blue"
-            app:layout_constraintTop_toTopOf="@id/btn_set_reminder"
-            app:layout_constraintStart_toEndOf="@id/btn_set_reminder"
+            app:layout_constraintTop_toTopOf="@id/btnSetReminder"
+            app:layout_constraintStart_toEndOf="@id/btnSetReminder"
             app:layout_constraintEnd_toEndOf="parent"
             style="?attr/materialButtonOutlinedStyle"
             app:cornerRadius="16dp" />
 
         <TextView
-            android:id="@+id/tv_vibration_title"
+            android:id="@+id/tvVibration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
@@ -182,46 +208,56 @@
             android:fontFamily="@font/smoochsans_bold"
             android:textColor="@color/oxford_blue"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/btn_set_reminder" />
+            app:layout_constraintTop_toBottomOf="@id/btnSetReminder" />
 
         <Spinner
-            android:id="@+id/spinner_vibration"
+            android:id="@+id/spinnerVibration"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_height="56dp"
+            android:layout_marginTop="10dp"
             android:background="@drawable/bg_dialog_rounded"
             android:backgroundTint="@color/white"
-            android:padding="12dp"
-            app:layout_constraintTop_toBottomOf="@id/tv_vibration_title"/>
-        
+            android:padding="16dp"
+            app:layout_constraintTop_toBottomOf="@id/tvVibration"/>
+
         <TextView
-            android:id="@+id/tv_notes_title"
+            android:id="@+id/tvNotes"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="16dp"
             android:text="Notes"
             android:textSize="22sp"
             android:fontFamily="@font/smoochsans_bold"
             android:textColor="@color/oxford_blue"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/spinner_vibration" />
+            app:layout_constraintTop_toBottomOf="@id/spinnerVibration" />
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/et_notes"
+            android:id="@+id/etNotes"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:minHeight="120dp"
-            android:hint="Add notes..."
+            android:layout_marginTop="10dp"
+            android:textSize="16sp"
             android:textColor="@android:color/black"
-            android:gravity="top"
+            android:hint="Add notes..."
+            android:minHeight="130dp"
             android:padding="16dp"
-            android:background="@drawable/bg_dialog_rounded"
+            android:gravity="top"
+            android:background="@drawable/bg_dialog_description"
             android:backgroundTint="@color/white"
-            app:layout_constraintTop_toBottomOf="@id/tv_notes_title"
+            app:layout_constraintTop_toBottomOf="@id/tvNotes"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
 
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/btnSaveTask"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/baseline_check_24"
+            app:tint="@color/white"
+            app:backgroundTint="@color/pastel_blue_dark"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:contentDescription="Save Task" />
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 </ScrollView>

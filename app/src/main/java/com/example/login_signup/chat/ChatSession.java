@@ -2,9 +2,12 @@ package com.example.login_signup.chat;
 
 import com.google.firebase.firestore.Exclude;
 import com.google.firebase.firestore.ServerTimestamp;
+import com.google.firebase.firestore.DocumentId;
+
 import java.util.Date;
 
 public class ChatSession {
+    @DocumentId
     private String id;
     private String name;
     private String lastMessage;

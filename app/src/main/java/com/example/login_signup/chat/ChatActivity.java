@@ -98,9 +98,9 @@ public class ChatActivity extends AppCompatActivity {
         messagesRef = db.collection("chat_sessions").document(sessionId).collection("messages");
         tasksRef = db.collection("tasks");
 
-        recyclerViewChat = findViewById(R.id.rvChat);
-        editTextMessage = findViewById(R.id.etMessage);
-        buttonSend = findViewById(R.id.btnSend);
+        recyclerViewChat = findViewById(R.id.recyclerViewChat);
+        editTextMessage = findViewById(R.id.editTextMessage);
+        buttonSend = findViewById(R.id.buttonSend);
 
         setupRecyclerView();
         loadMessages();

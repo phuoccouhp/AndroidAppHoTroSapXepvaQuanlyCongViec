@@ -63,7 +63,7 @@
             android:turnScreenOn="true" />
 
         <activity
-            android:name=".chat.ChatHistoryActivity"
+            android:name=".chat.ChatHistoryFragment"
             android:exported="false" />
             
         <activity

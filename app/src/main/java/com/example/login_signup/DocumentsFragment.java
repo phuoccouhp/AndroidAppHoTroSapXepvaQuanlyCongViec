@@ -16,9 +16,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.login_signup.achievement.AchievementsFragment;
+import com.example.login_signup.chat.ChatHistoryFragment;
 import com.example.login_signup.classes.FirebaseRepo;
 import com.example.login_signup.classes.Task;
 import com.example.login_signup.task.TaskAdapter;
+import com.google.ai.client.generativeai.Chat;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.*;
@@ -42,14 +44,14 @@ public class DocumentsFragment extends Fragment {
         btnTabAnalysis = v.findViewById(R.id.btnTabAnalysis);
 
         if (savedInstanceState == null) {
-            loadFragment(new TasksFragment());
+            loadFragment(new ChatHistoryFragment());
             updateButtonStyles(btnTabHome);
         }
 
         toggleGroup.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
             if (isChecked) {
                 if (checkedId == R.id.btnTabHome) {
-                    loadFragment(new TasksFragment());
+                    loadFragment(new ChatHistoryFragment());
                     updateButtonStyles(btnTabHome);
 
                 } else if (checkedId == R.id.btnTabAchievements) {

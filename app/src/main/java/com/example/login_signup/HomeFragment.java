@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.login_signup.chat.ChatHistoryActivity;
 import com.example.login_signup.task.AddTaskActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -21,12 +20,6 @@ public class HomeFragment extends Fragment {
         FloatingActionButton fabAddTask = view.findViewById(R.id.btnAddTask);
         fabAddTask.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), AddTaskActivity.class);
-            startActivity(intent);
-        });
-
-        FloatingActionButton fabAiChat = view.findViewById(R.id.btnAIChat);
-        fabAiChat.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), ChatHistoryActivity.class);
             startActivity(intent);
         });
 

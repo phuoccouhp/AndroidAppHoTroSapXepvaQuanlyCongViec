@@ -13,6 +13,9 @@ import android.view.View;
 import android.widget.ImageButton;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -40,6 +43,12 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+
         navButtons = new ArrayList<>();
         navButtons.add(findViewById(R.id.btnHome));
         navButtons.add(findViewById(R.id.btnCalendar));
@@ -52,13 +61,13 @@ public class HomeActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        navButtons.get(0).setOnClickListener(v -> loadFragment(new HomeFragment(), v));
+        navButtons.get(0).setOnClickListener(v -> loadFragment(new TasksFragment(), v));
         navButtons.get(1).setOnClickListener(v -> loadFragment(new CalendarFragment(), v));
         navButtons.get(2).setOnClickListener(v -> loadFragment(new DocumentsFragment(), v));
         navButtons.get(3).setOnClickListener(v -> loadFragment(new ProfileFragment(), v));
 
         if (savedInstanceState == null) {
-            loadFragment(new HomeFragment(), navButtons.get(0));
+            loadFragment(new TasksFragment(), navButtons.get(0));
         }
 
         checkAndRequestAlarmPermission();

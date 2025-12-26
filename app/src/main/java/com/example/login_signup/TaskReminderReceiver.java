@@ -35,10 +35,7 @@ public class TaskReminderReceiver extends BroadcastReceiver {
             String taskInfo = "Sắp tới: " + title + "\nLúc: " + dueTimeString;
             NotificationHelper.showAdvanceNotification(context, "Công việc sắp tới", taskInfo, taskId.hashCode());
         } else {
-            Intent alarmIntent = new Intent(context, AlarmActivity.class);
-            alarmIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            alarmIntent.putExtras(sourceIntent.getExtras());
-            context.startActivity(alarmIntent);
+            NotificationHelper.showDueNotification(context, sourceIntent);
         }
     }
 

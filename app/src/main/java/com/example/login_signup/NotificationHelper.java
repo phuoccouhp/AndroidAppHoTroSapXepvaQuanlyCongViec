@@ -71,6 +71,40 @@ public class NotificationHelper {
                 .build();
     }
 
+    public static void showDueNotification(Context context, Intent sourceIntent) {
+        String title = sourceIntent.getStringExtra("title");
+        String taskId = sourceIntent.getStringExtra("taskId");
+        int notificationId = (taskId != null) ? taskId.hashCode() : 1;
+
+        // 1. Create the intent that leads to AlarmActivity
+        Intent activityIntent = new Intent(context, AlarmActivity.class);
+        // Pass all the extras from the receiver to the activity
+        activityIntent.putExtras(sourceIntent.getExtras());
+        activityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+        // 2. Wrap it in a PendingIntent
+        PendingIntent contentPendingIntent = PendingIntent.getActivity(
+                context,
+                notificationId,
+                activityIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+        );
+
+        // 3. Build the notification
+        // Note: We use setContentIntent (tap to open) instead of setFullScreenIntent (auto-open)
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID_REMINDER)
+                .setSmallIcon(R.drawable.baseline_check_circle_24)
+                .setContentTitle("Task Due: " + title)
+                .setContentText("Tap to view alarm details")
+                .setPriority(NotificationCompat.PRIORITY_HIGH) // High priority for Heads-up display
+                .setCategory(NotificationCompat.CATEGORY_ALARM)
+                .setContentIntent(contentPendingIntent) // THIS ensures it only opens on click
+                .setAutoCancel(true); // Removes notification after tap
+
+        NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        manager.notify(notificationId, builder.build());
+    }
+
     public static void showAdvanceNotification(Context context, String taskTitle, String taskInfo, int notificationId) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID_ADVANCE)
                 .setSmallIcon(R.drawable.baseline_notifications_24)

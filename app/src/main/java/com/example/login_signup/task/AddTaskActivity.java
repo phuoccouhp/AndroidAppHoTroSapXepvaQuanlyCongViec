@@ -26,13 +26,17 @@ import com.example.login_signup.HomeActivity;
 import com.example.login_signup.NotificationHelper;
 import com.example.login_signup.R;
 import com.example.login_signup.TaskReminderReceiver;
+import com.example.login_signup.classes.FirebaseRepo;
 import com.example.login_signup.classes.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalTime;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -49,9 +53,7 @@ public class AddTaskActivity extends AppCompatActivity {
     private boolean reminderOn = false;
     private Uri selectedRingtoneUri;
 
-    private FirebaseFirestore db;
-    private FirebaseAuth auth;
-
+    private FirebaseRepo fbRepo;
     private final ActivityResultLauncher<Intent> ringtonePickerLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
@@ -73,8 +75,7 @@ public class AddTaskActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_task);
 
-        db = FirebaseFirestore.getInstance();
-        auth = FirebaseAuth.getInstance();
+        fbRepo = new FirebaseRepo();
 
         initViews();
         setupSpinners();
@@ -176,7 +177,10 @@ public class AddTaskActivity extends AppCompatActivity {
         }
 
         String noteContent = (etNotes != null && etNotes.getText() != null) ? etNotes.getText().toString().trim() : "";
-        String userId = auth.getCurrentUser() != null ? auth.getCurrentUser().getUid() : "anonymous";
+        Date creationDate = new Date();
+
+        FirebaseUser currentUser = fbRepo.getCurrentUser();
+        String userId = currentUser != null ? currentUser.getUid() : "anonymous";
 
         Map<String, Object> taskData = new HashMap<>();
         taskData.put("uid", userId);
@@ -187,37 +191,50 @@ public class AddTaskActivity extends AppCompatActivity {
         taskData.put("reminder", reminderOn);
         taskData.put("completed", false);
         taskData.put("taskDate", dueDateTime.getTime());
+        taskData.put("creationDate", creationDate);
         taskData.put("vibration", spinnerVibration.getSelectedItem().toString());
         if (selectedRingtoneUri != null) {
             taskData.put("ringtone", selectedRingtoneUri.toString());
         }
 
-        db.collection("tasks").add(taskData)
-                .addOnSuccessListener(documentReference -> {
-                    Toast.makeText(this, "Task saved", Toast.LENGTH_SHORT).show();
-                    if (reminderOn) {
-                        Task taskToSchedule = new Task();
-                        taskToSchedule.setId(documentReference.getId());
-                        taskToSchedule.setTitle(name);
-                        taskToSchedule.setNote(noteContent);
-                        taskToSchedule.setCategory(spinnerCategories.getSelectedItem().toString());
-                        taskToSchedule.setTaskDate(dueDateTime.getTime());
-                        taskToSchedule.setVibration(spinnerVibration.getSelectedItem().toString());
-                        if(selectedRingtoneUri != null) taskToSchedule.setRingtone(selectedRingtoneUri.toString());
+        fbRepo.addTask(taskData, new FirebaseRepo.OnAddTaskListener() {
+            @Override
+            public void onSuccess(String taskId) {
+                Toast.makeText(AddTaskActivity.this, "Task saved", Toast.LENGTH_SHORT).show();
 
-                        scheduleAlarmsForTask(this, taskToSchedule);
-                    }
+                if (reminderOn) {
+                    Task taskToSchedule = new Task();
+                    taskToSchedule.setId(taskId);
+                    taskToSchedule.setTitle(name);
+                    taskToSchedule.setNote(noteContent);
+                    taskToSchedule.setCategory(spinnerCategories.getSelectedItem().toString());
+                    taskToSchedule.setTaskDate(dueDateTime.getTime());
+                    taskToSchedule.setVibration(spinnerVibration.getSelectedItem().toString());
+                    if(selectedRingtoneUri != null) taskToSchedule.setRingtone(selectedRingtoneUri.toString());
 
-                    Intent widgetUpdateIntent = new Intent(this, TaskWidgetProvider.class);
-                    widgetUpdateIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-                    int[] ids = AppWidgetManager.getInstance(getApplication()).getAppWidgetIds(
-                            new ComponentName(getApplication(), TaskWidgetProvider.class));
-                    widgetUpdateIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
-                    sendBroadcast(widgetUpdateIntent);
+                    scheduleAlarmsForTask(AddTaskActivity.this, taskToSchedule);
+                }
 
-                    finish();
-                })
-                .addOnFailureListener(e -> Toast.makeText(this, "Error saving task", Toast.LENGTH_SHORT).show());
+                fbRepo.logTaskAction(taskId, name, "CREATED");
+
+                updateWidget();
+                finish();
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(AddTaskActivity.this, "Error saving task", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void updateWidget() {
+        Intent widgetUpdateIntent = new Intent(this, TaskWidgetProvider.class);
+        widgetUpdateIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+        int[] ids = AppWidgetManager.getInstance(getApplication()).getAppWidgetIds(
+                new ComponentName(getApplication(), TaskWidgetProvider.class));
+        widgetUpdateIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
+        sendBroadcast(widgetUpdateIntent);
     }
 
     private void scheduleAlarmsForTask(Context context, Task task) {

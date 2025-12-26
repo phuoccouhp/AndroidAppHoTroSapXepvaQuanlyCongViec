@@ -15,6 +15,7 @@ public class Task implements Serializable {
     private boolean reminder;
     private boolean completed;
     private Date taskDate;
+    private Date creationDate;
     private String vibration;
     private String ringtone;
 
@@ -61,6 +62,9 @@ public class Task implements Serializable {
 
     public Date getTaskDate() { return taskDate; }
     public void setTaskDate(Date taskDate) { this.taskDate = taskDate; }
+
+    public Date getCreationDate() { return creationDate; }
+    public void setCreationDate(Date creationDate) { this.creationDate = creationDate; }
 
     public String getVibration() { return vibration; }
     public void setVibration(String vibration) { this.vibration = vibration; }

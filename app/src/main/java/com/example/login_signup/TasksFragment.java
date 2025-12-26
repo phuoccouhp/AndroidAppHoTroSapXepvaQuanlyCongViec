@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
@@ -21,10 +22,12 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.login_signup.classes.FirebaseRepo;
 import com.example.login_signup.classes.Task;
 import com.example.login_signup.task.TaskAdapter;
 import com.example.login_signup.task.TaskDetailActivity;
 import com.example.login_signup.task.TaskWidgetProvider;
+import com.example.login_signup.taskHistory.TaskHistoryActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -40,7 +43,7 @@ public class TasksFragment extends Fragment {
     private ProgressBar progressBarTask;
     private TextView tvProgressPercent, tvProgressCount, tvHighPriorityCount, tvCompletedCount, tvPendingCount;
 
-    private ImageButton btnFilterHigh, btnFilterIncomplete, btnFilterCompleted;
+    private ImageButton btnFilterHigh, btnFilterIncomplete, btnFilterCompleted, btnHistory;
 
     private TaskAdapter adapterHighPriority, adapterIncomplete, adapterCompleted;
 
@@ -50,8 +53,7 @@ public class TasksFragment extends Fragment {
     private List<Task> completedList = new ArrayList<>();
 
     private ActivityResultLauncher<Intent> taskDetailLauncher;
-    private FirebaseFirestore db;
-    private FirebaseAuth auth;
+    private FirebaseRepo fbRepo;
 
     private String filterCategoryHigh = null;
     private String filterCategoryIncomplete = null;
@@ -83,10 +85,18 @@ public class TasksFragment extends Fragment {
         btnFilterHigh = v.findViewById(R.id.btnFilterHigh);
         btnFilterIncomplete = v.findViewById(R.id.btnFilterIncomplete);
         btnFilterCompleted = v.findViewById(R.id.btnFilterCompleted);
+        btnHistory = v.findViewById(R.id.btnHistory);
 
         rvHighPriority.setLayoutManager(new LinearLayoutManager(getContext()));
         rvIncomplete.setLayoutManager(new LinearLayoutManager(getContext()));
         rvCompleted.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        fbRepo = new FirebaseRepo();
+
+        btnHistory.setOnClickListener(v1 -> {
+            Intent intent = new Intent(getContext(), TaskHistoryActivity.class);
+            v1.getContext().startActivity(intent);
+        });
 
         TaskAdapter.OnTaskActionListener actionListener = new TaskAdapter.OnTaskActionListener() {
             @Override
@@ -134,10 +144,6 @@ public class TasksFragment extends Fragment {
                 }
         );
 
-        db = FirebaseFirestore.getInstance();
-        auth = FirebaseAuth.getInstance();
-
-        // Cài đặt sự kiện bấm nút Filter cho từng vùng
         btnFilterHigh.setOnClickListener(view -> showFilterMenu(view, 1));
         btnFilterIncomplete.setOnClickListener(view -> showFilterMenu(view, 2));
         btnFilterCompleted.setOnClickListener(view -> showFilterMenu(view, 3));
@@ -146,10 +152,15 @@ public class TasksFragment extends Fragment {
         return v;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadAllTasks();
+    }
+
     // Hàm hiển thị Popup Menu chọn Tag
     private void showFilterMenu(View v, int type) {
         PopupMenu popup = new PopupMenu(getContext(), v);
-        // Thêm các lựa chọn (Có thể thêm icon nếu muốn)
         popup.getMenu().add(Menu.NONE, 0, 0, "All");
         popup.getMenu().add(Menu.NONE, 1, 1, "Work");
         popup.getMenu().add(Menu.NONE, 2, 2, "Personal");
@@ -160,7 +171,6 @@ public class TasksFragment extends Fragment {
             String selected = item.getTitle().toString();
             if (selected.equals("All")) selected = null;
 
-            // Gán filter cho đúng vùng
             if (type == 1) filterCategoryHigh = selected;
             else if (type == 2) filterCategoryIncomplete = selected;
             else if (type == 3) filterCategoryCompleted = selected;
@@ -172,45 +182,31 @@ public class TasksFragment extends Fragment {
     }
 
     private void loadAllTasks() {
-        String uid = auth.getCurrentUser() != null ? auth.getCurrentUser().getUid() : null;
-        if (uid == null) return;
+        if (fbRepo.getCurrentUser() == null) return;
 
-        db.collection("tasks")
-                .whereEqualTo("uid", uid)
-                .addSnapshotListener((value, error) -> {
-                    if (error != null || value == null) {
-                        return;
+        fbRepo.loadTasksForUser(new FirebaseRepo.OnTasksLoadedListener() {
+            @Override
+            public void onTasksLoaded(List<Task> tasks) {
+                allTasks.clear();
+
+                SimpleDateFormat sdfDisplayDate = new SimpleDateFormat("dd/MM", Locale.getDefault());
+
+                for (Task t : tasks) {
+                    if (t.getTaskDate() != null) {
+                        t.setDate(sdfDisplayDate.format(t.getTaskDate()));
                     }
+                    allTasks.add(t);
+                }
+                filterTasks();
+            }
 
-                    allTasks.clear();
-                    SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-                    SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm", Locale.getDefault());
-                    SimpleDateFormat sdfDisplayDate = new SimpleDateFormat("dd/MM", Locale.getDefault());
-
-                    for (QueryDocumentSnapshot doc : value) {
-                        Object rawDate = doc.get("taskDate");
-                        if (!(rawDate instanceof com.google.firebase.Timestamp)) continue;
-
-                        Date taskDate = ((com.google.firebase.Timestamp) rawDate).toDate();
-                        String id = doc.getId();
-                        String title = doc.getString("title");
-                        String category = doc.getString("category");
-                        String noteContent = doc.getString("note") != null ? doc.getString("note") : doc.getString("notes");
-                        boolean completed = doc.getBoolean("completed") != null && doc.getBoolean("completed");
-                        String priority = doc.getString("priority");
-                        if (priority == null) priority = "Basic";
-
-                        String timeStr = sdfTime.format(taskDate);
-                        String dateStr = sdfDate.format(taskDate);
-
-                        Task task = new Task(id, title, category, timeStr, completed, dateStr, noteContent, priority);
-                        task.setDate(sdfDisplayDate.format(taskDate));
-                        task.setTaskDate(taskDate);
-
-                        allTasks.add(task);
-                    }
-                    filterTasks();
-                });
+            @Override
+            public void onError(Exception e) {
+                if (getContext() != null) {
+                    Toast.makeText(getContext(), "Error loading tasks", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     private void filterTasks() {
@@ -221,20 +217,16 @@ public class TasksFragment extends Fragment {
         for (Task t : allTasks) {
 
             if (t.isCompleted()) {
-                // List Completed: Kiểm tra filterCompleted
                 if (filterCategoryCompleted == null || t.getCategory().equals(filterCategoryCompleted)) {
                     completedList.add(t);
                 }
             } else {
-                // Chưa hoàn thành
                 String priority = t.getPriority();
                 if ("High".equals(priority)) {
-                    // List High Priority: Kiểm tra filterHigh
                     if (filterCategoryHigh == null || t.getCategory().equals(filterCategoryHigh)) {
                         highPriorityList.add(t);
                     }
                 } else {
-                    // List Incomplete (Basic Priority): Kiểm tra filterIncomplete
                     if (filterCategoryIncomplete == null || t.getCategory().equals(filterCategoryIncomplete)) {
                         incompleteList.add(t);
                     }
@@ -249,7 +241,6 @@ public class TasksFragment extends Fragment {
     }
 
     private void updateProgressBar() {
-        // Progress bar chỉ tính trong ngày hôm nay (không ảnh hưởng bởi filter tag)
         List<Task> todayTasks = new ArrayList<>();
         SimpleDateFormat sdfCompare = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         String today = sdfCompare.format(new Date());
@@ -276,7 +267,6 @@ public class TasksFragment extends Fragment {
         }
         tvProgressPercent.setText(progress + "%");
 
-        // Cập nhật số lượng trên 3 thẻ thống kê (Dựa trên list đã filter)
         tvHighPriorityCount.setText(String.valueOf(highPriorityList.size()));
         tvCompletedCount.setText(String.valueOf(completedList.size()));
         tvPendingCount.setText(String.valueOf(incompleteList.size()));
@@ -284,31 +274,50 @@ public class TasksFragment extends Fragment {
 
     private void updateTaskField(Task task, String field, Object value) {
         if (task.getId() == null) return;
-        db.collection("tasks").document(task.getId()).update(field, value)
-                .addOnSuccessListener(aVoid -> {
-                    if (getContext() != null) {
-                        Intent intent = new Intent(getContext(), TaskWidgetProvider.class);
-                        intent.setAction(android.appwidget.AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-                        int[] ids = android.appwidget.AppWidgetManager.getInstance(getContext()).getAppWidgetIds(
-                                new android.content.ComponentName(getContext(), TaskWidgetProvider.class));
-                        intent.putExtra(android.appwidget.AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
-                        getContext().sendBroadcast(intent);
-                    }
-                });
+
+        if ("completed".equals(field)) task.setCompleted((Boolean) value);
+        if ("priority".equals(field)) task.setPriority((String) value);
+
+        filterTasks();
+
+        fbRepo.updateTaskField(task.getId(), field, value, (message, e) -> {
+            if (e == null) {
+                if ("completed".equals(field) && (Boolean) value) {
+                    fbRepo.logTaskAction(task.getId(), task.getTitle(), "COMPLETED");
+                }
+
+                updateWidget();
+                loadAllTasks();
+            } else {
+                Toast.makeText(getContext(), "Update failed", Toast.LENGTH_SHORT).show();
+                loadAllTasks();
+            }
+        });
     }
 
     private void deleteTaskFromFirestore(Task task) {
         if (task.getId() == null) return;
-        db.collection("tasks").document(task.getId()).delete().addOnSuccessListener(aVoid -> {
-            if (getContext() != null) {
-                Toast.makeText(getContext(), "Deleted", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(getContext(), TaskWidgetProvider.class);
-                intent.setAction(android.appwidget.AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-                int[] ids = android.appwidget.AppWidgetManager.getInstance(getContext()).getAppWidgetIds(
-                        new android.content.ComponentName(getContext(), TaskWidgetProvider.class));
-                intent.putExtra(android.appwidget.AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
-                getContext().sendBroadcast(intent);
+        fbRepo.deleteTask(task.getId(), task.getTitle(), (message, e) -> {
+            if (e == null) {
+                if (getContext() != null) {
+                    Toast.makeText(getContext(), "Deleted", Toast.LENGTH_SHORT).show();
+                    updateWidget();
+                    loadAllTasks();
+                }
+            } else {
+                Toast.makeText(getContext(), "Error deleting", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void updateWidget() {
+        if (getContext() != null) {
+            Intent intent = new Intent(getContext(), TaskWidgetProvider.class);
+            intent.setAction(android.appwidget.AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+            int[] ids = android.appwidget.AppWidgetManager.getInstance(getContext()).getAppWidgetIds(
+                    new android.content.ComponentName(getContext(), TaskWidgetProvider.class));
+            intent.putExtra(android.appwidget.AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
+            getContext().sendBroadcast(intent);
+        }
     }
 }

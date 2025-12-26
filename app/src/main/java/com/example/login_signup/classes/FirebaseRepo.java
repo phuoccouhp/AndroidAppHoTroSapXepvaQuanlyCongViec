@@ -55,7 +55,17 @@ public class FirebaseRepo {
         void onFailure(Exception e);
     }
 
+    public interface OnLogLoadedListener {
+        void onLogsLoaded(List<TaskLog> logs);
+        void onError(Exception e);
+    }
+
     // Interface for task
+    public interface OnAddTaskListener {
+        void onSuccess(String taskId);
+        void onFailure(Exception e);
+    }
+
     public interface OnTasksLoadedListener {
         void onTasksLoaded(List<Task> tasks);
         void onError(Exception e);
@@ -258,7 +268,15 @@ public class FirebaseRepo {
                 .addOnFailureListener(listener::onFailure);
     }
 
-    public void deleteTask(String taskId, OnCompleteCallback callback) {
+    public void addTask(Map<String, Object> taskData, OnAddTaskListener listener) {
+        db.collection("tasks").add(taskData)
+                .addOnSuccessListener(documentReference -> {
+                    listener.onSuccess(documentReference.getId());
+                })
+                .addOnFailureListener(listener::onFailure);
+    }
+
+    public void deleteTask(String taskId, String taskTitle, OnCompleteCallback callback) {
         if (taskId == null || taskId.isEmpty()) {
             callback.onComplete(null, new IllegalArgumentException("Task ID is missing"));
             return;
@@ -266,7 +284,113 @@ public class FirebaseRepo {
 
         db.collection("tasks").document(taskId)
                 .delete()
-                .addOnSuccessListener(aVoid -> callback.onComplete("Task deleted", null))
+                .addOnSuccessListener(aVoid -> {
+                    logTaskAction(taskId, taskTitle, "DELETED");
+
+                    callback.onComplete("Task deleted", null);
+                })
                 .addOnFailureListener(e -> callback.onComplete(null, e));
+    }
+
+    public void loadTasksForUser(OnTasksLoadedListener listener) {
+        FirebaseUser user = auth.getCurrentUser();
+        if (user == null) {
+            listener.onError(new Exception("User not logged in"));
+            return;
+        }
+
+        db.collection("tasks")
+                .whereEqualTo("uid", user.getUid())
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<Task> tasks = new ArrayList<>();
+                    SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                    SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+
+                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                        try {
+                            Object rawDate = doc.get("taskDate");
+                            if (!(rawDate instanceof com.google.firebase.Timestamp)) continue;
+
+                            Date taskDate = ((com.google.firebase.Timestamp) rawDate).toDate();
+
+                            String id = doc.getId();
+                            String title = doc.getString("title");
+                            String category = doc.getString("category");
+                            boolean completed = doc.getBoolean("completed") != null && doc.getBoolean("completed");
+
+                            String noteContent = doc.getString("note");
+                            if (noteContent == null) {
+                                noteContent = doc.getString("notes");
+                            }
+
+                            String priority = doc.getString("priority");
+                            if (priority == null) priority = "Basic";
+
+                            String timeStr = sdfTime.format(taskDate);
+                            String dateStr = sdfDate.format(taskDate);
+
+                            Task t = new Task(id, title, category, timeStr, completed, dateStr, noteContent, priority);
+                            t.setTaskDate(taskDate);
+                            t.setUid(user.getUid());
+
+                            t.setVibration(doc.getString("vibration"));
+                            t.setRingtone(doc.getString("ringtone"));
+
+                            tasks.add(t);
+                        } catch (Exception e) {
+                            Log.e("FirebaseRepo", "Error parsing task: " + doc.getId(), e);
+                        }
+                    }
+                    listener.onTasksLoaded(tasks);
+                })
+                .addOnFailureListener(listener::onError);
+    }
+
+    public void updateTaskField(String taskId, String field, Object value, OnCompleteCallback callback) {
+        if (taskId == null) return;
+
+        db.collection("tasks").document(taskId)
+                .update(field, value)
+                .addOnSuccessListener(aVoid -> callback.onComplete("Updated", null))
+                .addOnFailureListener(e -> callback.onComplete(null, e));
+    }
+
+    public void logTaskAction(String taskId, String taskTitle, String action) {
+        FirebaseUser user = auth.getCurrentUser();
+        if (user == null) return;
+
+        TaskLog log = new TaskLog(
+                user.getUid(),
+                taskId,
+                taskTitle,
+                action,
+                new Date()
+        );
+
+        db.collection("task_logs").add(log);
+    }
+
+    public void getTaskLogs(OnLogLoadedListener listener) {
+        FirebaseUser user = auth.getCurrentUser();
+        if (user == null) {
+            listener.onError(new Exception("User not logged in"));
+            return;
+        }
+
+        db.collection("task_logs")
+                .whereEqualTo("userId", user.getUid())
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<TaskLog> logs = new ArrayList<>();
+                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                        TaskLog log = doc.toObject(TaskLog.class);
+                        log.setLogId(doc.getId());
+                        logs.add(log);
+                    }
+                    listener.onLogsLoaded(logs);
+                })
+                .addOnFailureListener(listener::onError);
     }
 }

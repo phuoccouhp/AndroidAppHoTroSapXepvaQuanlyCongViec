@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.login_signup.classes.FirebaseRepo;
 import com.example.login_signup.classes.Task;
 import com.example.login_signup.task.TaskAdapter;
 import com.example.login_signup.task.TaskDetailActivity;
@@ -29,8 +30,7 @@ public class CalendarFragment extends Fragment {
     private RecyclerView recyclerView;
     private TaskAdapter adapter;
     private List<Task> taskList = new ArrayList<>();
-    private FirebaseFirestore db;
-    private FirebaseAuth auth;
+    private FirebaseRepo fbRepo;
     private Date selectedDate = new Date();
 
     private TextView tvTaskList;
@@ -52,8 +52,7 @@ public class CalendarFragment extends Fragment {
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        db = FirebaseFirestore.getInstance();
-        auth = FirebaseAuth.getInstance();
+        fbRepo = new FirebaseRepo();
 
         adapter = new TaskAdapter(taskList, new TaskAdapter.OnTaskActionListener() {
             @Override
@@ -105,9 +104,16 @@ public class CalendarFragment extends Fragment {
         return v;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (selectedDate != null) {
+            loadTasksForDate(selectedDate);
+        }
+    }
+
     private void loadTasksForDate(Date dateToLoad) {
-        String uid = auth.getCurrentUser() != null ? auth.getCurrentUser().getUid() : null;
-        if (uid == null) return;
+        if (fbRepo.getCurrentUser() == null) return;
 
         SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         String selectedDayString = sdfDate.format(dateToLoad);
@@ -119,53 +125,30 @@ public class CalendarFragment extends Fragment {
             tvTaskList.setText("Task for " + sdfDisplay.format(dateToLoad));
         }
 
-        db.collection("tasks")
-                .whereEqualTo("uid", uid)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        taskList.clear();
+        fbRepo.loadTasksForUser(new FirebaseRepo.OnTasksLoadedListener() {
+            @Override
+            public void onTasksLoaded(List<Task> allTasks) {
+                taskList.clear();
 
-                        SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm", Locale.getDefault());
-                        SimpleDateFormat sdfDisplay = new SimpleDateFormat("dd/MM", Locale.getDefault());
-
-                        for (QueryDocumentSnapshot doc : task.getResult()) {
-                            Object rawDate = doc.get("taskDate");
-                            if (!(rawDate instanceof com.google.firebase.Timestamp)) continue;
-
-                            Date taskDate = ((com.google.firebase.Timestamp) rawDate).toDate();
-                            String taskDayString = sdfDate.format(taskDate);
-
-                            if (taskDayString.equals(selectedDayString)) {
-                                String id = doc.getId();
-                                String title = doc.getString("title");
-                                String category = doc.getString("category");
-
-                                boolean completed = doc.getBoolean("completed") != null && doc.getBoolean("completed");
-
-                                String noteContent = doc.getString("note");
-                                if (noteContent == null) {
-                                    noteContent = doc.getString("notes");
-                                }
-
-                                String priority = doc.getString("priority");
-                                if (priority == null) priority = "Basic";
-
-                                String timeStr = sdfTime.format(taskDate);
-                                String dateStr = sdfDate.format(taskDate);
-
-                                Task t = new Task(id, title, category, timeStr, completed, dateStr, noteContent, priority);
-                                t.setTaskDate(taskDate);
-                                taskList.add(t);
-                            }
-                        }
-                        adapter.notifyDataSetChanged();
-                    } else {
-                        if (getContext() != null) {
-                            Toast.makeText(getContext(), "Lỗi tải dữ liệu", Toast.LENGTH_SHORT).show();
+                // Filter the list based on selected date
+                for (Task t : allTasks) {
+                    if (t.getTaskDate() != null) {
+                        String taskDayString = sdfDate.format(t.getTaskDate());
+                        if (taskDayString.equals(selectedDayString)) {
+                            taskList.add(t);
                         }
                     }
-                });
+                }
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onError(Exception e) {
+                if (getContext() != null) {
+                    Toast.makeText(getContext(), "Error loading data", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     private void updateTaskField(Task task, String field, Object value) {
@@ -175,20 +158,19 @@ public class CalendarFragment extends Fragment {
         if ("priority".equals(field)) task.setPriority((String) value);
         adapter.notifyDataSetChanged();
 
-        db.collection("tasks").document(task.getId())
-                .update(field, value)
-                .addOnSuccessListener(aVoid -> {
-                    if (getContext() != null) {
-                        Intent widgetUpdateIntent = new Intent(getContext(), TaskWidgetProvider.class);
-                        widgetUpdateIntent.setAction(android.appwidget.AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-                        int[] ids = android.appwidget.AppWidgetManager.getInstance(getContext()).getAppWidgetIds(
-                                new android.content.ComponentName(getContext(), TaskWidgetProvider.class));
-                        widgetUpdateIntent.putExtra(android.appwidget.AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
-                        getContext().sendBroadcast(widgetUpdateIntent);
-                    }
-                    loadTasksForDate(selectedDate);
-                })
-                .addOnFailureListener(e -> Toast.makeText(getContext(), "Update failed", Toast.LENGTH_SHORT).show());
+        fbRepo.updateTaskField(task.getId(), field, value, (message, e) -> {
+            if (e == null) {
+                if ("completed".equals(field) && (Boolean) value) {
+                    fbRepo.logTaskAction(task.getId(), task.getTitle(), "COMPLETED");
+                }
+
+                updateWidget();
+                loadTasksForDate(selectedDate);
+            } else {
+                Toast.makeText(getContext(), "Update failed", Toast.LENGTH_SHORT).show();
+                loadTasksForDate(selectedDate);
+            }
+        });
     }
 
     private void deleteTaskFromFirestore(Task task) {
@@ -199,27 +181,29 @@ public class CalendarFragment extends Fragment {
             return;
         }
 
-        db.collection("tasks").document(task.getId())
-                .delete()
-                .addOnSuccessListener(aVoid -> {
-                    if (getContext() != null) {
-                        Toast.makeText(getContext(), "Task deleted", Toast.LENGTH_SHORT).show();
+        fbRepo.deleteTask(task.getId(), task.getTitle(), (message, e) -> {
+            if (e == null) {
+                if (getContext() != null) {
+                    Toast.makeText(getContext(), "Task deleted", Toast.LENGTH_SHORT).show();
+                    updateWidget();
+                }
+                loadTasksForDate(selectedDate);
+            } else {
+                if (getContext() != null) {
+                    Toast.makeText(getContext(), "Error deleting task: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
 
-                        Intent widgetUpdateIntent = new Intent(getContext(), TaskWidgetProvider.class);
-                        widgetUpdateIntent.setAction(android.appwidget.AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-
-                        int[] ids = android.appwidget.AppWidgetManager.getInstance(getContext()).getAppWidgetIds(
-                                new android.content.ComponentName(getContext(), TaskWidgetProvider.class));
-
-                        widgetUpdateIntent.putExtra(android.appwidget.AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
-                        getContext().sendBroadcast(widgetUpdateIntent);
-                    }
-                    loadTasksForDate(selectedDate);
-                })
-                .addOnFailureListener(e -> {
-                    if (getContext() != null) {
-                        Toast.makeText(getContext(), "Error deleting task: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
+    private void updateWidget() {
+        if (getContext() != null) {
+            Intent widgetUpdateIntent = new Intent(getContext(), TaskWidgetProvider.class);
+            widgetUpdateIntent.setAction(android.appwidget.AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+            int[] ids = android.appwidget.AppWidgetManager.getInstance(getContext()).getAppWidgetIds(
+                    new android.content.ComponentName(getContext(), TaskWidgetProvider.class));
+            widgetUpdateIntent.putExtra(android.appwidget.AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
+            getContext().sendBroadcast(widgetUpdateIntent);
+        }
     }
 }

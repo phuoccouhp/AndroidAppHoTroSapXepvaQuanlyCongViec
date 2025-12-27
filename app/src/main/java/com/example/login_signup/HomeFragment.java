@@ -1,37 +1,26 @@
 package com.example.login_signup;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.*;
 import android.widget.*;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.login_signup.achievement.AchievementsFragment;
 import com.example.login_signup.chat.ChatHistoryFragment;
-import com.example.login_signup.classes.FirebaseRepo;
-import com.example.login_signup.classes.Task;
-import com.example.login_signup.task.TaskAdapter;
-import com.google.ai.client.generativeai.Chat;
+import com.example.login_signup.taskHistory.TaskHistoryActivity;
 import com.google.android.material.button.MaterialButtonToggleGroup;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.*;
 
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-public class DocumentsFragment extends Fragment {
+public class HomeFragment extends Fragment {
 
     private MaterialButtonToggleGroup toggleGroup;
     private Button btnTabHome, btnTabAchievements, btnTabAnalysis;
+    private ImageButton btnHistory;
 
     @Nullable
     @Override
@@ -42,16 +31,17 @@ public class DocumentsFragment extends Fragment {
         btnTabHome = v.findViewById(R.id.btnTabHome);
         btnTabAchievements = v.findViewById(R.id.btnTabAchievements);
         btnTabAnalysis = v.findViewById(R.id.btnTabAnalysis);
+        btnHistory = v.findViewById(R.id.btnHistory);
 
         if (savedInstanceState == null) {
-            loadFragment(new ChatHistoryFragment());
+            loadFragment(new TaskFragment());
             updateButtonStyles(btnTabHome);
         }
 
         toggleGroup.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
             if (isChecked) {
                 if (checkedId == R.id.btnTabHome) {
-                    loadFragment(new ChatHistoryFragment());
+                    loadFragment(new TaskFragment());
                     updateButtonStyles(btnTabHome);
 
                 } else if (checkedId == R.id.btnTabAchievements) {
@@ -63,6 +53,11 @@ public class DocumentsFragment extends Fragment {
                     updateButtonStyles(btnTabAnalysis);
                 }
             }
+        });
+
+        btnHistory.setOnClickListener(v1 ->{
+            Intent intent = new Intent(getContext(), TaskHistoryActivity.class);
+            startActivity(intent);
         });
 
         toggleGroup.setSelectionRequired(true);
@@ -87,9 +82,3 @@ public class DocumentsFragment extends Fragment {
 
         setButtonStyle(activeButton, activeColor, activeTextColor);
     }
-
-    private void setButtonStyle(Button btn, int backgroundColor, int textColor) {
-        btn.setBackgroundColor(backgroundColor);
-        btn.setTextColor(textColor);
-    }
-}

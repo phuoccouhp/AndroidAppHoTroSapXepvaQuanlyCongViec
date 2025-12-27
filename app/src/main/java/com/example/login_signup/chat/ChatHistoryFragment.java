@@ -6,6 +6,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
@@ -49,13 +51,18 @@ public class ChatHistoryFragment extends Fragment {
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(requireContext());
         recyclerViewChatHistory.setLayoutManager(layoutManager);
-
         adapter = new ChatHistoryAdapter(sessionList);
         recyclerViewChatHistory.setAdapter(adapter);
 
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerViewChatHistory.getContext(), layoutManager.getOrientation());
         dividerItemDecoration.setDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.list_divider));
         recyclerViewChatHistory.addItemDecoration(dividerItemDecoration);
+
+        btnHistory = view.findViewById(R.id.btnHistory);
+        btnHistory.setOnClickListener(v ->{
+            Intent intent = new Intent(getContext(), TaskHistoryActivity.class);
+            startActivity(intent);
+        });
 
         fabNewChat.setOnClickListener(v -> createNewChatSession());
     }

@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
@@ -147,7 +148,6 @@ public class TaskFragment extends Fragment {
         loadAllTasks();
     }
 
-    // Hàm hiển thị Popup Menu chọn Tag
     private void showFilterMenu(View v, int type) {
         PopupMenu popup = new PopupMenu(getContext(), v);
         popup.getMenu().add(Menu.NONE, 0, 0, "All");
@@ -164,7 +164,7 @@ public class TaskFragment extends Fragment {
             else if (type == 2) filterCategoryIncomplete = selected;
             else if (type == 3) filterCategoryCompleted = selected;
 
-            filterTasks(); // Chạy lại lọc
+            filterTasks();
             return true;
         });
         popup.show();

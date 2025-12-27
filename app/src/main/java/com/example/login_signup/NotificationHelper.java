@@ -26,7 +26,6 @@ public class NotificationHelper {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationManager manager = context.getSystemService(NotificationManager.class);
 
-            // A high-priority channel MUST have sound and/or vibration to be considered for a full-screen intent.
             NotificationChannel reminderChannel = new NotificationChannel(
                     CHANNEL_ID_REMINDER, CHANNEL_NAME_REMINDER, NotificationManager.IMPORTANCE_HIGH);
             reminderChannel.setDescription(CHANNEL_DESC_REMINDER);
@@ -34,8 +33,7 @@ public class NotificationHelper {
             reminderChannel.setLightColor(Color.RED);
             reminderChannel.enableVibration(true);
             reminderChannel.setVibrationPattern(new long[]{0, 1000, 500, 1000});
-            
-            // Allow lock screen visibility
+
             reminderChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
 
             manager.createNotificationChannel(reminderChannel);
@@ -76,13 +74,10 @@ public class NotificationHelper {
         String taskId = sourceIntent.getStringExtra("taskId");
         int notificationId = (taskId != null) ? taskId.hashCode() : 1;
 
-        // 1. Create the intent that leads to AlarmActivity
         Intent activityIntent = new Intent(context, AlarmActivity.class);
-        // Pass all the extras from the receiver to the activity
         activityIntent.putExtras(sourceIntent.getExtras());
         activityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NO_USER_ACTION);
 
-        // 2. Wrap it in a PendingIntent
         PendingIntent fullScreenPendingIntent = PendingIntent.getActivity(
                 context,
                 notificationId,
@@ -90,8 +85,6 @@ public class NotificationHelper {
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
 
-        // 3. Build the notification
-        // Use setFullScreenIntent to ensure the activity opens automatically or shows as a high-priority notification
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID_REMINDER)
                 .setSmallIcon(R.drawable.baseline_check_circle_24)
                 .setContentTitle("Task Due: " + title)

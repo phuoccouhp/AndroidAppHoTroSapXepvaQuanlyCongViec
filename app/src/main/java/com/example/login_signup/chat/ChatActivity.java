@@ -596,7 +596,7 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void showTasksFromFirestore() {
-         FirebaseUser currentUser = auth.getCurrentUser();
+        FirebaseUser currentUser = auth.getCurrentUser();
         if (currentUser == null) return;
         tasksRef.whereEqualTo("uid", currentUser.getUid()).get()
             .addOnSuccessListener(queryDocumentSnapshots -> {
@@ -612,7 +612,15 @@ public class ChatActivity extends AppCompatActivity {
                 }
             });
     }
-    private String formatDate(Date date) { return new SimpleDateFormat("dd/MM", Locale.getDefault()).format(date); }
+    private String formatDate(Date date) {
+        return new SimpleDateFormat("dd/MM", Locale.getDefault()).format(date);
+    }
 
-    @Override public boolean onOptionsItemSelected(@NonNull MenuItem item) { if (item.getItemId() == android.R.id.home) { onBackPressed(); return true; } return super.onOptionsItemSelected(item); }
+    @Override public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 }

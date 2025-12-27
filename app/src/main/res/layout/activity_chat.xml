@@ -65,9 +65,8 @@
                 android:src="@drawable/ic_send"
                 app:backgroundTint="@color/colorPrimary"
                 app:tint="@color/white"
-                app:elevation="2dp"
+                app:elevation="0dp"
                 app:fabSize="mini"/>
         </LinearLayout>
     </FrameLayout>
-
 </RelativeLayout>

@@ -130,7 +130,6 @@ public class CalendarFragment extends Fragment {
             public void onTasksLoaded(List<Task> allTasks) {
                 taskList.clear();
 
-                // Filter the list based on selected date
                 for (Task t : allTasks) {
                     if (t.getTaskDate() != null) {
                         String taskDayString = sdfDate.format(t.getTaskDate());

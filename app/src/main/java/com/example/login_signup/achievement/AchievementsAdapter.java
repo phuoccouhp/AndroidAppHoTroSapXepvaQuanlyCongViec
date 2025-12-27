@@ -1,7 +1,7 @@
 package com.example.login_signup.achievement;
 
 import android.graphics.Color;
-import android.graphics.PorterDuff; // Import thêm
+import android.graphics.PorterDuff;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,29 +33,19 @@ public class AchievementsAdapter extends RecyclerView.Adapter<AchievementsAdapte
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Achievement item = list.get(position);
 
-
         holder.imgIcon.setImageResource(item.iconResId);
-
 
         if (item.isUnlocked()) {
 
             holder.imgIcon.setColorFilter(item.color, PorterDuff.Mode.SRC_IN);
-
-
             holder.ivStatus.setImageResource(R.drawable.baseline_check_circle_24);
-            holder.ivStatus.setColorFilter(Color.parseColor("#4CAF50")); // Xanh lá
-
-
+            holder.ivStatus.setColorFilter(Color.parseColor("#4CAF50"));
             holder.tvTitle.setTextColor(Color.BLACK);
         } else {
 
             holder.imgIcon.setColorFilter(Color.parseColor("#BDBDBD"), PorterDuff.Mode.SRC_IN);
-
-
             holder.ivStatus.setImageResource(R.drawable.baseline_lock_24);
-            holder.ivStatus.setColorFilter(Color.parseColor("#BDBDBD")); // Xám
-
-
+            holder.ivStatus.setColorFilter(Color.parseColor("#BDBDBD"));
             holder.tvTitle.setTextColor(Color.GRAY);
         }
 

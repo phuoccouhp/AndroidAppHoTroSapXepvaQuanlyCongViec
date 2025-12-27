@@ -6,17 +6,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.login_signup.classes.FirebaseRepo;
 import com.example.login_signup.classes.Task;
+
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
@@ -25,10 +24,6 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.formatter.PercentFormatter;
-
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -43,8 +38,7 @@ public class AnalysisFragment extends Fragment {
 
     private LineChart lineChart;
     private PieChart pieChart;
-    private FirebaseFirestore db;
-    private FirebaseAuth auth;
+    private FirebaseRepo fbRepo;
     private List<Task> allTasks = new ArrayList<>();
 
     @Nullable
@@ -55,8 +49,7 @@ public class AnalysisFragment extends Fragment {
         lineChart = v.findViewById(R.id.lineChart);
         pieChart = v.findViewById(R.id.pieChart);
 
-        db = FirebaseFirestore.getInstance();
-        auth = FirebaseAuth.getInstance();
+        fbRepo = new FirebaseRepo();
 
         loadDataAndDrawChart();
 
@@ -64,35 +57,23 @@ public class AnalysisFragment extends Fragment {
     }
 
     private void loadDataAndDrawChart() {
-        String uid = auth.getCurrentUser() != null ? auth.getCurrentUser().getUid() : null;
-        if (uid == null) {
-            return;
-        }
+        fbRepo.loadTasksForUser(new FirebaseRepo.OnTasksLoadedListener() {
+            @Override
+            public void onTasksLoaded(List<Task> tasks) {
+                allTasks.clear();
+                allTasks.addAll(tasks);
 
-        db.collection("tasks")
-                .whereEqualTo("uid", uid)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    allTasks.clear();
-                    for (DocumentSnapshot doc : queryDocumentSnapshots) {
-                        Task t = new Task();
-                        t.setCompleted(Boolean.TRUE.equals(doc.getBoolean("completed")));
-                        t.setCategory(doc.getString("category")); // <--- Lấy thêm trường Category
+                setupLineChart();
+                setupPieChart();
+            }
 
-                        Date date = doc.getDate("taskDate");
-                        if (date != null) {
-                            t.setTaskDate(date);
-                            allTasks.add(t);
-                        }
-                    }
-                    setupLineChart();
-                    setupPieChart();
-                })
-                .addOnFailureListener(e -> {
-                    if (getContext() != null) {
-                        Toast.makeText(getContext(), "Failed to load data", Toast.LENGTH_SHORT).show();
-                    }
-                });
+            @Override
+            public void onError(Exception e) {
+                if (getContext() != null) {
+                    Toast.makeText(getContext(), "Không thể tải dữ liệu biểu đồ", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     private void setupPieChart() {

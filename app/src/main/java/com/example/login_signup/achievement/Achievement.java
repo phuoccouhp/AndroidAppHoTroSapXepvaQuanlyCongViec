@@ -8,7 +8,6 @@ public class Achievement {
     int currentProgress;
     int maxProgress;
 
-
     public Achievement(int iconResId, int color, String title, String description, int currentProgress, int maxProgress) {
         this.iconResId = iconResId;
         this.color = color;

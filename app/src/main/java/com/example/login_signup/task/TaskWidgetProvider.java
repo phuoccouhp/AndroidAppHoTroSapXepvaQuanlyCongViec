@@ -36,7 +36,6 @@ public class TaskWidgetProvider extends AppWidgetProvider {
     @Override
     public void onReceive(Context context, Intent intent) {
         super.onReceive(context, intent);
-        // Nhận tín hiệu cập nhật tự động
         if (ACTION_AUTO_UPDATE.equals(intent.getAction()) || AppWidgetManager.ACTION_APPWIDGET_UPDATE.equals(intent.getAction())) {
             ComponentName thisAppWidget = new ComponentName(context.getPackageName(), TaskWidgetProvider.class.getName());
             int[] appWidgetIds = AppWidgetManager.getInstance(context).getAppWidgetIds(thisAppWidget);
@@ -47,20 +46,18 @@ public class TaskWidgetProvider extends AppWidgetProvider {
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_task); // Đảm bảo tên layout đúng
 
-        // Sự kiện click mở app
         Intent intent = new Intent(context, HomeActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
         views.setOnClickPendingIntent(R.id.layoutTaskContent, pendingIntent);
-        // Click vào phần giờ cũng mở app
         views.setOnClickPendingIntent(R.id.tvWidgetTime, pendingIntent);
 
-        // Lấy dữ liệu từ Firestore để quyết định hiển thị
         fetchUpcomingTask(context, views, appWidgetManager, appWidgetId);
     }
 
     private static void fetchUpcomingTask(Context context, RemoteViews views, AppWidgetManager appWidgetManager, int appWidgetId) {
         FirebaseAuth auth = FirebaseAuth.getInstance();
-        // Nếu chưa đăng nhập
+
         if (auth.getCurrentUser() == null) {
             showCurrentTimeState(context, views);
             appWidgetManager.updateAppWidget(appWidgetId, views);
@@ -71,7 +68,6 @@ public class TaskWidgetProvider extends AppWidgetProvider {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         Date currentTime = new Date();
 
-        // Query tất cả task của user
         db.collection("tasks")
                 .whereEqualTo("uid", uid)
                 .get()
@@ -82,14 +78,11 @@ public class TaskWidgetProvider extends AppWidgetProvider {
                     Date nextTaskTime = null;
                     long minDiff = Long.MAX_VALUE;
 
-                    // Lọc tìm task gần nhất trong ngày hôm nay
                     for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                         Date taskDate = doc.getDate("taskDate");
 
                         if (taskDate == null) continue;
 
-                        // 1. Phải là hôm nay
-                        // 2. Phải là tương lai ( > giờ hiện tại)
                         if (isSameDay(taskDate, currentTime) && taskDate.after(currentTime)) {
                             long diff = taskDate.getTime() - currentTime.getTime();
 
@@ -103,57 +96,40 @@ public class TaskWidgetProvider extends AppWidgetProvider {
                         }
                     }
 
-                    // Định dạng ngày giờ
                     SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm", Locale.getDefault());
                     SimpleDateFormat sdfDate = new SimpleDateFormat("EEE, dd/MM/yyyy", Locale.getDefault());
 
                     if (hasTask) {
-                        // --- TRƯỜNG HỢP 1: CÓ TASK SẮP TỚI ---
-
-                        // Hiển thị thời gian CỦA TASK lên Header
                         views.setTextViewText(R.id.tvWidgetTime, sdfTime.format(nextTaskTime));
                         views.setTextViewText(R.id.tvWidgetDate, sdfDate.format(nextTaskTime));
-
-                        // Hiển thị nội dung Task
                         views.setTextViewText(R.id.tvTaskTitle, title);
                         views.setTextViewText(R.id.tvWidgetCategory, category);
 
-                        // Cập nhật Icon và Màu
                         int iconResId = getIconForCategory(category);
                         int colorResId = getColorForCategory(category);
+
                         views.setImageViewResource(R.id.imgTags, iconResId);
                         views.setInt(R.id.imgTags, "setColorFilter", colorResId);
-
-                        // HIỆN khung chứa task
                         views.setViewVisibility(R.id.layoutTaskContent, View.VISIBLE);
 
-                        // Lên lịch cập nhật khi task diễn ra
                         scheduleNextUpdate(context, nextTaskTime);
 
                     } else {
-                        // --- TRƯỜNG HỢP 2: KHÔNG CÓ TASK (HOẶC HẾT TASK) ---
-
-                        // Hiển thị thời gian HIỆN TẠI lên Header
                         views.setTextViewText(R.id.tvWidgetTime, sdfTime.format(currentTime));
                         views.setTextViewText(R.id.tvWidgetDate, sdfDate.format(currentTime));
-
-                        // ẨN khung chứa task
                         views.setViewVisibility(R.id.layoutTaskContent, View.GONE);
 
-                        // Lên lịch cập nhật sau 1 phút (để đồng hồ chạy đúng)
                         scheduleNextUpdate(context, new Date());
                     }
 
                     appWidgetManager.updateAppWidget(appWidgetId, views);
                 })
                 .addOnFailureListener(e -> {
-                    // Nếu lỗi mạng, hiển thị giờ hiện tại
                     showCurrentTimeState(context, views);
                     appWidgetManager.updateAppWidget(appWidgetId, views);
                 });
     }
 
-    // Hàm hiển thị trạng thái mặc định (Giờ hiện tại, ẩn task)
     private static void showCurrentTimeState(Context context, RemoteViews views) {
         Date now = new Date();
         SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm", Locale.getDefault());
@@ -163,11 +139,8 @@ public class TaskWidgetProvider extends AppWidgetProvider {
         views.setTextViewText(R.id.tvWidgetDate, sdfDate.format(now));
         views.setViewVisibility(R.id.layoutTaskContent, View.GONE);
 
-        // Vẫn phải update đồng hồ
         scheduleNextUpdate(context, now);
     }
-
-    // --- CÁC HÀM HỖ TRỢ GIỮ NGUYÊN ---
 
     private static boolean isSameDay(Date date1, Date date2) {
         Calendar cal1 = Calendar.getInstance();
@@ -214,7 +187,7 @@ public class TaskWidgetProvider extends AppWidgetProvider {
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
 
-        long triggerTime = taskDate.getTime() + 60000; // +1 phút
+        long triggerTime = taskDate.getTime() + 60000;
 
         if (alarmManager != null) {
             try {

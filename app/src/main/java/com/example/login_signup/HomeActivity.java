@@ -8,7 +8,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.provider.Settings;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import androidx.appcompat.app.AlertDialog;
@@ -18,20 +17,13 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.text.SimpleDateFormat;
+import com.example.login_signup.chat.ChatHistoryFragment;
+import com.example.login_signup.taskHistory.TaskHistoryActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.example.login_signup.task.AddTaskActivity;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -61,13 +53,13 @@ public class HomeActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        navButtons.get(0).setOnClickListener(v -> loadFragment(new TasksFragment(), v));
+        navButtons.get(0).setOnClickListener(v -> loadFragment(new HomeFragment(), v));
         navButtons.get(1).setOnClickListener(v -> loadFragment(new CalendarFragment(), v));
-        navButtons.get(2).setOnClickListener(v -> loadFragment(new DocumentsFragment(), v));
+        navButtons.get(2).setOnClickListener(v -> loadFragment(new ChatHistoryFragment(), v));
         navButtons.get(3).setOnClickListener(v -> loadFragment(new ProfileFragment(), v));
 
         if (savedInstanceState == null) {
-            loadFragment(new TasksFragment(), navButtons.get(0));
+            loadFragment(new HomeFragment(), navButtons.get(0));
         }
 
         checkAndRequestAlarmPermission();

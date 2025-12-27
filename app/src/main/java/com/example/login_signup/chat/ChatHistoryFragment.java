@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.login_signup.R;
 import com.example.login_signup.classes.FirebaseRepo;
+import com.example.login_signup.taskHistory.TaskHistoryActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
@@ -30,16 +31,13 @@ public class ChatHistoryFragment extends Fragment {
     private RecyclerView recyclerViewChatHistory;
     private ChatHistoryAdapter adapter;
     private List<ChatSession> sessionList = new ArrayList<>();
-    // Note: btnBack is usually removed in fragments managed by a bottom nav/tab system,
-    // but I will leave the declaration here just in case.
-    private ImageButton btnBack;
+    private ImageButton btnHistory;
 
     private FirebaseRepo fbRepo;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // Reuse the existing layout
         View view = inflater.inflate(R.layout.fragment_chat_history, container, false);
 
         fbRepo = new FirebaseRepo();
@@ -53,7 +51,6 @@ public class ChatHistoryFragment extends Fragment {
         recyclerViewChatHistory = view.findViewById(R.id.recyclerViewChatHistory);
         FloatingActionButton fabNewChat = view.findViewById(R.id.fabNewChat);
 
-        // Use requireContext() or getContext() instead of 'this'
         LinearLayoutManager layoutManager = new LinearLayoutManager(requireContext());
         recyclerViewChatHistory.setLayoutManager(layoutManager);
         adapter = new ChatHistoryAdapter(sessionList);
@@ -62,6 +59,12 @@ public class ChatHistoryFragment extends Fragment {
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerViewChatHistory.getContext(), layoutManager.getOrientation());
         dividerItemDecoration.setDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.list_divider));
         recyclerViewChatHistory.addItemDecoration(dividerItemDecoration);
+
+        btnHistory = view.findViewById(R.id.btnHistory);
+        btnHistory.setOnClickListener(v ->{
+            Intent intent = new Intent(getContext(), TaskHistoryActivity.class);
+            startActivity(intent);
+        });
 
         fabNewChat.setOnClickListener(v -> createNewChatSession());
     }
@@ -88,7 +91,6 @@ public class ChatHistoryFragment extends Fragment {
         fbRepo.createNewChatSession(new FirebaseRepo.OnCreateSessionListener() {
             @Override
             public void onSuccess(ChatSession newSession, String documentId) {
-                // Use getActivity() for Intent context
                 Intent intent = new Intent(getActivity(), ChatActivity.class);
                 intent.putExtra("CHAT_SESSION_ID", documentId);
                 intent.putExtra("CHAT_SESSION_NAME", newSession.getName());

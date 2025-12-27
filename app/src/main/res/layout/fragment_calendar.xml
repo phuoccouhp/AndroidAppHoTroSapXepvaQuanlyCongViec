@@ -22,14 +22,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardCalendar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="10dp"
         app:cardCornerRadius="16dp"
-        app:cardElevation="4dp"
+        app:cardElevation="8dp"
+        app:strokeWidth="0dp"
+        app:cardBackgroundColor="@color/white"
         app:layout_constraintTop_toBottomOf="@id/tvTitle"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -39,12 +41,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/white"
-            android:dateTextAppearance="@android:style/TextAppearance.Material.Body1"
-            android:weekSeparatorLineColor="@android:color/transparent"
+            android:dateTextAppearance="@style/CalenderViewDateCustom"
+            android:weekDayTextAppearance="@style/CalenderViewWeekCustom"
+            android:weekSeparatorLineColor="@color/white"
             android:firstDayOfWeek="2"
             android:layout_margin="8dp"
             android:theme="@style/MyCalendarTheme" />
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
     <TextView
         android:id="@+id/tvTaskList"

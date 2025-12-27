@@ -15,9 +15,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.login_signup.R;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.example.login_signup.classes.FirebaseRepo;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,8 +26,7 @@ public class AchievementsFragment extends Fragment {
     private ProgressBar pbLevelProgress;
     private RecyclerView rvAchievements;
 
-    private FirebaseAuth mAuth;
-    private FirebaseFirestore db;
+    private FirebaseRepo firebaseRepo;
 
     private int currentStreak = 0;
     private int totalTasksCreated = 0;
@@ -44,8 +42,7 @@ public class AchievementsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mAuth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance();
+        firebaseRepo = new FirebaseRepo();
 
         tvCurrentLevel = view.findViewById(R.id.tvCurrentLevel);
         tvNextLevelInfo = view.findViewById(R.id.tvNextLevelInfo);
@@ -53,46 +50,48 @@ public class AchievementsFragment extends Fragment {
         pbLevelProgress = view.findViewById(R.id.pbLevelProgress);
         rvAchievements = view.findViewById(R.id.rvAchievements);
 
-        loadUserData();
+        loadData();
     }
 
-    private void loadUserData() {
-        if (mAuth.getCurrentUser() == null) return;
-        String uid = mAuth.getCurrentUser().getUid();
+    private void loadData() {
+        // 1. Lấy thông tin Streak từ Repo
+        firebaseRepo.getUserStreak(new FirebaseRepo.OnStreakLoadedListener() {
+            @Override
+            public void onStreakLoaded(int streak) {
+                currentStreak = streak;
+                // Sau khi lấy streak xong, lấy tiếp thống kê Task
+                loadTaskStats();
+            }
 
-        db.collection("users").document(uid).get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
-                        Long s = documentSnapshot.getLong("streak");
-                        currentStreak = (s != null) ? s.intValue() : 0;
-                    } else {
-                        currentStreak = 0;
-                    }
-                    loadTaskData(uid);
-                })
-                .addOnFailureListener(e -> {
-                    Log.e("Achieve", "Error loading user data", e);
-                    loadTaskData(uid);
-                });
+            @Override
+            public void onError(Exception e) {
+                Log.e("Achieve", "Lỗi lấy streak", e);
+                // Dù lỗi streak vẫn cố lấy task stats
+                loadTaskStats();
+            }
+        });
     }
 
-    private void loadTaskData(String uid) {
-        db.collection("tasks").whereEqualTo("uid", uid).get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    totalTasksCreated = queryDocumentSnapshots.size();
-                    totalTasksCompleted = 0;
-                    for (DocumentSnapshot doc : queryDocumentSnapshots) {
-                        Boolean completed = doc.getBoolean("completed");
-                        if (completed != null && completed) {
-                            totalTasksCompleted++;
-                        }
-                    }
-                    updateUI();
-                });
+    private void loadTaskStats() {
+        firebaseRepo.getTaskStatistics(new FirebaseRepo.OnTaskStatsLoadedListener() {
+            @Override
+            public void onStatsLoaded(int totalCreated, int totalCompleted) {
+                totalTasksCreated = totalCreated;
+                totalTasksCompleted = totalCompleted;
+                updateUI();
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Log.e("Achieve", "Lỗi lấy thống kê task", e);
+                updateUI();
+            }
+        });
     }
 
     private void updateUI() {
-        // LOGIC LEVEL
+        if (getContext() == null) return;
+
         int currentLevel = (totalTasksCreated / 10) + 1;
         int progressInLevel = totalTasksCreated % 10;
         int tasksNeedForNextLevel = 10 - progressInLevel;

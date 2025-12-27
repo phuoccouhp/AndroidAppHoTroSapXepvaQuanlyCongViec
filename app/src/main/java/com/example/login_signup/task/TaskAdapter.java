@@ -65,7 +65,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         }
 
         if ("High".equals(task.getPriority())) {
-            holder.btnPriority.setText("Priority");
+            holder.btnPriority.setText("High");
             holder.btnPriority.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#FF9F0B")));
         } else {
             holder.btnPriority.setText("Normal");

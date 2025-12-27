@@ -18,11 +18,6 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
-
 import java.text.SimpleDateFormat;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.example.login_signup.task.AddTaskActivity;

@@ -6,8 +6,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
@@ -30,16 +28,12 @@ public class ChatHistoryFragment extends Fragment {
     private RecyclerView recyclerViewChatHistory;
     private ChatHistoryAdapter adapter;
     private List<ChatSession> sessionList = new ArrayList<>();
-    // Note: btnBack is usually removed in fragments managed by a bottom nav/tab system,
-    // but I will leave the declaration here just in case.
-    private ImageButton btnBack;
 
     private FirebaseRepo fbRepo;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // Reuse the existing layout
         View view = inflater.inflate(R.layout.fragment_chat_history, container, false);
 
         fbRepo = new FirebaseRepo();
@@ -53,9 +47,9 @@ public class ChatHistoryFragment extends Fragment {
         recyclerViewChatHistory = view.findViewById(R.id.recyclerViewChatHistory);
         FloatingActionButton fabNewChat = view.findViewById(R.id.fabNewChat);
 
-        // Use requireContext() or getContext() instead of 'this'
         LinearLayoutManager layoutManager = new LinearLayoutManager(requireContext());
         recyclerViewChatHistory.setLayoutManager(layoutManager);
+
         adapter = new ChatHistoryAdapter(sessionList);
         recyclerViewChatHistory.setAdapter(adapter);
 
@@ -88,7 +82,6 @@ public class ChatHistoryFragment extends Fragment {
         fbRepo.createNewChatSession(new FirebaseRepo.OnCreateSessionListener() {
             @Override
             public void onSuccess(ChatSession newSession, String documentId) {
-                // Use getActivity() for Intent context
                 Intent intent = new Intent(getActivity(), ChatActivity.class);
                 intent.putExtra("CHAT_SESSION_ID", documentId);
                 intent.putExtra("CHAT_SESSION_NAME", newSession.getName());

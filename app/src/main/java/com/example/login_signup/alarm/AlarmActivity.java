@@ -9,7 +9,6 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.login_signup.R;
-import com.example.login_signup.alarm.AlarmService;
 
 public class AlarmActivity extends AppCompatActivity {
 

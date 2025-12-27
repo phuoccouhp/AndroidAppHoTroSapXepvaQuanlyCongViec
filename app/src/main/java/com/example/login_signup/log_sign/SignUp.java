@@ -30,7 +30,6 @@ public class SignUp extends AppCompatActivity {
     private ActivityResultLauncher<Intent> googlePicker;
 
     private FirebaseRepo fbRepo;
-    private FirebaseFirestore db;
 
     private void Init(){
         etEmail = findViewById(R.id.etEmail);

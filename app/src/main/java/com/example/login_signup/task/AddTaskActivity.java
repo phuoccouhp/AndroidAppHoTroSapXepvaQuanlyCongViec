@@ -107,7 +107,7 @@ public class AddTaskActivity extends AppCompatActivity {
                 android.R.layout.simple_spinner_dropdown_item, vibrations);
         spinnerVibration.setAdapter(vibrationsAdapter);
 
-        String[] priorities = {"Basic", "High"};
+        String[] priorities = {"Normal", "High"};
         ArrayAdapter<String> priorityAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_dropdown_item, priorities);
         spinnerPriority.setAdapter(priorityAdapter);

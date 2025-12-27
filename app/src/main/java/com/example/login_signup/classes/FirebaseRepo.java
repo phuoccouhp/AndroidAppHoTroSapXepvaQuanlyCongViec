@@ -9,6 +9,7 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -25,7 +26,6 @@ public class FirebaseRepo {
     private FirebaseAuth auth;
     private FirebaseFirestore db;
 
-    //Interface to report success/failure
     public interface OnCompleteCallback {
         void onComplete(String message, Exception e);
     }
@@ -44,7 +44,6 @@ public class FirebaseRepo {
         void onComplete(User user, Exception e);
     }
 
-    //Interface for chat history
     public interface OnChatSessionsListener {
         void onSessionsLoaded(List<ChatSession> sessions);
         void onError(Exception e);
@@ -60,7 +59,6 @@ public class FirebaseRepo {
         void onError(Exception e);
     }
 
-    // Interface for task
     public interface OnAddTaskListener {
         void onSuccess(String taskId);
         void onFailure(Exception e);
@@ -68,6 +66,16 @@ public class FirebaseRepo {
 
     public interface OnTasksLoadedListener {
         void onTasksLoaded(List<Task> tasks);
+        void onError(Exception e);
+    }
+
+    public interface OnStreakLoadedListener {
+        void onStreakLoaded(int currentStreak);
+        void onError(Exception e);
+    }
+
+    public interface OnTaskStatsLoadedListener {
+        void onStatsLoaded(int totalCreated, int totalCompleted);
         void onError(Exception e);
     }
 
@@ -390,6 +398,50 @@ public class FirebaseRepo {
                         logs.add(log);
                     }
                     listener.onLogsLoaded(logs);
+                })
+                .addOnFailureListener(listener::onError);
+    }
+
+    public void getUserStreak(OnStreakLoadedListener listener) {
+        FirebaseUser user = auth.getCurrentUser();
+        if (user == null) {
+            listener.onError(new Exception("User not logged in"));
+            return;
+        }
+
+        db.collection("users").document(user.getUid()).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    int streak = 0;
+                    if (documentSnapshot.exists()) {
+                        Long s = documentSnapshot.getLong("streak");
+                        streak = (s != null) ? s.intValue() : 0;
+                    }
+                    listener.onStreakLoaded(streak);
+                })
+                .addOnFailureListener(listener::onError);
+    }
+
+    public void getTaskStatistics(OnTaskStatsLoadedListener listener) {
+        FirebaseUser user = auth.getCurrentUser();
+        if (user == null) {
+            listener.onError(new Exception("User not logged in"));
+            return;
+        }
+
+        db.collection("tasks")
+                .whereEqualTo("uid", user.getUid())
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    int totalCreated = queryDocumentSnapshots.size();
+                    int totalCompleted = 0;
+
+                    for (DocumentSnapshot doc : queryDocumentSnapshots) {
+                        Boolean completed = doc.getBoolean("completed");
+                        if (completed != null && completed) {
+                            totalCompleted++;
+                        }
+                    }
+                    listener.onStatsLoaded(totalCreated, totalCompleted);
                 })
                 .addOnFailureListener(listener::onError);
     }

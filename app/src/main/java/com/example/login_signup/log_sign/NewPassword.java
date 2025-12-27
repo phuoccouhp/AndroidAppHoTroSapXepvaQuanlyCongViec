@@ -35,7 +35,7 @@ public class NewPassword extends AppCompatActivity {
         String p2 = val(etConfirm);
 
         if (TextUtils.isEmpty(p1)) { etNewPass.setError("Nhập mật khẩu mới"); etNewPass.requestFocus(); return; }
-        if (p1.length() < 6)        { etNewPass.setError("Mật khẩu ≥ 6 ký tự"); etNewPass.requestFocus(); return; }
+        if (p1.length() < 6) { etNewPass.setError("Mật khẩu ≥ 6 ký tự"); etNewPass.requestFocus(); return; }
         if (!TextUtils.equals(p1, p2)) { etConfirm.setError("Không khớp"); etConfirm.requestFocus(); return; }
 
         FirebaseUser user = mAuth.getCurrentUser();

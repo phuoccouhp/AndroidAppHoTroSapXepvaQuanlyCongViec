@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
@@ -28,9 +27,6 @@ import com.example.login_signup.task.TaskAdapter;
 import com.example.login_signup.task.TaskDetailActivity;
 import com.example.login_signup.task.TaskWidgetProvider;
 import com.example.login_signup.taskHistory.TaskHistoryActivity;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -158,7 +154,6 @@ public class TasksFragment extends Fragment {
         loadAllTasks();
     }
 
-    // Hàm hiển thị Popup Menu chọn Tag
     private void showFilterMenu(View v, int type) {
         PopupMenu popup = new PopupMenu(getContext(), v);
         popup.getMenu().add(Menu.NONE, 0, 0, "All");
@@ -175,7 +170,7 @@ public class TasksFragment extends Fragment {
             else if (type == 2) filterCategoryIncomplete = selected;
             else if (type == 3) filterCategoryCompleted = selected;
 
-            filterTasks(); // Chạy lại lọc
+            filterTasks();
             return true;
         });
         popup.show();

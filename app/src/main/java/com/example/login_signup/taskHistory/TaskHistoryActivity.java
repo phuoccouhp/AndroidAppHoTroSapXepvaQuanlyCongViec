@@ -21,7 +21,7 @@ import java.util.Locale;
 public class TaskHistoryActivity extends AppCompatActivity {
 
     private RecyclerView recyclerViewLog;
-    private FirebaseRepo firebaseRepo;
+    private FirebaseRepo fbRepo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,12 +38,12 @@ public class TaskHistoryActivity extends AppCompatActivity {
         recyclerViewLog = findViewById(R.id.recyclerViewLog);
         recyclerViewLog.setLayoutManager(new LinearLayoutManager(this));
 
-        firebaseRepo = new FirebaseRepo();
+        fbRepo = new FirebaseRepo();
         loadHistory();
     }
 
     private void loadHistory() {
-        firebaseRepo.getTaskLogs(new FirebaseRepo.OnLogLoadedListener() {
+        fbRepo.getTaskLogs(new FirebaseRepo.OnLogLoadedListener() {
             @Override
             public void onLogsLoaded(List<TaskLog> logs) {
                 List<Object> groupedList = groupLogsByDate(logs);

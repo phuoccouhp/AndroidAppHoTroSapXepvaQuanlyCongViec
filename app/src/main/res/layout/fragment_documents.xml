@@ -6,7 +6,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".DocumentsFragment">
+    tools:context=".HomeFragment">
 
     <ImageButton
         android:id="@+id/btnHistory"
@@ -24,7 +24,7 @@
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Welcome Back"
+        android:text="Welcome To Taskify"
         android:textSize="30sp"
         android:textColor="@color/oxford_blue"
         android:textAlignment="center"
@@ -50,7 +50,7 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
-            android:text="Chatbot"
+            android:text="Home"
             android:textColor="@color/white"
             android:textSize="13sp"
             android:textAllCaps="false"

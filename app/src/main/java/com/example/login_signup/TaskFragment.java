@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
@@ -27,10 +26,6 @@ import com.example.login_signup.classes.Task;
 import com.example.login_signup.task.TaskAdapter;
 import com.example.login_signup.task.TaskDetailActivity;
 import com.example.login_signup.task.TaskWidgetProvider;
-import com.example.login_signup.taskHistory.TaskHistoryActivity;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -38,12 +33,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class TasksFragment extends Fragment {
+public class TaskFragment extends Fragment {
     private RecyclerView rvHighPriority, rvIncomplete, rvCompleted;
     private ProgressBar progressBarTask;
     private TextView tvProgressPercent, tvProgressCount, tvHighPriorityCount, tvCompletedCount, tvPendingCount;
 
-    private ImageButton btnFilterHigh, btnFilterIncomplete, btnFilterCompleted, btnHistory;
+    private ImageButton btnFilterHigh, btnFilterIncomplete, btnFilterCompleted;
 
     private TaskAdapter adapterHighPriority, adapterIncomplete, adapterCompleted;
 
@@ -85,18 +80,12 @@ public class TasksFragment extends Fragment {
         btnFilterHigh = v.findViewById(R.id.btnFilterHigh);
         btnFilterIncomplete = v.findViewById(R.id.btnFilterIncomplete);
         btnFilterCompleted = v.findViewById(R.id.btnFilterCompleted);
-        btnHistory = v.findViewById(R.id.btnHistory);
 
         rvHighPriority.setLayoutManager(new LinearLayoutManager(getContext()));
         rvIncomplete.setLayoutManager(new LinearLayoutManager(getContext()));
         rvCompleted.setLayoutManager(new LinearLayoutManager(getContext()));
 
         fbRepo = new FirebaseRepo();
-
-        btnHistory.setOnClickListener(v1 -> {
-            Intent intent = new Intent(getContext(), TaskHistoryActivity.class);
-            v1.getContext().startActivity(intent);
-        });
 
         TaskAdapter.OnTaskActionListener actionListener = new TaskAdapter.OnTaskActionListener() {
             @Override

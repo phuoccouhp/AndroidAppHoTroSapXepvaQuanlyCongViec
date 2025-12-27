@@ -26,9 +26,7 @@ public class NotificationHelper {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationManager manager = context.getSystemService(NotificationManager.class);
 
-            // FIX: Restore sound and vibration to the channel itself.
             // A high-priority channel MUST have sound and/or vibration to be considered for a full-screen intent.
-            // Setting them to null effectively downgrades the notification's urgency.
             NotificationChannel reminderChannel = new NotificationChannel(
                     CHANNEL_ID_REMINDER, CHANNEL_NAME_REMINDER, NotificationManager.IMPORTANCE_HIGH);
             reminderChannel.setDescription(CHANNEL_DESC_REMINDER);
@@ -36,8 +34,10 @@ public class NotificationHelper {
             reminderChannel.setLightColor(Color.RED);
             reminderChannel.enableVibration(true);
             reminderChannel.setVibrationPattern(new long[]{0, 1000, 500, 1000});
-            // Note: The sound for the notification will be the default notification sound.
-            // The AlarmService will play the chosen alarm ringtone separately.
+            
+            // Allow lock screen visibility
+            reminderChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+
             manager.createNotificationChannel(reminderChannel);
 
             NotificationChannel advanceChannel = new NotificationChannel(
@@ -80,10 +80,10 @@ public class NotificationHelper {
         Intent activityIntent = new Intent(context, AlarmActivity.class);
         // Pass all the extras from the receiver to the activity
         activityIntent.putExtras(sourceIntent.getExtras());
-        activityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        activityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NO_USER_ACTION);
 
         // 2. Wrap it in a PendingIntent
-        PendingIntent contentPendingIntent = PendingIntent.getActivity(
+        PendingIntent fullScreenPendingIntent = PendingIntent.getActivity(
                 context,
                 notificationId,
                 activityIntent,
@@ -91,15 +91,16 @@ public class NotificationHelper {
         );
 
         // 3. Build the notification
-        // Note: We use setContentIntent (tap to open) instead of setFullScreenIntent (auto-open)
+        // Use setFullScreenIntent to ensure the activity opens automatically or shows as a high-priority notification
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID_REMINDER)
                 .setSmallIcon(R.drawable.baseline_check_circle_24)
                 .setContentTitle("Task Due: " + title)
-                .setContentText("Tap to view alarm details")
-                .setPriority(NotificationCompat.PRIORITY_HIGH) // High priority for Heads-up display
+                .setContentText("Tap to stop alarm")
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setCategory(NotificationCompat.CATEGORY_ALARM)
-                .setContentIntent(contentPendingIntent) // THIS ensures it only opens on click
-                .setAutoCancel(true); // Removes notification after tap
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .setFullScreenIntent(fullScreenPendingIntent, true)
+                .setAutoCancel(true);
 
         NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         manager.notify(notificationId, builder.build());

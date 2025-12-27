@@ -82,3 +82,9 @@ public class HomeFragment extends Fragment {
 
         setButtonStyle(activeButton, activeColor, activeTextColor);
     }
+
+    private void setButtonStyle(Button btn, int backgroundColor, int textColor) {
+        btn.setBackgroundColor(backgroundColor);
+        btn.setTextColor(textColor);
+    }
+}

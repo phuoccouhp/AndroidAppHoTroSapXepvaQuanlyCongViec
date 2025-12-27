@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.login_signup.R;
 import com.example.login_signup.classes.FirebaseRepo;
+import com.example.login_signup.taskHistory.TaskHistoryActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ public class ChatHistoryFragment extends Fragment {
     private RecyclerView recyclerViewChatHistory;
     private ChatHistoryAdapter adapter;
     private List<ChatSession> sessionList = new ArrayList<>();
+    private ImageButton btnHistory;
 
     private FirebaseRepo fbRepo;
 

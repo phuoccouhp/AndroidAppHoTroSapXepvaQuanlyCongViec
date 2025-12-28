@@ -12,7 +12,6 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.login_signup.achievement.AchievementsFragment;
-import com.example.login_signup.chat.ChatHistoryFragment;
 import com.example.login_signup.taskHistory.TaskHistoryActivity;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 
@@ -25,7 +24,7 @@ public class HomeFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_documents, container, false);
+        View v = inflater.inflate(R.layout.fragment_home, container, false);
 
         toggleGroup = v.findViewById(R.id.toggleGroup);
         btnTabHome = v.findViewById(R.id.btnTabHome);

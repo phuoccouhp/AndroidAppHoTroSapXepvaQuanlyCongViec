@@ -26,17 +26,12 @@ import com.example.login_signup.ForgetPassword;
 import com.example.login_signup.HomeActivity;
 import com.example.login_signup.R;
 import com.example.login_signup.classes.FirebaseRepo;
-import com.example.login_signup.classes.User;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.GoogleAuthProvider;
 
 public class Login extends AppCompatActivity {
 
@@ -62,7 +57,7 @@ public class Login extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         if (fbRepo.getCurrentUser() != null) {
-            Toast.makeText(this, "Đã tự động đăng nhập!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Automatically logged in!", Toast.LENGTH_SHORT).show();
             navigateToHomeActivity();
         }
     }
@@ -109,7 +104,7 @@ public class Login extends AppCompatActivity {
                         GoogleSignInAccount account = task.getResult(ApiException.class);
                         firebaseAuthWithGoogle(account.getIdToken());
                     } catch (ApiException e) {
-                        Toast.makeText(this, "Đăng nhập Google thất bại.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Google sign in failed.", Toast.LENGTH_SHORT).show();
                     }
                 }
             });
@@ -187,7 +182,7 @@ public class Login extends AppCompatActivity {
                 Toast.makeText(Login.this, message, Toast.LENGTH_SHORT).show();
                 navigateToHomeActivity();
             } else {
-                Toast.makeText(Login.this, "Đăng nhập thất bại: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(Login.this, "Login failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

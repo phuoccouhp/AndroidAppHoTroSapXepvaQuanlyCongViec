@@ -5,13 +5,14 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import com.example.login_signup.alarm.AlarmActivity;
+import com.example.login_signup.classes.FirebaseRepo;
 import com.example.login_signup.classes.Task;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.Locale;
 
 public class TaskReminderReceiver extends BroadcastReceiver {
@@ -32,8 +33,11 @@ public class TaskReminderReceiver extends BroadcastReceiver {
             String taskId = sourceIntent.getStringExtra("taskId");
             String title = sourceIntent.getStringExtra("title");
             String dueTimeString = sourceIntent.getStringExtra("due_time_string");
-            String taskInfo = "Sắp tới: " + title + "\nLúc: " + dueTimeString;
-            NotificationHelper.showAdvanceNotification(context, "Công việc sắp tới", taskInfo, taskId.hashCode(), taskId);
+            String taskInfo = "Upcoming: " + title + "\nAt: " + dueTimeString;
+
+            if (taskId != null) {
+                NotificationHelper.showAdvanceNotification(context, "Upcoming Task", taskInfo, taskId.hashCode(), taskId);
+            }
         } else {
             Intent alarmIntent = new Intent(context, AlarmActivity.class);
             alarmIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -43,22 +47,23 @@ public class TaskReminderReceiver extends BroadcastReceiver {
     }
 
     private void rescheduleAlarms(Context context) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("tasks")
-                .whereEqualTo("reminder", true)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            Task t = document.toObject(Task.class);
-                            t.setId(document.getId());
+        FirebaseRepo fbRepo = new FirebaseRepo();
 
-                            if (t.getTaskDate() != null && t.getTaskDate().getTime() > System.currentTimeMillis()) {
-                                scheduleAlarmsForTask(context, t);
-                            }
-                        }
+        fbRepo.loadReminders(new FirebaseRepo.OnTasksLoadedListener() {
+            @Override
+            public void onTasksLoaded(List<Task> tasks) {
+                for (Task t : tasks) {
+                    if (t.getTaskDate() != null && t.getTaskDate().getTime() > System.currentTimeMillis()) {
+                        scheduleAlarmsForTask(context, t);
                     }
-                });
+                }
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Log.e("TaskReminderReceiver", "Error rescheduling alarms", e);
+            }
+        });
     }
 
     private void scheduleAlarmsForTask(Context context, Task task) {
@@ -67,6 +72,7 @@ public class TaskReminderReceiver extends BroadcastReceiver {
 
         long twentyFourHoursInMillis = 24 * 60 * 60 * 1000;
         long advanceTime = dueTime - twentyFourHoursInMillis;
+
         if (advanceTime > System.currentTimeMillis()) {
             scheduleNotification(context, task, advanceTime, true);
         }
@@ -103,6 +109,7 @@ public class TaskReminderReceiver extends BroadcastReceiver {
                 AlarmManager.AlarmClockInfo alarmClockInfo = new AlarmManager.AlarmClockInfo(time, showTaskPendingIntent);
                 alarmManager.setAlarmClock(alarmClockInfo, pendingIntent);
             } catch (SecurityException se) {
+                Log.e("TaskReminderReceiver", "Permission not granted for alarm", se);
             }
         }
     }

@@ -22,13 +22,8 @@ import android.widget.Toast;
 import com.example.login_signup.classes.AvatarUtils;
 import com.example.login_signup.classes.FirebaseRepo;
 import com.example.login_signup.log_sign.Login;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.io.IOException;
-import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -102,16 +97,16 @@ public class ProfileFragment extends Fragment {
                 if(e == null){
                     Bitmap bitmap = AvatarUtils.convertBase64ToBitmap(convert);
                     ivAvatar.setImageBitmap(bitmap);
-                    Toast.makeText(getContext(), "Cập nhật avatar thành công.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Avatar updated successfully.", Toast.LENGTH_SHORT).show();
                 }
                 else{
-                    Toast.makeText(getContext(), "Không thể cập nhật avatar.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), "Could not update avatar.", Toast.LENGTH_LONG).show();
                     loadUserProfile();
                 }
             });
         } catch (IOException e) {
             Log.e(TAG, "Error converting image", e);
-            Toast.makeText(getContext(), "Lỗi xử lý ảnh", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Error processing image", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -125,7 +120,7 @@ public class ProfileFragment extends Fragment {
             }
 
             if (e != null) {
-                Log.w(TAG, "Lỗi: " + e.getMessage());
+                Log.w(TAG, "Error: " + e.getMessage());
                 return;
             }
 

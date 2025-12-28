@@ -6,6 +6,7 @@
     android:paddingTop="24dp"
     android:paddingBottom="8dp"
     android:text="26 Dec • Today"
-    android:textSize="14sp"
+    android:textSize="20sp"
     android:textStyle="bold"
+    android:fontFamily="@font/smoochsans_bold"
     android:textColor="@color/oxford_blue"/>

@@ -13,6 +13,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.auth.EmailAuthProvider;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -69,6 +70,11 @@ public class FirebaseRepo {
         void onError(Exception e);
     }
 
+    public interface OnTaskDetailLoadedListener {
+        void onTaskLoaded(Task task);
+        void onError(Exception e);
+    }
+
     public interface OnStreakLoadedListener {
         void onStreakLoaded(int currentStreak);
         void onError(Exception e);
@@ -94,16 +100,16 @@ public class FirebaseRepo {
 
     public void signInWithEmailAndPassword(String email, String password, OnCompleteCallback callback) {
         if (email == null || email.isEmpty() || password == null || password.isEmpty()) {
-            callback.onComplete(null, new IllegalArgumentException("Vui lòng nhập email và mật khẩu"));
+            callback.onComplete(null, new IllegalArgumentException("Please enter email and password"));
             return;
         }
 
         auth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        callback.onComplete("Đăng nhập thành công!", null);
+                        callback.onComplete("Login successful!", null);
                     } else {
-                        callback.onComplete("Đăng nhập thất bại: ", task.getException());
+                        callback.onComplete("Login failed: ", task.getException());
                     }
                 });
     }
@@ -113,7 +119,7 @@ public class FirebaseRepo {
         auth.signInWithCredential(credential)
                 .addOnCompleteListener(task -> {
                    if(task.isSuccessful()){
-                       callback.onComplete("Đăng nhập thành công!", null);
+                       callback.onComplete("Login successful!", null);
                    } else {
                        callback.onComplete(null, task.getException());
                    }
@@ -127,13 +133,13 @@ public class FirebaseRepo {
                 .get()
                 .addOnSuccessListener(snap -> {
                     if (!snap.isEmpty()) {
-                        listener.onComplete(true, "Email đã tồn tại. Vui lòng đăng nhập.", null);
+                        listener.onComplete(true, "Email already exists. Please login.", null);
                     } else {
                         listener.onComplete(false, null, null);
                     }
                 })
                 .addOnFailureListener(e -> {
-                    listener.onComplete(false, "Không kiểm tra được email: ", e);
+                    listener.onComplete(false, "Could not check email: ", e);
                 });
     }
 
@@ -146,7 +152,7 @@ public class FirebaseRepo {
                     if (task.isSuccessful()) {
                         FirebaseUser user = auth.getCurrentUser();
                         if (user == null){
-                            listener.onAuthFailure(new Exception("Không lấy được người dùng sau khi tạo"));
+                            listener.onAuthFailure(new Exception("Could not get user after creation"));
                             return;
                         }
 
@@ -169,11 +175,60 @@ public class FirebaseRepo {
                             listener.onAuthFailure(task.getException());
                         }
                         else{
-                            listener.onAuthFailure(new Exception("Đăng ký thất bại"));
+                            listener.onAuthFailure(new Exception("Registration failed"));
                         }
                     }
                 });
 
+    }
+
+    public void sendPasswordResetEmail(String email, OnCompleteCallback callback) {
+        if (email == null || email.isEmpty()) {
+            callback.onComplete(null, new IllegalArgumentException("Email cannot be empty"));
+            return;
+        }
+
+        auth.sendPasswordResetEmail(email)
+                .addOnSuccessListener(aVoid -> callback.onComplete("Reset email sent", null))
+                .addOnFailureListener(e -> callback.onComplete(null, e));
+    }
+
+    public void changePassword(String oldPassword, String newPassword, OnCompleteCallback callback) {
+        FirebaseUser user = auth.getCurrentUser();
+        if (user == null) {
+            callback.onComplete(null, new Exception("User not logged in"));
+            return;
+        }
+
+        String email = user.getEmail();
+        if (email == null) {
+            callback.onComplete(null, new Exception("Cannot determine user email"));
+            return;
+        }
+
+        AuthCredential credential = EmailAuthProvider.getCredential(email, oldPassword);
+
+        user.reauthenticate(credential)
+                .addOnSuccessListener(aVoid -> {
+                    user.updatePassword(newPassword)
+                            .addOnSuccessListener(unused -> callback.onComplete("Password changed successfully!", null))
+                            .addOnFailureListener(e -> callback.onComplete(null, e));
+                })
+                .addOnFailureListener(e -> {
+                    callback.onComplete(null, new Exception("Incorrect old password"));
+                });
+    }
+
+    public void updatePassword(String newPassword, OnCompleteCallback callback) {
+        FirebaseUser user = auth.getCurrentUser();
+        if (user == null) {
+            callback.onComplete(null, new Exception("User not logged in"));
+            return;
+        }
+
+        user.updatePassword(newPassword)
+                .addOnSuccessListener(aVoid -> callback.onComplete("Password updated", null))
+                .addOnFailureListener(e -> callback.onComplete(null, e));
     }
 
     public void loadCurrentUserProfile(onLoadedUserListener listener){
@@ -195,7 +250,7 @@ public class FirebaseRepo {
                             user.setAvatarId(avatarId);
                             listener.onComplete(user, null);
                         } else {
-                            listener.onComplete(user, new Exception("Không tìm thấy thông tin người dùng."));
+                            listener.onComplete(user, new Exception("User information not found."));
                         }
                     })
                     .addOnFailureListener(e -> {
@@ -276,6 +331,22 @@ public class FirebaseRepo {
                 .addOnFailureListener(listener::onFailure);
     }
 
+    public void renameChatSession(String sessionId, String newName, OnCompleteCallback callback) {
+        if (sessionId == null) return;
+        db.collection("chat_sessions").document(sessionId)
+                .update("name", newName)
+                .addOnSuccessListener(aVoid -> callback.onComplete("Renamed successfully", null))
+                .addOnFailureListener(e -> callback.onComplete(null, e));
+    }
+
+    public void deleteChatSession(String sessionId, OnCompleteCallback callback) {
+        if (sessionId == null) return;
+        db.collection("chat_sessions").document(sessionId)
+                .delete()
+                .addOnSuccessListener(aVoid -> callback.onComplete("Deleted successfully", null))
+                .addOnFailureListener(e -> callback.onComplete(null, e));
+    }
+
     public void addTask(Map<String, Object> taskData, OnAddTaskListener listener) {
         db.collection("tasks").add(taskData)
                 .addOnSuccessListener(documentReference -> {
@@ -297,6 +368,52 @@ public class FirebaseRepo {
 
                     callback.onComplete("Task deleted", null);
                 })
+                .addOnFailureListener(e -> callback.onComplete(null, e));
+    }
+
+    public void getTaskDetails(String taskId, OnTaskDetailLoadedListener listener) {
+        if (taskId == null) {
+            listener.onError(new Exception("Task ID is null"));
+            return;
+        }
+
+        db.collection("tasks").document(taskId).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        try {
+                            Task task = new Task();
+                            task.setId(documentSnapshot.getId());
+                            task.setTitle(documentSnapshot.getString("title"));
+                            task.setCategory(documentSnapshot.getString("category"));
+                            task.setVibration(documentSnapshot.getString("vibration"));
+                            task.setNote(documentSnapshot.getString("notes"));
+
+                            task.setTaskDate(documentSnapshot.getDate("taskDate"));
+                            task.setRingtone(documentSnapshot.getString("ringtone"));
+
+                            Boolean reminder = documentSnapshot.getBoolean("reminder");
+                            task.setReminder(reminder != null && reminder);
+
+                            listener.onTaskLoaded(task);
+                        } catch (Exception e) {
+                            listener.onError(e);
+                        }
+                    } else {
+                        listener.onError(new Exception("Task not found"));
+                    }
+                })
+                .addOnFailureListener(listener::onError);
+    }
+
+    public void updateTask(String taskId, Map<String, Object> taskUpdates, OnCompleteCallback callback) {
+        if (taskId == null) {
+            callback.onComplete(null, new Exception("Task ID is null"));
+            return;
+        }
+
+        db.collection("tasks").document(taskId)
+                .update(taskUpdates)
+                .addOnSuccessListener(aVoid -> callback.onComplete("Task updated successfully", null))
                 .addOnFailureListener(e -> callback.onComplete(null, e));
     }
 
@@ -362,6 +479,37 @@ public class FirebaseRepo {
                 .update(field, value)
                 .addOnSuccessListener(aVoid -> callback.onComplete("Updated", null))
                 .addOnFailureListener(e -> callback.onComplete(null, e));
+    }
+
+    public void loadReminders(OnTasksLoadedListener listener) {
+        FirebaseUser user = auth.getCurrentUser();
+        if (user == null) {
+            return;
+        }
+
+        db.collection("tasks")
+                .whereEqualTo("uid", user.getUid())
+                .whereEqualTo("reminder", true)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<Task> tasks = new ArrayList<>();
+                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                        try {
+                            Task t = doc.toObject(Task.class);
+                            t.setId(doc.getId());
+
+                            if (t.getTaskDate() == null && doc.get("taskDate") instanceof com.google.firebase.Timestamp) {
+                                t.setTaskDate(doc.getTimestamp("taskDate").toDate());
+                            }
+
+                            tasks.add(t);
+                        } catch (Exception e) {
+                            Log.e("FirebaseRepo", "Error parsing reminder task: " + doc.getId(), e);
+                        }
+                    }
+                    listener.onTasksLoaded(tasks);
+                })
+                .addOnFailureListener(listener::onError);
     }
 
     public void logTaskAction(String taskId, String taskTitle, String action) {

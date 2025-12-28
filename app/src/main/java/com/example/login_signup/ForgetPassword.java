@@ -8,12 +8,12 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.firebase.auth.FirebaseAuth;
+import com.example.login_signup.classes.FirebaseRepo;
 
 public class ForgetPassword extends AppCompatActivity {
 
     private EditText etEmail;
-    private FirebaseAuth mAuth;
+    private FirebaseRepo fbRepo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,7 +21,7 @@ public class ForgetPassword extends AppCompatActivity {
         setContentView(R.layout.activity_forget_password);
 
         etEmail = findViewById(R.id.etEmail);
-        mAuth = FirebaseAuth.getInstance();
+        fbRepo = new FirebaseRepo();
 
         findViewById(R.id.btnNext).setOnClickListener(v -> sendResetEmail());
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
@@ -31,21 +31,26 @@ public class ForgetPassword extends AppCompatActivity {
         String email = etEmail.getText() != null ? etEmail.getText().toString().trim() : "";
 
         if (TextUtils.isEmpty(email) || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            etEmail.setError("Email không hợp lệ");
+            etEmail.setError("Invalid email");
             etEmail.requestFocus();
             return;
         }
 
-        mAuth.sendPasswordResetEmail(email)
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(this,
-                            "Đã gửi liên kết đặt lại mật khẩu đến " + email + ". Vui lòng kiểm tra hộp thư.",
-                            Toast.LENGTH_LONG).show();
-                    finish();
-                })
-                .addOnFailureListener(e ->
-                        Toast.makeText(this,
-                                "Gửi email thất bại: " + e.getMessage(),
-                                Toast.LENGTH_LONG).show());
+        findViewById(R.id.btnNext).setEnabled(false);
+
+        fbRepo.sendPasswordResetEmail(email, (message, e) -> {
+            findViewById(R.id.btnNext).setEnabled(true);
+
+            if (e == null) {
+                Toast.makeText(this,
+                        "Password reset link sent to " + email + ". Please check your inbox.",
+                        Toast.LENGTH_LONG).show();
+                finish();
+            } else {
+                Toast.makeText(this,
+                        "Failed to send email: " + e.getMessage(),
+                        Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }

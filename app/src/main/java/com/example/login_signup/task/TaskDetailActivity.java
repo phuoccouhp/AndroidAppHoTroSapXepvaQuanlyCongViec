@@ -14,17 +14,17 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.login_signup.R;
+import com.example.login_signup.classes.FirebaseRepo;
+import com.example.login_signup.classes.Task;
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -37,7 +37,7 @@ public class TaskDetailActivity extends AppCompatActivity {
     private ImageButton btnBack;
     private FloatingActionButton btnSaveTask;
 
-    private FirebaseFirestore db;
+    private FirebaseRepo fbRepo;
     private String taskId;
     private Calendar dueDateTime = Calendar.getInstance();
     private boolean reminderOn = false;
@@ -64,7 +64,7 @@ public class TaskDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task_detail);
 
-        db = FirebaseFirestore.getInstance();
+        fbRepo = new FirebaseRepo();
         taskId = getIntent().getStringExtra("taskId");
 
         initViews();
@@ -146,62 +146,52 @@ public class TaskDetailActivity extends AppCompatActivity {
     }
 
     private void loadTaskDetails() {
-        db.collection("tasks").document(taskId).get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
-                        String title = documentSnapshot.getString("title");
-                        String category = documentSnapshot.getString("category");
-                        String vibration = documentSnapshot.getString("vibration");
-                        String note = documentSnapshot.getString("notes");
-                        Date taskDate = documentSnapshot.getDate("taskDate");
-                        reminderOn = Boolean.TRUE.equals(documentSnapshot.getBoolean("reminder"));
-                        String ringtoneUriString = documentSnapshot.getString("ringtone");
-                        if (ringtoneUriString != null) {
-                            selectedRingtoneUri = Uri.parse(ringtoneUriString);
-                        }
+        fbRepo.getTaskDetails(taskId, new FirebaseRepo.OnTaskDetailLoadedListener() {
+            @Override
+            public void onTaskLoaded(Task task) {
+                etTaskName.setText(task.getTitle());
+                etNotes.setText(task.getNote());
+                reminderOn = task.isReminder();
 
-                        etTaskName.setText(title);
-                        etNotes.setText(note);
-
-                        if (category != null) {
-                            ArrayAdapter<String> categoryAdapter = (ArrayAdapter<String>) spinnerCategories.getAdapter();
-                            int categoryPosition = categoryAdapter.getPosition(category);
-                            if (categoryPosition >= 0) {
-                                spinnerCategories.setSelection(categoryPosition);
-                            }
-                        }
-
-                        if (vibration != null) {
-                            ArrayAdapter<String> vibrationAdapter = (ArrayAdapter<String>) spinnerVibration.getAdapter();
-                            int vibrationPosition = vibrationAdapter.getPosition(vibration);
-                            if (vibrationPosition >= 0) {
-                                spinnerVibration.setSelection(vibrationPosition);
-                            }
-                        }
-
-                        if (taskDate != null) {
-                            dueDateTime.setTime(taskDate);
-                            updateDateAndTimeButtons();
-                        }
-
-                        updateReminderButton();
-                        if (selectedRingtoneUri != null) {
-                            try {
-                                btnSelectRingtone.setText(RingtoneManager.getRingtone(this, selectedRingtoneUri).getTitle(this));
-                            } catch (Exception e) {
-                                btnSelectRingtone.setText("Select Sound");
-                            }
-                        }
-
-                    } else {
-                        Toast.makeText(TaskDetailActivity.this, "Task not found", Toast.LENGTH_SHORT).show();
-                        finish();
+                if (task.getCategory() != null) {
+                    ArrayAdapter<String> categoryAdapter = (ArrayAdapter<String>) spinnerCategories.getAdapter();
+                    int categoryPosition = categoryAdapter.getPosition(task.getCategory());
+                    if (categoryPosition >= 0) {
+                        spinnerCategories.setSelection(categoryPosition);
                     }
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(TaskDetailActivity.this, "Error loading task", Toast.LENGTH_SHORT).show();
-                    finish();
-                });
+                }
+
+                if (task.getVibration() != null) {
+                    ArrayAdapter<String> vibrationAdapter = (ArrayAdapter<String>) spinnerVibration.getAdapter();
+                    int vibrationPosition = vibrationAdapter.getPosition(task.getVibration());
+                    if (vibrationPosition >= 0) {
+                        spinnerVibration.setSelection(vibrationPosition);
+                    }
+                }
+
+                if (task.getTaskDate() != null) {
+                    dueDateTime.setTime(task.getTaskDate());
+                    updateDateAndTimeButtons();
+                }
+
+                if (task.getRingtone() != null) {
+                    selectedRingtoneUri = Uri.parse(task.getRingtone());
+                    try {
+                        btnSelectRingtone.setText(RingtoneManager.getRingtone(TaskDetailActivity.this, selectedRingtoneUri).getTitle(TaskDetailActivity.this));
+                    } catch (Exception e) {
+                        btnSelectRingtone.setText("Select Sound");
+                    }
+                }
+
+                updateReminderButton();
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Toast.makeText(TaskDetailActivity.this, "Error loading task: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        });
     }
 
     private void updateTask() {
@@ -226,17 +216,18 @@ public class TaskDetailActivity extends AppCompatActivity {
             taskUpdates.put("ringtone", selectedRingtoneUri.toString());
         }
 
+        fbRepo.updateTask(taskId, taskUpdates, (message, e) -> {
+            if (e == null) {
+                Toast.makeText(TaskDetailActivity.this, message, Toast.LENGTH_SHORT).show();
 
-        db.collection("tasks").document(taskId)
-                .update(taskUpdates)
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(TaskDetailActivity.this, "Task updated successfully", Toast.LENGTH_SHORT).show();
-                    Intent resultIntent = new Intent();
-                    resultIntent.putExtra("isTaskUpdated", true);
-                    setResult(RESULT_OK, resultIntent);
-                    finish();
-                })
-                .addOnFailureListener(e -> Toast.makeText(TaskDetailActivity.this, "Error updating task", Toast.LENGTH_SHORT).show());
+                Intent resultIntent = new Intent();
+                resultIntent.putExtra("isTaskUpdated", true);
+                setResult(RESULT_OK, resultIntent);
+                finish();
+            } else {
+                Toast.makeText(TaskDetailActivity.this, "Error updating task", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void updateDateAndTimeButtons() {

@@ -13,13 +13,13 @@ import android.widget.RemoteViews;
 
 import com.example.login_signup.HomeActivity;
 import com.example.login_signup.R;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.example.login_signup.classes.FirebaseRepo;
+import com.example.login_signup.classes.Task;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class TaskWidgetProvider extends AppWidgetProvider {
@@ -44,7 +44,7 @@ public class TaskWidgetProvider extends AppWidgetProvider {
     }
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
-        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_task); // Đảm bảo tên layout đúng
+        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_task);
 
         Intent intent = new Intent(context, HomeActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
@@ -56,78 +56,78 @@ public class TaskWidgetProvider extends AppWidgetProvider {
     }
 
     private static void fetchUpcomingTask(Context context, RemoteViews views, AppWidgetManager appWidgetManager, int appWidgetId) {
-        FirebaseAuth auth = FirebaseAuth.getInstance();
+        FirebaseRepo fbRepo = new FirebaseRepo();
 
-        if (auth.getCurrentUser() == null) {
+        if (fbRepo.getCurrentUser() == null) {
             showCurrentTimeState(context, views);
             appWidgetManager.updateAppWidget(appWidgetId, views);
             return;
         }
 
-        String uid = auth.getCurrentUser().getUid();
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
         Date currentTime = new Date();
 
-        db.collection("tasks")
-                .whereEqualTo("uid", uid)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    String title = "";
-                    String category = "";
-                    boolean hasTask = false;
-                    Date nextTaskTime = null;
-                    long minDiff = Long.MAX_VALUE;
+        fbRepo.loadTasksForUser(new FirebaseRepo.OnTasksLoadedListener() {
+            @Override
+            public void onTasksLoaded(List<Task> tasks) {
+                String title = "";
+                String category = "";
+                boolean hasTask = false;
+                Date nextTaskTime = null;
+                long minDiff = Long.MAX_VALUE;
 
-                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                        Date taskDate = doc.getDate("taskDate");
+                for (Task task : tasks) {
+                    Date taskDate = task.getTaskDate();
 
-                        if (taskDate == null) continue;
+                    if (taskDate == null) continue;
 
-                        if (isSameDay(taskDate, currentTime) && taskDate.after(currentTime)) {
-                            long diff = taskDate.getTime() - currentTime.getTime();
+                    if (isSameDay(taskDate, currentTime) && taskDate.after(currentTime)) {
+                        long diff = taskDate.getTime() - currentTime.getTime();
 
-                            if (diff < minDiff) {
-                                minDiff = diff;
-                                title = doc.getString("title");
-                                category = doc.getString("category");
-                                nextTaskTime = taskDate;
-                                hasTask = true;
-                            }
+                        if (diff < minDiff) {
+                            minDiff = diff;
+                            title = task.getTitle();
+                            category = task.getCategory();
+                            nextTaskTime = taskDate;
+                            hasTask = true;
                         }
                     }
+                }
 
-                    SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm", Locale.getDefault());
-                    SimpleDateFormat sdfDate = new SimpleDateFormat("EEE, dd/MM/yyyy", Locale.getDefault());
+                SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                SimpleDateFormat sdfDate = new SimpleDateFormat("EEE, dd/MM/yyyy", Locale.getDefault());
 
-                    if (hasTask) {
-                        views.setTextViewText(R.id.tvWidgetTime, sdfTime.format(nextTaskTime));
-                        views.setTextViewText(R.id.tvWidgetDate, sdfDate.format(nextTaskTime));
-                        views.setTextViewText(R.id.tvTaskTitle, title);
-                        views.setTextViewText(R.id.tvWidgetCategory, category);
+                if (hasTask) {
+                    views.setTextViewText(R.id.tvWidgetTime, sdfTime.format(nextTaskTime));
+                    views.setTextViewText(R.id.tvWidgetDate, sdfDate.format(nextTaskTime));
+                    views.setTextViewText(R.id.tvTaskTitle, title);
+                    views.setTextViewText(R.id.tvWidgetCategory, category);
 
-                        int iconResId = getIconForCategory(category);
-                        int colorResId = getColorForCategory(category);
+                    int iconResId = getIconForCategory(category);
+                    int colorResId = getColorForCategory(category);
 
-                        views.setImageViewResource(R.id.imgTags, iconResId);
-                        views.setInt(R.id.imgTags, "setColorFilter", colorResId);
-                        views.setViewVisibility(R.id.layoutTaskContent, View.VISIBLE);
+                    views.setImageViewResource(R.id.imgTags, iconResId);
+                    views.setInt(R.id.imgTags, "setColorFilter", colorResId);
+                    views.setViewVisibility(R.id.layoutTaskContent, View.VISIBLE);
 
-                        scheduleNextUpdate(context, nextTaskTime);
+                    scheduleNextUpdate(context, nextTaskTime);
 
-                    } else {
-                        views.setTextViewText(R.id.tvWidgetTime, sdfTime.format(currentTime));
-                        views.setTextViewText(R.id.tvWidgetDate, sdfDate.format(currentTime));
-                        views.setViewVisibility(R.id.layoutTaskContent, View.GONE);
+                } else {
+                    views.setTextViewText(R.id.tvWidgetTime, sdfTime.format(currentTime));
+                    views.setTextViewText(R.id.tvWidgetDate, sdfDate.format(currentTime));
+                    views.setViewVisibility(R.id.layoutTaskContent, View.GONE);
 
-                        scheduleNextUpdate(context, new Date());
-                    }
+                    scheduleNextUpdate(context, new Date());
+                }
 
-                    appWidgetManager.updateAppWidget(appWidgetId, views);
-                })
-                .addOnFailureListener(e -> {
-                    showCurrentTimeState(context, views);
-                    appWidgetManager.updateAppWidget(appWidgetId, views);
-                });
+                appWidgetManager.updateAppWidget(appWidgetId, views);
+            }
+
+            @Override
+            public void onError(Exception e) {
+                showCurrentTimeState(context, views);
+                appWidgetManager.updateAppWidget(appWidgetId, views);
+            }
+        });
     }
 
     private static void showCurrentTimeState(Context context, RemoteViews views) {

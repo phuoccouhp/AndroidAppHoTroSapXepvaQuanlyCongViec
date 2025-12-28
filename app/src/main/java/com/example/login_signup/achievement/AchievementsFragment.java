@@ -54,19 +54,16 @@ public class AchievementsFragment extends Fragment {
     }
 
     private void loadData() {
-        // 1. Lấy thông tin Streak từ Repo
         firebaseRepo.getUserStreak(new FirebaseRepo.OnStreakLoadedListener() {
             @Override
             public void onStreakLoaded(int streak) {
                 currentStreak = streak;
-                // Sau khi lấy streak xong, lấy tiếp thống kê Task
                 loadTaskStats();
             }
 
             @Override
             public void onError(Exception e) {
                 Log.e("Achieve", "Lỗi lấy streak", e);
-                // Dù lỗi streak vẫn cố lấy task stats
                 loadTaskStats();
             }
         });
@@ -99,58 +96,58 @@ public class AchievementsFragment extends Fragment {
         tvCurrentLevel.setText(String.valueOf(currentLevel));
         pbLevelProgress.setMax(10);
         pbLevelProgress.setProgress(progressInLevel);
-        tvNextLevelInfo.setText("Tạo thêm " + tasksNeedForNextLevel + " công việc để lên Level " + (currentLevel + 1));
+        tvNextLevelInfo.setText("Create " + tasksNeedForNextLevel + " more tasks to reach Level " + (currentLevel + 1));
 
-        tvStreakDays.setText(currentStreak + " Ngày");
+        tvStreakDays.setText(currentStreak + " Days");
 
         List<Achievement> list = new ArrayList<>();
 
 
-        int colorCreate = Color.parseColor("#2196F3"); 
+        int colorCreate = Color.parseColor("#2196F3");
 
         list.add(new Achievement(R.drawable.baseline_flag_24, colorCreate,
-                "Khởi Đầu", "Tạo công việc đầu tiên",
+                "Getting Started", "Create your first task",
                 Math.min(totalTasksCreated, 1), 1));
 
         list.add(new Achievement(R.drawable.baseline_edit_note_24, colorCreate,
-                "Lập Kế Hoạch", "Tạo 10 công việc",
+                "Planner", "Create 10 tasks",
                 Math.min(totalTasksCreated, 10), 10));
 
-        list.add(new Achievement(R.drawable.baseline_rocket_launch_24, Color.parseColor("#673AB7"), 
-                "Người Bận Rộn", "Tạo 50 công việc",
+        list.add(new Achievement(R.drawable.baseline_rocket_launch_24, Color.parseColor("#673AB7"),
+                "Busy Bee", "Create 50 tasks",
                 Math.min(totalTasksCreated, 50), 50));
 
-        list.add(new Achievement(R.drawable.baseline_rocket_launch_24, Color.parseColor("#9C27B0"), 
-                "Chuyên Gia Task", "Tạo 100 công việc",
+        list.add(new Achievement(R.drawable.baseline_rocket_launch_24, Color.parseColor("#9C27B0"),
+                "Task Master", "Create 100 tasks",
                 Math.min(totalTasksCreated, 100), 100));
 
         int colorComplete = Color.parseColor("#4CAF50");
 
         list.add(new Achievement(R.drawable.baseline_check_circle_24, colorComplete,
-                "Hoàn Thành", "Hoàn thành công việc đầu tiên",
+                "Done!", "Complete your first task",
                 Math.min(totalTasksCompleted, 1), 1));
 
         list.add(new Achievement(R.drawable.baseline_offline_bolt_24, colorComplete,
-                "Năng Suất", "Hoàn thành 10 công việc",
+                "Productive", "Complete 10 tasks",
                 Math.min(totalTasksCompleted, 10), 10));
 
-        list.add(new Achievement(R.drawable.baseline_emoji_events_24, Color.parseColor("#FFC107"), 
-                "Xuất Sắc", "Hoàn thành 50 công việc",
+        list.add(new Achievement(R.drawable.baseline_emoji_events_24, Color.parseColor("#FFC107"),
+                "Excellent", "Complete 50 tasks",
                 Math.min(totalTasksCompleted, 50), 50));
 
        
         int colorFire = Color.parseColor("#FF5722");
 
         list.add(new Achievement(R.drawable.ic_fire_24, colorFire,
-                "Làm Nóng", "Chuỗi 3 ngày liên tiếp",
+                "Warming Up", "3-day streak",
                 Math.min(currentStreak, 3), 3));
 
         list.add(new Achievement(R.drawable.ic_fire_24, Color.parseColor("#F44336"),
-                "Kiên Trì", "Chuỗi 7 ngày liên tiếp",
+                "Persistent", "7-day streak",
                 Math.min(currentStreak, 7), 7));
 
         list.add(new Achievement(R.drawable.baseline_emoji_events_24, Color.parseColor("#FFD700"),
-                "Thói Quen Thép", "Chuỗi 30 ngày liên tiếp",
+                "Iron Habit", "30-day streak",
                 Math.min(currentStreak, 30), 30));
 
         AchievementsAdapter adapter = new AchievementsAdapter(list);

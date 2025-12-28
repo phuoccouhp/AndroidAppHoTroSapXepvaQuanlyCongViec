@@ -9,13 +9,12 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.login_signup.R;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import com.example.login_signup.classes.FirebaseRepo;
 
 public class NewPassword extends AppCompatActivity {
 
     private EditText etNewPass, etConfirm;
-    private FirebaseAuth mAuth;
+    private FirebaseRepo fbRepo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,7 +23,8 @@ public class NewPassword extends AppCompatActivity {
 
         etNewPass = findViewById(R.id.etNewPass);
         etConfirm = findViewById(R.id.etConfirm);
-        mAuth = FirebaseAuth.getInstance();
+
+        fbRepo = new FirebaseRepo();
 
         findViewById(R.id.btnConfirm).setOnClickListener(v -> changePassword());
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
@@ -34,32 +34,43 @@ public class NewPassword extends AppCompatActivity {
         String p1 = val(etNewPass);
         String p2 = val(etConfirm);
 
-        if (TextUtils.isEmpty(p1)) { etNewPass.setError("Nhập mật khẩu mới"); etNewPass.requestFocus(); return; }
-        if (p1.length() < 6) { etNewPass.setError("Mật khẩu ≥ 6 ký tự"); etNewPass.requestFocus(); return; }
-        if (!TextUtils.equals(p1, p2)) { etConfirm.setError("Không khớp"); etConfirm.requestFocus(); return; }
+        if (TextUtils.isEmpty(p1)) {
+            etNewPass.setError("Enter new password");
+            etNewPass.requestFocus();
+            return;
+        }
+        if (p1.length() < 6) {
+            etNewPass.setError("Password must be at least 6 characters");
+            etNewPass.requestFocus();
+            return;
+        }
+        if (!TextUtils.equals(p1, p2)) {
+            etConfirm.setError("Passwords do not match");
+            etConfirm.requestFocus();
+            return;
+        }
 
-        FirebaseUser user = mAuth.getCurrentUser();
-        if (user == null) {
+        if (fbRepo.getCurrentUser() == null) {
             Toast.makeText(this,
-                    "Bạn chưa đăng nhập. Hãy dùng email đặt lại mật khẩu từ màn trước.",
+                    "You are not logged in. Please use the password reset email from the previous screen.",
                     Toast.LENGTH_LONG).show();
             return;
         }
 
-        user.updatePassword(p1)
-                .addOnSuccessListener(a -> {
-                    Toast.makeText(this, "Đổi mật khẩu thành công!",
-                            Toast.LENGTH_SHORT).show();
+        fbRepo.updatePassword(p1, (message, e) -> {
+            if (e == null) {
+                Toast.makeText(NewPassword.this, "Password changed successfully!",
+                        Toast.LENGTH_SHORT).show();
 
-                    Intent intent = new Intent(NewPassword.this, Login.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
-                    finish();
-                    
-                })
-                .addOnFailureListener(e ->
-                        Toast.makeText(this, "Đổi mật khẩu thất bại: " + e.getMessage(),
-                                Toast.LENGTH_LONG).show());
+                Intent intent = new Intent(NewPassword.this, Login.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
+            } else {
+                Toast.makeText(NewPassword.this, "Failed to change password: " + e.getMessage(),
+                        Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private String val(EditText e) {

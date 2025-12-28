@@ -70,7 +70,7 @@ public class AnalysisFragment extends Fragment {
             @Override
             public void onError(Exception e) {
                 if (getContext() != null) {
-                    Toast.makeText(getContext(), "Không thể tải dữ liệu biểu đồ", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Unable to load chart data", Toast.LENGTH_SHORT).show();
                 }
             }
         });

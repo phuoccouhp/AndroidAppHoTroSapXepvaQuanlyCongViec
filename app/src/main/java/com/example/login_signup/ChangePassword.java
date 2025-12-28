@@ -7,15 +7,12 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.EmailAuthProvider;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import com.example.login_signup.classes.FirebaseRepo;
 
 public class ChangePassword extends AppCompatActivity {
 
     private EditText etOldPass, etNewPass, etConfirm;
-    private FirebaseAuth mAuth;
+    private FirebaseRepo fbRepo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,7 +23,7 @@ public class ChangePassword extends AppCompatActivity {
         etNewPass = findViewById(R.id.etNewPass);
         etConfirm = findViewById(R.id.etConfirm);
 
-        mAuth = FirebaseAuth.getInstance();
+        fbRepo = new FirebaseRepo();
 
         findViewById(R.id.btnConfirm).setOnClickListener(v -> onChangePassword());
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
@@ -37,43 +34,24 @@ public class ChangePassword extends AppCompatActivity {
         String newPw = val(etNewPass);
         String cfPw  = val(etConfirm);
 
-        if (TextUtils.isEmpty(oldPw)) { etOldPass.setError("Nhập mật khẩu cũ"); etOldPass.requestFocus(); return; }
-        if (TextUtils.isEmpty(newPw)) { etNewPass.setError("Nhập mật khẩu mới"); etNewPass.requestFocus(); return; }
-        if (newPw.length() < 6) { etNewPass.setError("Mật khẩu ≥ 6 ký tự"); etNewPass.requestFocus(); return; }
-        if (!TextUtils.equals(newPw, cfPw)) { etConfirm.setError("Không khớp"); etConfirm.requestFocus(); return; }
-        if (oldPw.equals(newPw)) { etNewPass.setError("Mật khẩu mới phải khác mật khẩu cũ"); etNewPass.requestFocus(); return; }
+        if (TextUtils.isEmpty(oldPw)) { etOldPass.setError("Enter old password"); etOldPass.requestFocus(); return; }
+        if (TextUtils.isEmpty(newPw)) { etNewPass.setError("Enter new password"); etNewPass.requestFocus(); return; }
+        if (newPw.length() < 6) { etNewPass.setError("Password must be at least 6 characters"); etNewPass.requestFocus(); return; }
+        if (!TextUtils.equals(newPw, cfPw)) { etConfirm.setError("Passwords do not match"); etConfirm.requestFocus(); return; }
+        if (oldPw.equals(newPw)) { etNewPass.setError("New password must be different from the old one"); etNewPass.requestFocus(); return; }
 
-        FirebaseUser user = mAuth.getCurrentUser();
-        if (user == null) {
-            Toast.makeText(this, "Bạn chưa đăng nhập!", Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        String email = user.getEmail();
-        if (TextUtils.isEmpty(email)) {
-            Toast.makeText(this, "Không xác định được email người dùng.", Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        AuthCredential credential = EmailAuthProvider.getCredential(email, oldPw);
         findViewById(R.id.btnConfirm).setEnabled(false);
 
-        user.reauthenticate(credential)
-                .addOnSuccessListener(aVoid -> {
-                    user.updatePassword(newPw)
-                            .addOnSuccessListener(unused -> {
-                                Toast.makeText(this, "Đổi mật khẩu thành công!", Toast.LENGTH_SHORT).show();
-                                finish();
-                            })
-                            .addOnFailureListener(e -> {
-                                findViewById(R.id.btnConfirm).setEnabled(true);
-                                Toast.makeText(this, "Đổi mật khẩu thất bại: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                            });
-                })
-                .addOnFailureListener(e -> {
-                    findViewById(R.id.btnConfirm).setEnabled(true);
-                    Toast.makeText(this, "Mật khẩu cũ không đúng: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                });
+        fbRepo.changePassword(oldPw, newPw, (message, e) -> {
+            findViewById(R.id.btnConfirm).setEnabled(true);
+
+            if (e == null) {
+                Toast.makeText(ChangePassword.this, message, Toast.LENGTH_SHORT).show();
+                finish();
+            } else {
+                Toast.makeText(ChangePassword.this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private String val(EditText e) {

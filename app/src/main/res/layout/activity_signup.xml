@@ -18,7 +18,7 @@
             android:id="@+id/tvForgetPass"
             android:layout_width="300dp"
             android:layout_height="70dp"
-            android:layout_margin="40dp"
+            android:layout_margin="30dp"
             android:fontFamily="@font/bebasneue_regular"
             android:shadowColor="#80000000"
             android:shadowDx="4"

@@ -17,10 +17,17 @@ import java.util.List;
 public class ChatHistoryAdapter extends RecyclerView.Adapter<ChatHistoryAdapter.SessionViewHolder> {
 
     private List<ChatSession> sessionList;
+    private OnSessionLongClickListener longClickListener;
 
-    public ChatHistoryAdapter(List<ChatSession> sessionList) {
-        this.sessionList = sessionList;
+    public interface OnSessionLongClickListener {
+        void onSessionLongClick(View view, ChatSession session);
     }
+
+    public ChatHistoryAdapter(List<ChatSession> sessionList, OnSessionLongClickListener longClickListener) {
+        this.sessionList = sessionList;
+        this.longClickListener = longClickListener;
+    }
+
 
     @NonNull
     @Override
@@ -46,6 +53,13 @@ public class ChatHistoryAdapter extends RecyclerView.Adapter<ChatHistoryAdapter.
             intent.putExtra("CHAT_SESSION_ID", session.getId());
             intent.putExtra("CHAT_SESSION_NAME", session.getName());
             v.getContext().startActivity(intent);
+        });
+
+        holder.itemView.setOnLongClickListener(v -> {
+            if (longClickListener != null) {
+                longClickListener.onSessionLongClick(v, session);
+            }
+            return true;
         });
     }
 

@@ -44,7 +44,7 @@ public class SignUp extends AppCompatActivity {
             String email = etEmail.getText().toString().trim();
 
             if (!isValidEmail(email)) {
-                etEmail.setError("Email không hợp lệ");
+                etEmail.setError("Invalid email");
                 etEmail.requestFocus();
                 return;
             }
@@ -100,10 +100,10 @@ public class SignUp extends AppCompatActivity {
                             i.putExtra("email", acc.getEmail());
                             startActivity(i);
                         } else {
-                            Toast.makeText(this, "Không lấy được email Google", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(this, "Could not get Google email", Toast.LENGTH_SHORT).show();
                         }
                     } catch (ApiException e) {
-                        Toast.makeText(this, "Google chọn tài khoản lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Google account selection error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
     }

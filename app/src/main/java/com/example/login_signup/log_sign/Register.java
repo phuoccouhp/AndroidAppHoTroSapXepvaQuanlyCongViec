@@ -12,12 +12,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.login_signup.R;
 import com.example.login_signup.classes.FirebaseRepo;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class Register extends AppCompatActivity {
 
@@ -45,7 +39,7 @@ public class Register extends AppCompatActivity {
         emailFromSignUp = getIntent().getStringExtra("email");
         if (TextUtils.isEmpty(emailFromSignUp) ||
                 !Patterns.EMAIL_ADDRESS.matcher(emailFromSignUp).matches()) {
-            Toast.makeText(this, "Thiếu hoặc sai email, hãy quay lại nhập lại.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Missing or incorrect email, please go back and re-enter.", Toast.LENGTH_LONG).show();
             finish();
             return;
         }
@@ -61,24 +55,24 @@ public class Register extends AppCompatActivity {
 
         if (TextUtils.isEmpty(name))
         {
-            etName.setError("Nhập tên");
+            etName.setError("Enter name");
             etName.requestFocus();
             return;
         }
         if (TextUtils.isEmpty(pass))
         {
-            etOldPass.setError("Nhập mật khẩu");
+            etOldPass.setError("Enter password");
             etOldPass.requestFocus();
             return;
         }
         if (pass.length() < 6)
         {
-            etOldPass.setError("Mật khẩu ≥ 6 ký tự");
+            etOldPass.setError("Password must be at least 6 characters");
             etOldPass.requestFocus(); return;
         }
         if (!TextUtils.equals(pass, cf))
         {
-            etConfirm.setError("Không khớp");
+            etConfirm.setError("Passwords do not match");
             etConfirm.requestFocus();
             return;
         }
@@ -86,7 +80,7 @@ public class Register extends AppCompatActivity {
         fbRepo.createUserWithEmailAndPassword(name, emailFromSignUp, pass, new FirebaseRepo.OnRegisterListener() {
             @Override
             public void onSuccess() {
-                Toast.makeText(Register.this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(Register.this, "Registration successful!", Toast.LENGTH_SHORT).show();
                 Intent i = new Intent(Register.this, Login.class);
                 startActivity(i);
                 finish();
@@ -94,13 +88,12 @@ public class Register extends AppCompatActivity {
 
             @Override
             public void onAuthFailure(Exception e) {
-                Toast.makeText(Register.this, "Đăng ký thất bại: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(Register.this, "Registration failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void onDbFailure(Exception e) {
-                Toast.makeText(Register.this, "Lưu hồ sơ thất bại: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                //if (mAuth.getCurrentUser() != null) mAuth.getCurrentUser().delete();
+                Toast.makeText(Register.this, "Failed to save profile: " + e.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
 

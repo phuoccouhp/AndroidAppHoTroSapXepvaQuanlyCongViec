@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.login_signup.HomeActivity;
 import com.example.login_signup.R;
 
 public class AlarmActivity extends AppCompatActivity {
@@ -48,7 +49,12 @@ public class AlarmActivity extends AppCompatActivity {
 
         btnStopAlarm.setOnClickListener(v -> {
             stopService(new Intent(this, AlarmService.class));
-            finishAndRemoveTask();
+
+            Intent homeIntent = new Intent(this, HomeActivity.class);
+            homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(homeIntent);
+
+            finish();
         });
     }
 }

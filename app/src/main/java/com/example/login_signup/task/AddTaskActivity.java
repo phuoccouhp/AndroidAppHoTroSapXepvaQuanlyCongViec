@@ -250,7 +250,7 @@ public class AddTaskActivity extends AppCompatActivity {
         if (timeDifference > 0 && timeDifference < twentyFourHoursInMillis) {
             SimpleDateFormat sdf = new SimpleDateFormat("HH:mm, dd/MM", Locale.getDefault());
             String taskInfo = "Due at: " + sdf.format(task.getTaskDate());
-            NotificationHelper.showAdvanceNotification(context, task.getTitle(), taskInfo, task.getId().hashCode() + 1);
+            NotificationHelper.showAdvanceNotification(context, task.getTitle(), taskInfo, task.getId().hashCode() + 1, task.getId());
         } else if (timeDifference >= twentyFourHoursInMillis) {
             long advanceTime = dueTime - twentyFourHoursInMillis;
             scheduleNotification(context, task, advanceTime, true);

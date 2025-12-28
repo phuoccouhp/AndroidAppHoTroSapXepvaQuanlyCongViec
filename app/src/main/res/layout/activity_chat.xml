@@ -21,10 +21,12 @@
         android:id="@+id/recyclerViewChat"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/toolbar"
         android:layout_above="@id/input_layout_container"
-        android:padding="8dp"
-        android:clipToPadding="false" />
+        android:layout_below="@id/toolbar"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="-2dp"
+        android:clipToPadding="false"
+        android:padding="8dp" />
 
     <FrameLayout
         android:id="@+id/input_layout_container"

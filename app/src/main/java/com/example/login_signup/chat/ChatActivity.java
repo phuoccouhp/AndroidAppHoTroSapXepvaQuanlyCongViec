@@ -558,7 +558,7 @@ public class ChatActivity extends AppCompatActivity {
             scheduleNotification(taskId + "_advance", task, advanceTime, true);
         } else if (dueTime > System.currentTimeMillis()) {
             String taskInfo = "Title: " + task.getTitle() + "\nCategory: " + task.getCategory() + "\nNote: " + task.getNote();
-            NotificationHelper.showAdvanceNotification(this, task.getTitle(), taskInfo, (taskId + "_advance").hashCode());
+            NotificationHelper.showAdvanceNotification(this, task.getTitle(), taskInfo, (taskId + "_advance").hashCode(), taskId);
         }
     }
 

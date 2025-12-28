@@ -11,6 +11,7 @@ import android.os.Build;
 import androidx.core.app.NotificationCompat;
 
 import com.example.login_signup.alarm.AlarmActivity;
+import com.example.login_signup.task.TaskDetailActivity;
 
 public class NotificationHelper {
 
@@ -69,42 +70,23 @@ public class NotificationHelper {
                 .build();
     }
 
-    public static void showDueNotification(Context context, Intent sourceIntent) {
-        String title = sourceIntent.getStringExtra("title");
-        String taskId = sourceIntent.getStringExtra("taskId");
-        int notificationId = (taskId != null) ? taskId.hashCode() : 1;
+    public static void showAdvanceNotification(Context context, String taskTitle, String taskInfo, int notificationId, String taskId) {
+        Intent intent = new Intent(context, TaskDetailActivity.class);
+        intent.putExtra("taskId", taskId);
 
-        Intent activityIntent = new Intent(context, AlarmActivity.class);
-        activityIntent.putExtras(sourceIntent.getExtras());
-        activityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NO_USER_ACTION);
-
-        PendingIntent fullScreenPendingIntent = PendingIntent.getActivity(
+        PendingIntent pendingIntent = PendingIntent.getActivity(
                 context,
                 notificationId,
-                activityIntent,
+                intent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID_REMINDER)
-                .setSmallIcon(R.drawable.baseline_check_circle_24)
-                .setContentTitle("Task Due: " + title)
-                .setContentText("Tap to stop alarm")
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setCategory(NotificationCompat.CATEGORY_ALARM)
-                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                .setFullScreenIntent(fullScreenPendingIntent, true)
-                .setAutoCancel(true);
-
-        NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        manager.notify(notificationId, builder.build());
-    }
-
-    public static void showAdvanceNotification(Context context, String taskTitle, String taskInfo, int notificationId) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID_ADVANCE)
                 .setSmallIcon(R.drawable.baseline_notifications_24)
                 .setContentTitle(taskTitle)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(taskInfo))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setContentIntent(pendingIntent)
                 .setAutoCancel(true);
 
         NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);

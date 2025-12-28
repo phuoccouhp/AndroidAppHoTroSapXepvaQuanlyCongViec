@@ -123,6 +123,10 @@ public class TaskFragment extends Fragment {
         rvIncomplete.setAdapter(adapterIncomplete);
         rvCompleted.setAdapter(adapterCompleted);
 
+        rvHighPriority.setNestedScrollingEnabled(false);
+        rvIncomplete.setNestedScrollingEnabled(false);
+        rvCompleted.setNestedScrollingEnabled(false);
+
         taskDetailLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {

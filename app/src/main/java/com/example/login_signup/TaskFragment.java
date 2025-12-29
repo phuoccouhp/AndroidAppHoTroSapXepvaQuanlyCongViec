@@ -272,6 +272,7 @@ public class TaskFragment extends Fragment {
             if (e == null) {
                 if ("completed".equals(field) && (Boolean) value) {
                     fbRepo.logTaskAction(task.getId(), task.getTitle(), "COMPLETED");
+                    fbRepo.updateStreak();
                 }
 
                 updateWidget();

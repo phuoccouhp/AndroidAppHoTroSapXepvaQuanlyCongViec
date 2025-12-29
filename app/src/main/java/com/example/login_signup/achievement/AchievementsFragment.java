@@ -63,7 +63,7 @@ public class AchievementsFragment extends Fragment {
 
             @Override
             public void onError(Exception e) {
-                Log.e("Achieve", "Lỗi lấy streak", e);
+                Log.e("Achieve", "Error streak", e);
                 loadTaskStats();
             }
         });
@@ -80,7 +80,7 @@ public class AchievementsFragment extends Fragment {
 
             @Override
             public void onError(Exception e) {
-                Log.e("Achieve", "Lỗi lấy thống kê task", e);
+                Log.e("Achieve", "Error analysis tasks", e);
                 updateUI();
             }
         });

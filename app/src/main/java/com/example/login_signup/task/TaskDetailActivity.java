@@ -220,6 +220,21 @@ public class TaskDetailActivity extends AppCompatActivity {
             if (e == null) {
                 Toast.makeText(TaskDetailActivity.this, message, Toast.LENGTH_SHORT).show();
 
+                if (reminderOn) {
+                    Task updatedTask = new Task();
+                    updatedTask.setId(taskId);
+                    updatedTask.setTitle(title);
+                    updatedTask.setCategory(category);
+                    updatedTask.setNote(notes);
+                    updatedTask.setTaskDate(dueDateTime.getTime());
+                    updatedTask.setVibration(vibration);
+                    if (selectedRingtoneUri != null) {
+                        updatedTask.setRingtone(selectedRingtoneUri.toString());
+                    }
+
+                    scheduleAlarmsForTask(TaskDetailActivity.this, updatedTask);
+                }
+
                 Intent resultIntent = new Intent();
                 resultIntent.putExtra("isTaskUpdated", true);
                 setResult(RESULT_OK, resultIntent);
@@ -240,5 +255,69 @@ public class TaskDetailActivity extends AppCompatActivity {
 
     private void updateReminderButton() {
         btnSetReminder.setText(reminderOn ? "Reminder ON" : "Reminder OFF");
+    }
+
+    private void scheduleAlarmsForTask(android.content.Context context, Task task) {
+        long dueTime = task.getTaskDate().getTime();
+        long currentTime = System.currentTimeMillis();
+        long twentyFourHoursInMillis = 24 * 60 * 60 * 1000;
+
+        if (dueTime > currentTime) {
+            scheduleNotification(context, task, dueTime, false);
+        }
+
+        long timeDifference = dueTime - currentTime;
+        if (timeDifference > 0 && timeDifference < twentyFourHoursInMillis) {
+        } else if (timeDifference >= twentyFourHoursInMillis) {
+            long advanceTime = dueTime - twentyFourHoursInMillis;
+            scheduleNotification(context, task, advanceTime, true);
+        }
+    }
+
+    private void scheduleNotification(android.content.Context context, Task task, long time, boolean isAdvance) {
+        String uniqueId = isAdvance ? task.getId() + "_advance" : task.getId();
+
+        Intent intent = new Intent(context, com.example.login_signup.TaskReminderReceiver.class);
+        intent.putExtra("taskId", uniqueId);
+        intent.putExtra("title", task.getTitle());
+        intent.putExtra("note", task.getNote());
+        intent.putExtra("category", task.getCategory());
+        intent.putExtra("isAdvance", isAdvance);
+        if (task.getRingtone() != null) {
+            intent.putExtra("ringtone", task.getRingtone());
+        }
+        if (task.getVibration() != null) {
+            intent.putExtra("vibration", task.getVibration());
+        }
+
+        int requestCode = uniqueId.hashCode();
+
+        android.app.PendingIntent pendingIntent = android.app.PendingIntent.getBroadcast(
+                context,
+                requestCode,
+                intent,
+                android.app.PendingIntent.FLAG_UPDATE_CURRENT | android.app.PendingIntent.FLAG_IMMUTABLE
+        );
+
+        android.app.AlarmManager alarmManager = (android.app.AlarmManager) context.getSystemService(android.content.Context.ALARM_SERVICE);
+        if (alarmManager != null) {
+            try {
+                if (!isAdvance) {
+                    Intent showTaskIntent = new Intent(context, com.example.login_signup.HomeActivity.class);
+                    android.app.PendingIntent showTaskPendingIntent = android.app.PendingIntent.getActivity(
+                            context,
+                            requestCode,
+                            showTaskIntent,
+                            android.app.PendingIntent.FLAG_UPDATE_CURRENT | android.app.PendingIntent.FLAG_IMMUTABLE
+                    );
+                    android.app.AlarmManager.AlarmClockInfo alarmClockInfo = new android.app.AlarmManager.AlarmClockInfo(time, showTaskPendingIntent);
+                    alarmManager.setAlarmClock(alarmClockInfo, pendingIntent);
+                } else {
+                    alarmManager.setExact(android.app.AlarmManager.RTC_WAKEUP, time, pendingIntent);
+                }
+            } catch (SecurityException se) {
+                Toast.makeText(context, "Permission not granted", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 }

@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Calendar;
 
 public class FirebaseRepo {
     private FirebaseAuth auth;
@@ -567,6 +568,68 @@ public class FirebaseRepo {
                     listener.onStreakLoaded(streak);
                 })
                 .addOnFailureListener(listener::onError);
+    }
+
+    public void updateStreak() {
+        FirebaseUser user = auth.getCurrentUser();
+        if (user == null) return;
+
+        db.collection("users").document(user.getUid()).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (!documentSnapshot.exists()) return;
+
+                    long currentStreak = 0;
+                    if (documentSnapshot.contains("streak")) {
+                        currentStreak = documentSnapshot.getLong("streak");
+                    }
+
+                    Date lastStreakDate = null;
+                    if (documentSnapshot.contains("lastStreakDate")) {
+                        lastStreakDate = documentSnapshot.getDate("lastStreakDate");
+                    }
+
+                    Calendar today = Calendar.getInstance();
+                    resetTime(today);
+
+                    Calendar lastDate = Calendar.getInstance();
+                    if (lastStreakDate != null) {
+                        lastDate.setTime(lastStreakDate);
+                        resetTime(lastDate);
+                    } else {
+                        lastDate.setTimeInMillis(0);
+                    }
+
+                    if (lastStreakDate == null) {
+                        updateUserStreakField(user.getUid(), 1);
+                    } else if (today.compareTo(lastDate) == 0) {
+                        Log.d("Streak", "Already updated for today");
+                    } else {
+                        lastDate.add(Calendar.DAY_OF_YEAR, 1);
+                        if (today.compareTo(lastDate) == 0) {
+                            updateUserStreakField(user.getUid(), currentStreak + 1);
+                        } else {
+                            updateUserStreakField(user.getUid(), 1);
+                        }
+                    }
+                })
+                .addOnFailureListener(e -> Log.e("Streak", "Error calculating streak", e));
+    }
+
+    private void updateUserStreakField(String uid, long newStreak) {
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("streak", newStreak);
+        updates.put("lastStreakDate", new Date()); // Lưu lại ngày cập nhật mới nhất
+
+        db.collection("users").document(uid)
+                .update(updates)
+                .addOnSuccessListener(aVoid -> Log.d("Streak", "Streak updated to: " + newStreak));
+    }
+
+    private void resetTime(Calendar calendar) {
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
     }
 
     public void getTaskStatistics(OnTaskStatsLoadedListener listener) {

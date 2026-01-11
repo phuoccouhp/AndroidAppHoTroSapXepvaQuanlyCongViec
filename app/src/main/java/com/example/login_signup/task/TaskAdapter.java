@@ -19,16 +19,17 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 
+// Adapter hiển thị danh sách các công việc (task) trong RecyclerView
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder> {
+    private List<Task> taskList; // Danh sách công việc
+    private OnTaskActionListener actionListener; // Bộ lắng nghe sự kiện tương tác
 
-    private List<Task> taskList;
-    private OnTaskActionListener actionListener;
-
+    // Interface để xử lý các sự kiện tương tác từ người dùng trên mỗi mục công việc
     public interface OnTaskActionListener {
-        void onItemClick(Task task);
-        void onDeleteClick(Task task);
-        void onStatusClick(Task task);
-        void onPriorityClick(Task task);
+        void onItemClick(Task task); // Click vào mục công việc để xem chi tiết
+        void onDeleteClick(Task task); // Click nút xóa công việc
+        void onStatusClick(Task task); // Click đổi trạng thái (Xong/Chưa xong)
+        void onPriorityClick(Task task); // Click đổi mức độ ưu tiên (Cơ bản/Cao)
     }
 
     public TaskAdapter(List<Task> taskList, OnTaskActionListener actionListener) {
@@ -39,6 +40,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     @NonNull
     @Override
     public TaskViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        // Nạp giao diện cho từng mục công việc
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_task, parent, false);
         return new TaskViewHolder(view);
@@ -48,13 +50,16 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     public void onBindViewHolder(@NonNull TaskViewHolder holder, int position) {
         Task task = taskList.get(position);
 
+        // Hiển thị các thông tin cơ bản: Tiêu đề, Danh mục, Giờ
         holder.tvTaskTitle.setText(task.getTitle());
         holder.tvTags.setText(task.getCategory());
         holder.tvTaskTime.setText(task.getTime());
 
+        // Định dạng và hiển thị ngày tháng
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         holder.tvTaskDay.setText(sdf.format(task.getTaskDate()));
 
+        // Thiết lập giao diện nút Trạng thái (Done/Unfinished) dựa trên dữ liệu
         if (task.isCompleted()) {
             holder.btnStatus.setText("Done");
             holder.btnStatus.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#62EF63")));
@@ -63,6 +68,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             holder.btnStatus.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#B0BEC5")));
         }
 
+        // Thiết lập giao diện nút Ưu tiên (High/Normal)
         if ("High".equals(task.getPriority())) {
             holder.btnPriority.setText("High");
             holder.btnPriority.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#FF9F0B")));
@@ -71,6 +77,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             holder.btnPriority.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#64B5F6")));
         }
 
+        // Thay đổi Icon và Màu sắc dựa theo Tag
         int iconResId, tagColor;
         String category = task.getCategory();
 
@@ -95,14 +102,16 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
                 break;
             default:
                 iconResId = R.drawable.baseline_check_circle_24;
-                tagColor = Color.parseColor("#9E9E9E"); // Màu Xám mặc định
+                tagColor = Color.parseColor("#9E9E9E"); // Màu Xám
                 break;
         }
         holder.imgTags.setImageResource(iconResId);
         holder.imgTags.setColorFilter(tagColor);
 
+        // Thiết lập sự kiện click vào mục công việc
         holder.itemView.setOnClickListener(v -> actionListener.onItemClick(task));
 
+        // Thiết lập sự kiện click button Delete
         holder.btnDeleteTask.setOnClickListener(v -> {
             int pos = holder.getAdapterPosition();
             if (pos != RecyclerView.NO_POSITION) {
@@ -110,6 +119,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             }
         });
 
+        // Thiết lập sự kiện click button Status
         holder.btnStatus.setOnClickListener(v -> {
             int pos = holder.getAdapterPosition();
             if (pos != RecyclerView.NO_POSITION) {
@@ -117,6 +127,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             }
         });
 
+        // Thiết lập sự kiện click button Priority
         holder.btnPriority.setOnClickListener(v -> {
             int pos = holder.getAdapterPosition();
             if (pos != RecyclerView.NO_POSITION) {
@@ -130,9 +141,10 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         return taskList.size();
     }
 
+   // ViewHolder lưu trữ các thành phần giao diện cho mỗi mục công việc
     public static class TaskViewHolder extends RecyclerView.ViewHolder {
         TextView tvTaskTitle, tvTags, tvTaskTime, tvTaskDay;
-        Button btnStatus, btnPriority, btnDeleteTask;;
+        Button btnStatus, btnPriority, btnDeleteTask;
         ImageView imgTags;
 
         public TaskViewHolder(@NonNull View itemView) {

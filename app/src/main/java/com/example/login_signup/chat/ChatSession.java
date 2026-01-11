@@ -6,6 +6,7 @@ import com.google.firebase.firestore.DocumentId;
 
 import java.util.Date;
 
+// Lớp ChatSession đại diện cho một phiên trò chuyện
 public class ChatSession {
     @DocumentId
     private String id;

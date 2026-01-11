@@ -22,10 +22,10 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
-import com.example.login_signup.ForgetPassword;
-import com.example.login_signup.HomeActivity;
+import com.example.login_signup.home.HomeActivity;
 import com.example.login_signup.R;
 import com.example.login_signup.classes.FirebaseRepo;
+import com.example.login_signup.password.ForgetPassword;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -33,8 +33,11 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 
+// Login: Màn hình đăng nhập của ứng dụng
 public class Login extends AppCompatActivity {
+    private FirebaseRepo fbRepo;
 
+    // Các đối tượng thành phần giao diện
     private EditText etEmail;
     private EditText etOldPass;
     private Button btnLogin;
@@ -42,10 +45,11 @@ public class Login extends AppCompatActivity {
     private TextView tvSignUp;
     private ImageButton btnGoogle;
 
-    private FirebaseRepo fbRepo;
+    // Đăng nhập bằng Google
     private GoogleSignInClient mGoogleSignInClient;
     private ActivityResultLauncher<Intent> googleSignInLauncher;
 
+    // Bộ khởi chạy để yêu cầu quyền thông báo
     private final ActivityResultLauncher<String> requestPermissionLauncher = registerForActivityResult(
             new ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (!isGranted) {
@@ -56,12 +60,14 @@ public class Login extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        // Tự động đăng nhập nếu đã có phiên làm việc trước đó
         if (fbRepo.getCurrentUser() != null) {
             Toast.makeText(this, "Automatically logged in!", Toast.LENGTH_SHORT).show();
             navigateToHomeActivity();
         }
     }
 
+    // Ánh xạ các thành phần giao diện
     void Init(){
         etEmail = findViewById(R.id.etEmail);
         etOldPass = findViewById(R.id.etOldPass);
@@ -71,6 +77,7 @@ public class Login extends AppCompatActivity {
         btnGoogle = findViewById(R.id.btnGoogle);
     }
 
+    // Thiết lập sự kiện click cho các nút bấm và liên kết
     void setOnClick(){
         btnLogin.setOnClickListener(v -> handleLogin());
         tvForgetPass.setOnClickListener(v -> {
@@ -89,12 +96,14 @@ public class Login extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        fbRepo = new FirebaseRepo();
         Init();
         setOnClick();
 
-        fbRepo = new FirebaseRepo();
-
+        // Cấu hình đăng nhập Google
         createGoogleSignInRequest();
+        
+        // Nhận kết quả từ màn hình chọn tài khoản Google
         googleSignInLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
@@ -108,16 +117,16 @@ public class Login extends AppCompatActivity {
                     }
                 }
             });
-
-
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        // Kiểm tra xem người dùng có vừa quay lại sau khi đặt lại mật khẩu không
         checkPasswordResetFlow();
     }
 
+    // Kiểm tra trạng thái đặt lại mật khẩu
     private void checkPasswordResetFlow() {
         SharedPreferences prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE);
         boolean passwordResetFlow = prefs.getBoolean("passwordResetViaEmail", false);
@@ -130,6 +139,7 @@ public class Login extends AppCompatActivity {
         }
     }
 
+    // Hiển thị hộp thoại thông báo đặt lại mật khẩu thành công
     private void showSuccessDialog() {
         final Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.dialog_success);
@@ -139,6 +149,7 @@ public class Login extends AppCompatActivity {
         dialog.setCancelable(false);
         dialog.show();
 
+        // Tự động đóng dialog sau 5 giây
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             if (dialog.isShowing()) {
                 dialog.dismiss();
@@ -146,6 +157,7 @@ public class Login extends AppCompatActivity {
         }, 5000);
     }
 
+    // Xử lý đăng nhập bằng Email và Mật khẩu qua Firebase
     private void handleLogin() {
         String email = etEmail.getText().toString().trim();
         String password = etOldPass.getText().toString();
@@ -155,12 +167,12 @@ public class Login extends AppCompatActivity {
                 Toast.makeText(Login.this, message, Toast.LENGTH_SHORT).show();
                 navigateToHomeActivity();
             } else {
-                Toast.makeText(Login.this, e.getMessage(),
-                        Toast.LENGTH_LONG).show();
+                Toast.makeText(Login.this, e.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
 
+    // Cấu hình đăng nhập Google
     private void createGoogleSignInRequest() {
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
@@ -169,6 +181,7 @@ public class Login extends AppCompatActivity {
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
     }
 
+    // Đăng nhập bằng Google
     private void signInWithGoogle() {
         mGoogleSignInClient.signOut().addOnCompleteListener(this, task -> {
             Intent signInIntent = mGoogleSignInClient.getSignInIntent();
@@ -176,6 +189,7 @@ public class Login extends AppCompatActivity {
         });
     }
 
+    // Xác thực với Firebase bằng Token nhận được từ Google
     private void firebaseAuthWithGoogle(String idToken) {
         fbRepo.firebaseAuthWithGoogle(idToken, (message, e) -> {
             if (e == null) {
@@ -187,15 +201,18 @@ public class Login extends AppCompatActivity {
         });
     }
 
+    // Chuyển sang màn hình chính (HomeActivity)
     private void navigateToHomeActivity() {
         requestNotificationPermission();
 
         Intent intent = new Intent(Login.this, HomeActivity.class);
+        // Xóa sạch stack các Activity trước đó
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
     }
 
+    // Yêu cầu quyền thông báo nếu chạy trên Android 13 trở lên
     private void requestNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) !=

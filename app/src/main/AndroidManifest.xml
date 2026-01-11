@@ -31,7 +31,7 @@
             android:name=".alarm.AlarmService" />
 
         <receiver
-            android:name=".TaskReminderReceiver"
+            android:name=".alarm.TaskReminderReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
@@ -61,7 +61,7 @@
             android:turnScreenOn="true" />
 
         <activity
-            android:name=".taskHistory.TaskHistoryActivity"
+            android:name=".history.TaskHistoryActivity"
             android:exported="false" />
             
         <activity
@@ -70,7 +70,7 @@
             android:exported="false" />
 
         <activity
-            android:name=".HomeActivity"
+            android:name=".home.HomeActivity"
             android:windowSoftInputMode="adjustPan"
             android:exported="false" />
         <activity
@@ -81,15 +81,15 @@
             android:windowSoftInputMode="adjustPan"
             android:exported="false" />
         <activity
-            android:name=".ChangePassword"
+            android:name=".password.ChangePassword"
             android:windowSoftInputMode="adjustPan"
             android:exported="false" />
         <activity
-            android:name=".ForgetPassword"
+            android:name=".password.ForgetPassword"
             android:windowSoftInputMode="adjustPan"
             android:exported="false" />
         <activity
-            android:name=".log_sign.NewPassword"
+            android:name=".password.NewPassword"
             android:windowSoftInputMode="adjustPan"
             android:exported="false" />
         <activity

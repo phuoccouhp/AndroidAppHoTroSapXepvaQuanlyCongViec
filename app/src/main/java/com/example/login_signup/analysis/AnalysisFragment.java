@@ -1,4 +1,4 @@
-package com.example.login_signup;
+package com.example.login_signup.analysis;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.login_signup.R;
 import com.example.login_signup.classes.FirebaseRepo;
 import com.example.login_signup.classes.Task;
 
@@ -46,10 +47,9 @@ public class AnalysisFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_analysis, container, false);
 
+        fbRepo = new FirebaseRepo();
         lineChart = v.findViewById(R.id.lineChart);
         pieChart = v.findViewById(R.id.pieChart);
-
-        fbRepo = new FirebaseRepo();
 
         loadDataAndDrawChart();
 

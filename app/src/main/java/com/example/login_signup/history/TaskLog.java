@@ -1,7 +1,8 @@
-package com.example.login_signup.classes;
+package com.example.login_signup.history;
 
 import java.util.Date;
 
+// Lớp TaskLog đại diện cho một bản ghi nhật ký của một công việc
 public class TaskLog {
     private String logId;
     private String userId;

@@ -1,10 +1,9 @@
 package com.example.login_signup.classes;
 
 import android.util.Log;
-import android.widget.Toast;
 
 import com.example.login_signup.chat.ChatSession;
-import com.google.firebase.Timestamp;
+import com.example.login_signup.history.TaskLog;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -24,81 +23,102 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Calendar;
 
+// Lớp FirebaseRepo quản lý tập trung các tương tác với Firebase (Auth & Firestore)
 public class FirebaseRepo {
     private FirebaseAuth auth;
     private FirebaseFirestore db;
 
+    // Khởi tạo đối tượng FirebaseRepo
+    public FirebaseRepo() {
+        this.auth = FirebaseAuth.getInstance();
+        this.db = FirebaseFirestore.getInstance();
+    }
+
+    // Phương thức trả về người dùng hiện tại
+    public FirebaseUser getCurrentUser(){
+        return auth.getCurrentUser();
+    }
+
+    // Phương thức đăng xuất
+    public void signOut() {
+        auth.signOut();
+    }
+
+    // --- Các interface trả về kết quả (callback) ---
+
+    // Interface trả về kết quả sau khi thực hiện một hành động
     public interface OnCompleteCallback {
         void onComplete(String message, Exception e);
     }
 
+    // Interface trả về kết quả sau khi kiểm tra Email
     public interface OnEmailCheckListener {
         void onComplete(boolean emailExists, String message, Exception e);
     }
 
+    // Interface trả về kết quả sau khi đăng ký tài khoản
     public interface OnRegisterListener {
         void onSuccess();
         void onAuthFailure(Exception e);
         void onDbFailure(Exception e);
     }
 
+    // Interface trả về kết quả sau khi tải thông tin người dùng
     public interface onLoadedUserListener {
         void onComplete(User user, Exception e);
     }
 
+    // Interface trả về kết quả sau khi tải danh sách phiên trò chuyện
     public interface OnChatSessionsListener {
         void onSessionsLoaded(List<ChatSession> sessions);
         void onError(Exception e);
     }
 
+    // Interface trả về kết quả sau khi tạo phiên trò chuyện
     public interface OnCreateSessionListener {
         void onSuccess(ChatSession newSession, String documentId);
         void onFailure(Exception e);
     }
 
+    // Interface trả về kết quả sau khi tải danh sách lịch sử hành động
     public interface OnLogLoadedListener {
         void onLogsLoaded(List<TaskLog> logs);
         void onError(Exception e);
     }
 
+    // Interface trả về kết quả sau khi thêm công việc
     public interface OnAddTaskListener {
         void onSuccess(String taskId);
         void onFailure(Exception e);
     }
 
+    // Interface trả về kết quả sau khi tải danh sách công việc
     public interface OnTasksLoadedListener {
         void onTasksLoaded(List<Task> tasks);
         void onError(Exception e);
     }
 
+    // Interface trả về kết quả sau khi tải chi tiết công việc
     public interface OnTaskDetailLoadedListener {
         void onTaskLoaded(Task task);
         void onError(Exception e);
     }
 
+    // Interface trả về kết quả sau khi tải số ngày liên tiếp (Streak)
     public interface OnStreakLoadedListener {
         void onStreakLoaded(int currentStreak);
         void onError(Exception e);
     }
 
+    // Interface trả về kết quả sau khi tải thống kê số lượng công việc
     public interface OnTaskStatsLoadedListener {
         void onStatsLoaded(int totalCreated, int totalCompleted);
         void onError(Exception e);
     }
 
-    public FirebaseRepo() {
-        this.auth = FirebaseAuth.getInstance();
-        this.db = FirebaseFirestore.getInstance();
-    }
+    // -- Quản lý việc đăng nhập/đăng ký tài khoản (AUTH) --
 
-    public FirebaseUser getCurrentUser(){
-        return auth.getCurrentUser();
-    }
-
-    public void signOut() {
-        auth.signOut();
-    }
-
+    // Đăng nhập bằng Email/Password
     public void signInWithEmailAndPassword(String email, String password, OnCompleteCallback callback) {
         if (email == null || email.isEmpty() || password == null || password.isEmpty()) {
             callback.onComplete(null, new IllegalArgumentException("Please enter email and password"));
@@ -115,18 +135,20 @@ public class FirebaseRepo {
                 });
     }
 
+    // Xác thực với Google
     public void firebaseAuthWithGoogle(String idToken, OnCompleteCallback callback){
         AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
         auth.signInWithCredential(credential)
                 .addOnCompleteListener(task -> {
-                   if(task.isSuccessful()){
-                       callback.onComplete("Login successful!", null);
-                   } else {
-                       callback.onComplete(null, task.getException());
-                   }
+                    if(task.isSuccessful()){
+                        callback.onComplete("Login successful!", null);
+                    } else {
+                        callback.onComplete(null, task.getException());
+                    }
                 });
     }
 
+    // Kiểm tra Email đã tồn tại trong hệ thống chưa
     public void checkEmailExists(String email, OnEmailCheckListener listener) {
         db.collection("users")
                 .whereEqualTo("email", email)
@@ -144,6 +166,7 @@ public class FirebaseRepo {
                 });
     }
 
+    // Tạo tài khoản mới và lưu thông tin vào Firestore
     public void createUserWithEmailAndPassword(String name, String email, String pass, OnRegisterListener listener){
         auth.createUserWithEmailAndPassword(email, pass)
                 .addOnCompleteListener(task -> {
@@ -183,6 +206,7 @@ public class FirebaseRepo {
 
     }
 
+    // Gửi Email khôi phục mật khẩu
     public void sendPasswordResetEmail(String email, OnCompleteCallback callback) {
         if (email == null || email.isEmpty()) {
             callback.onComplete(null, new IllegalArgumentException("Email cannot be empty"));
@@ -194,6 +218,7 @@ public class FirebaseRepo {
                 .addOnFailureListener(e -> callback.onComplete(null, e));
     }
 
+    // Đổi mật khẩu (yêu cầu xác thực lại người dùng)
     public void changePassword(String oldPassword, String newPassword, OnCompleteCallback callback) {
         FirebaseUser user = auth.getCurrentUser();
         if (user == null) {
@@ -220,6 +245,7 @@ public class FirebaseRepo {
                 });
     }
 
+    // Cập nhật mật khẩu (không yêu cầu xác thực lại người dùng)
     public void updatePassword(String newPassword, OnCompleteCallback callback) {
         FirebaseUser user = auth.getCurrentUser();
         if (user == null) {
@@ -232,6 +258,7 @@ public class FirebaseRepo {
                 .addOnFailureListener(e -> callback.onComplete(null, e));
     }
 
+    // Tải thông tin Profile của người dùng
     public void loadCurrentUserProfile(onLoadedUserListener listener){
         User user = new User();
         FirebaseUser currentUser = this.getCurrentUser();
@@ -263,6 +290,7 @@ public class FirebaseRepo {
         }
     }
 
+    // Cập nhật ảnh đại diện (Base64)
     public void updateAvatar(String base64String, OnCompleteCallback callback){
         FirebaseUser currentUser = this.getCurrentUser();
         if(currentUser != null){
@@ -275,6 +303,9 @@ public class FirebaseRepo {
         }
     }
 
+    // --- Quản lý cuộc trò chuyện (CHAT) ---
+
+    // Lắng nghe các thay đổi trong danh sách phiên chat theo thời gian thực
     public void listenForChatSessions(OnChatSessionsListener listener) {
         FirebaseUser currentUser = auth.getCurrentUser();
         if (currentUser == null) {
@@ -303,6 +334,7 @@ public class FirebaseRepo {
                 });
     }
 
+    // Tạo một phiên chat mới
     public void createNewChatSession(OnCreateSessionListener listener) {
         FirebaseUser currentUser = auth.getCurrentUser();
         if (currentUser == null) {
@@ -332,6 +364,8 @@ public class FirebaseRepo {
                 .addOnFailureListener(listener::onFailure);
     }
 
+
+    // Đổi tên phiên chat
     public void renameChatSession(String sessionId, String newName, OnCompleteCallback callback) {
         if (sessionId == null) return;
         db.collection("chat_sessions").document(sessionId)
@@ -340,6 +374,7 @@ public class FirebaseRepo {
                 .addOnFailureListener(e -> callback.onComplete(null, e));
     }
 
+    // Xóa phiên chat.
     public void deleteChatSession(String sessionId, OnCompleteCallback callback) {
         if (sessionId == null) return;
         db.collection("chat_sessions").document(sessionId)
@@ -348,6 +383,9 @@ public class FirebaseRepo {
                 .addOnFailureListener(e -> callback.onComplete(null, e));
     }
 
+    // --- Quản lý công việc (TASK) ---
+
+    // Thêm công việc mới
     public void addTask(Map<String, Object> taskData, OnAddTaskListener listener) {
         db.collection("tasks").add(taskData)
                 .addOnSuccessListener(documentReference -> {
@@ -356,6 +394,8 @@ public class FirebaseRepo {
                 .addOnFailureListener(listener::onFailure);
     }
 
+
+    // Xóa công việc
     public void deleteTask(String taskId, String taskTitle, OnCompleteCallback callback) {
         if (taskId == null || taskId.isEmpty()) {
             callback.onComplete(null, new IllegalArgumentException("Task ID is missing"));
@@ -372,6 +412,7 @@ public class FirebaseRepo {
                 .addOnFailureListener(e -> callback.onComplete(null, e));
     }
 
+    // Tải chi tiết một công việc
     public void getTaskDetails(String taskId, OnTaskDetailLoadedListener listener) {
         if (taskId == null) {
             listener.onError(new Exception("Task ID is null"));
@@ -406,6 +447,7 @@ public class FirebaseRepo {
                 .addOnFailureListener(listener::onError);
     }
 
+    // Cập nhật công việc
     public void updateTask(String taskId, Map<String, Object> taskUpdates, OnCompleteCallback callback) {
         if (taskId == null) {
             callback.onComplete(null, new Exception("Task ID is null"));
@@ -418,6 +460,7 @@ public class FirebaseRepo {
                 .addOnFailureListener(e -> callback.onComplete(null, e));
     }
 
+    // Tải tất cả công việc của người dùng hiện tại
     public void loadTasksForUser(OnTasksLoadedListener listener) {
         FirebaseUser user = auth.getCurrentUser();
         if (user == null) {
@@ -473,6 +516,7 @@ public class FirebaseRepo {
                 .addOnFailureListener(listener::onError);
     }
 
+    // Cập nhật trường dữ liệu cho công việc
     public void updateTaskField(String taskId, String field, Object value, OnCompleteCallback callback) {
         if (taskId == null) return;
 
@@ -482,6 +526,7 @@ public class FirebaseRepo {
                 .addOnFailureListener(e -> callback.onComplete(null, e));
     }
 
+    // Tải danh sách nhắc nhở (Reminders)
     public void loadReminders(OnTasksLoadedListener listener) {
         FirebaseUser user = auth.getCurrentUser();
         if (user == null) {
@@ -513,6 +558,10 @@ public class FirebaseRepo {
                 .addOnFailureListener(listener::onError);
     }
 
+
+    // --- Lịch sử hành động (LOG) ---
+
+    // Lưu log hành động thực hiện trên Task
     public void logTaskAction(String taskId, String taskTitle, String action) {
         FirebaseUser user = auth.getCurrentUser();
         if (user == null) return;
@@ -528,6 +577,7 @@ public class FirebaseRepo {
         db.collection("task_logs").add(log);
     }
 
+    // Lấy danh sách lịch sử log của Task
     public void getTaskLogs(OnLogLoadedListener listener) {
         FirebaseUser user = auth.getCurrentUser();
         if (user == null) {
@@ -551,6 +601,9 @@ public class FirebaseRepo {
                 .addOnFailureListener(listener::onError);
     }
 
+    // --- Thành tích (ACHIEVEMENTS) ---
+
+    // Tải số ngày liên tiếp (Streak) người dùng
     public void getUserStreak(OnStreakLoadedListener listener) {
         FirebaseUser user = auth.getCurrentUser();
         if (user == null) {
@@ -570,6 +623,7 @@ public class FirebaseRepo {
                 .addOnFailureListener(listener::onError);
     }
 
+    // Cập nhật số ngày liên tiếp (Streak) người dùng
     public void updateStreak() {
         FirebaseUser user = auth.getCurrentUser();
         if (user == null) return;
@@ -615,23 +669,20 @@ public class FirebaseRepo {
                 .addOnFailureListener(e -> Log.e("Streak", "Error calculating streak", e));
     }
 
+    // Cập nhật Streak cho người dùng
     private void updateUserStreakField(String uid, long newStreak) {
         Map<String, Object> updates = new HashMap<>();
         updates.put("streak", newStreak);
-        updates.put("lastStreakDate", new Date()); // Lưu lại ngày cập nhật mới nhất
+        updates.put("lastStreakDate", new Date());
 
         db.collection("users").document(uid)
                 .update(updates)
                 .addOnSuccessListener(aVoid -> Log.d("Streak", "Streak updated to: " + newStreak));
     }
 
-    private void resetTime(Calendar calendar) {
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-    }
+    // --- Thống kê (STATISTICS) ---
 
+    // Lấy thống kê số lượng Task (Tổng số và Đã hoàn thành)
     public void getTaskStatistics(OnTaskStatsLoadedListener listener) {
         FirebaseUser user = auth.getCurrentUser();
         if (user == null) {
@@ -655,5 +706,13 @@ public class FirebaseRepo {
                     listener.onStatsLoaded(totalCreated, totalCompleted);
                 })
                 .addOnFailureListener(listener::onError);
+    }
+
+    // Hàm reset thời gian
+    private void resetTime(Calendar calendar) {
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
     }
 }

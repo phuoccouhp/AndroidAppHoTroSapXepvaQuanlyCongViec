@@ -1,5 +1,6 @@
 package com.example.login_signup.achievement;
 
+// Lớp Achievement đại diện cho một thành tựu
 public class Achievement {
     int iconResId;
     int color;
@@ -17,7 +18,9 @@ public class Achievement {
         this.maxProgress = maxProgress;
     }
 
+    // Phương thức kiểm tra xem thành tựu có được mở khóa hay chưa
     public boolean isUnlocked() {
+        // So sánh tiến trình hiện tại với tiến trình định mức
         return currentProgress >= maxProgress;
     }
 }

@@ -1,4 +1,4 @@
-package com.example.login_signup.log_sign;
+package com.example.login_signup.password;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.login_signup.R;
 import com.example.login_signup.classes.FirebaseRepo;
+import com.example.login_signup.log_sign.Login;
 
 public class NewPassword extends AppCompatActivity {
 

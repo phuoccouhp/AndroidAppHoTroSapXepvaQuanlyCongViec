@@ -14,6 +14,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.login_signup.R;
+import com.example.login_signup.alarm.TaskReminderReceiver;
 import com.example.login_signup.classes.FirebaseRepo;
 import com.example.login_signup.classes.Task;
 
@@ -21,6 +22,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.login_signup.home.HomeActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.text.SimpleDateFormat;
@@ -29,20 +31,22 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+// TaskDetailActivity hiển thị chi tiết và cho phép chỉnh sửa công việc hiện có
 public class TaskDetailActivity extends AppCompatActivity {
-
+    private FirebaseRepo fbRepo;
+    // Các đối tượng thành phần giao diện
     private EditText etTaskName, etNotes;
     private Spinner spinnerCategories, spinnerVibration;
     private Button btnSetDueDate, btnSetTime, btnSetReminder, btnSelectRingtone;
     private ImageButton btnBack;
     private FloatingActionButton btnSaveTask;
 
-    private FirebaseRepo fbRepo;
     private String taskId;
     private Calendar dueDateTime = Calendar.getInstance();
     private boolean reminderOn = false;
     private Uri selectedRingtoneUri;
 
+    // Bộ khởi chạy để chọn nhạc chuông từ hệ thống
     private final ActivityResultLauncher<Intent> ringtonePickerLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
@@ -65,6 +69,7 @@ public class TaskDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_task_detail);
 
         fbRepo = new FirebaseRepo();
+        // Nhận ID công việc được truyền từ màn hình trước
         taskId = getIntent().getStringExtra("taskId");
 
         initViews();
@@ -73,6 +78,7 @@ public class TaskDetailActivity extends AppCompatActivity {
         setupVibrationSpinner();
 
         if (taskId != null) {
+            // Tải thông tin chi tiết công việc từ Firestore
             loadTaskDetails();
         } else {
             Toast.makeText(this, "Task ID not found", Toast.LENGTH_SHORT).show();
@@ -80,6 +86,7 @@ public class TaskDetailActivity extends AppCompatActivity {
         }
     }
 
+    // Ánh xạ các thành phần giao diện
     private void initViews() {
         etTaskName = findViewById(R.id.etTaskName);
         spinnerCategories = findViewById(R.id.spinnerCategories);
@@ -93,10 +100,12 @@ public class TaskDetailActivity extends AppCompatActivity {
         btnSelectRingtone = findViewById(R.id.btnSelectRingtone);
     }
 
+    // Thiết lập các sự kiện tương tác cho các button
     private void setupListeners() {
         btnBack.setOnClickListener(v -> finish());
         btnSaveTask.setOnClickListener(v -> updateTask());
 
+        // Chọn ngày đến hạn mới
         btnSetDueDate.setOnClickListener(v -> {
             Calendar c = Calendar.getInstance();
             new DatePickerDialog(this, (view, year, month, day) -> {
@@ -107,6 +116,7 @@ public class TaskDetailActivity extends AppCompatActivity {
             }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH)).show();
         });
 
+        // Chọn giờ đến hạn mới
         btnSetTime.setOnClickListener(v -> {
             Calendar c = Calendar.getInstance();
             new TimePickerDialog(this, (view, hour, minute) -> {
@@ -117,11 +127,13 @@ public class TaskDetailActivity extends AppCompatActivity {
             }, c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), true).show();
         });
 
+        // Thay đổi trạng thái nhắc nhở
         btnSetReminder.setOnClickListener(v -> {
             reminderOn = !reminderOn;
             updateReminderButton();
         });
 
+        // Mở trình chọn nhạc chuông hệ thống
         btnSelectRingtone.setOnClickListener(v -> {
             Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
             intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_ALARM);
@@ -131,6 +143,7 @@ public class TaskDetailActivity extends AppCompatActivity {
         });
     }
 
+    // Cấu hình danh sách Tag
     private void setupCategorySpinner() {
         String[] categories = {"Work", "Personal", "Health", "Shopping"};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, categories);
@@ -138,6 +151,7 @@ public class TaskDetailActivity extends AppCompatActivity {
         spinnerCategories.setAdapter(adapter);
     }
 
+    // Cấu hình danh sách kiểu rung
     private void setupVibrationSpinner() {
         String[] vibrations = {"Default", "Short", "Long", "Heartbeat"};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, vibrations);
@@ -145,6 +159,7 @@ public class TaskDetailActivity extends AppCompatActivity {
         spinnerVibration.setAdapter(adapter);
     }
 
+    // Lấy dữ liệu công việc từ Firestore và hiển thị lên giao diện
     private void loadTaskDetails() {
         fbRepo.getTaskDetails(taskId, new FirebaseRepo.OnTaskDetailLoadedListener() {
             @Override
@@ -153,6 +168,7 @@ public class TaskDetailActivity extends AppCompatActivity {
                 etNotes.setText(task.getNote());
                 reminderOn = task.isReminder();
 
+                // Tự động chọn đúng Category trong Spinner
                 if (task.getCategory() != null) {
                     ArrayAdapter<String> categoryAdapter = (ArrayAdapter<String>) spinnerCategories.getAdapter();
                     int categoryPosition = categoryAdapter.getPosition(task.getCategory());
@@ -161,6 +177,7 @@ public class TaskDetailActivity extends AppCompatActivity {
                     }
                 }
 
+                // Tự động chọn đúng Vibration trong Spinner
                 if (task.getVibration() != null) {
                     ArrayAdapter<String> vibrationAdapter = (ArrayAdapter<String>) spinnerVibration.getAdapter();
                     int vibrationPosition = vibrationAdapter.getPosition(task.getVibration());
@@ -169,11 +186,13 @@ public class TaskDetailActivity extends AppCompatActivity {
                     }
                 }
 
+                // Tự động chọn đúng ngày đến hạn trong Calendar
                 if (task.getTaskDate() != null) {
                     dueDateTime.setTime(task.getTaskDate());
                     updateDateAndTimeButtons();
                 }
 
+                // Tự động chọn đúng nhạc chuông
                 if (task.getRingtone() != null) {
                     selectedRingtoneUri = Uri.parse(task.getRingtone());
                     try {
@@ -194,6 +213,7 @@ public class TaskDetailActivity extends AppCompatActivity {
         });
     }
 
+    // Cập nhật thông tin công việc đã thay đổi lên Firestore
     private void updateTask() {
         String title = etTaskName.getText().toString().trim();
         String category = spinnerCategories.getSelectedItem().toString();
@@ -220,6 +240,7 @@ public class TaskDetailActivity extends AppCompatActivity {
             if (e == null) {
                 Toast.makeText(TaskDetailActivity.this, message, Toast.LENGTH_SHORT).show();
 
+                // Nếu bật nhắc nhở, cập nhật lại báo thức hệ thống
                 if (reminderOn) {
                     Task updatedTask = new Task();
                     updatedTask.setId(taskId);
@@ -235,6 +256,7 @@ public class TaskDetailActivity extends AppCompatActivity {
                     scheduleAlarmsForTask(TaskDetailActivity.this, updatedTask);
                 }
 
+                // Trả về kết quả thành công cho màn hình gọi Activity này
                 Intent resultIntent = new Intent();
                 resultIntent.putExtra("isTaskUpdated", true);
                 setResult(RESULT_OK, resultIntent);
@@ -245,6 +267,7 @@ public class TaskDetailActivity extends AppCompatActivity {
         });
     }
 
+    // Cập nhật hiển thị Text trên các nút Ngày và Giờ
     private void updateDateAndTimeButtons() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         btnSetDueDate.setText(dateFormat.format(dueDateTime.getTime()));
@@ -253,10 +276,12 @@ public class TaskDetailActivity extends AppCompatActivity {
         btnSetTime.setText(timeFormat.format(dueDateTime.getTime()));
     }
 
+    // Cập nhật nhãn Text trên nút nhắc nhở
     private void updateReminderButton() {
         btnSetReminder.setText(reminderOn ? "Reminder ON" : "Reminder OFF");
     }
 
+    // Tính toán thời gian và lên lịch các thông báo nhắc nhở cho công việc
     private void scheduleAlarmsForTask(android.content.Context context, Task task) {
         long dueTime = task.getTaskDate().getTime();
         long currentTime = System.currentTimeMillis();
@@ -274,10 +299,11 @@ public class TaskDetailActivity extends AppCompatActivity {
         }
     }
 
+    // Gửi Intent đến AlarmManager để kích hoạt thông báo trong tương lai
     private void scheduleNotification(android.content.Context context, Task task, long time, boolean isAdvance) {
         String uniqueId = isAdvance ? task.getId() + "_advance" : task.getId();
 
-        Intent intent = new Intent(context, com.example.login_signup.TaskReminderReceiver.class);
+        Intent intent = new Intent(context, TaskReminderReceiver.class);
         intent.putExtra("taskId", uniqueId);
         intent.putExtra("title", task.getTitle());
         intent.putExtra("note", task.getNote());
@@ -303,7 +329,7 @@ public class TaskDetailActivity extends AppCompatActivity {
         if (alarmManager != null) {
             try {
                 if (!isAdvance) {
-                    Intent showTaskIntent = new Intent(context, com.example.login_signup.HomeActivity.class);
+                    Intent showTaskIntent = new Intent(context, HomeActivity.class);
                     android.app.PendingIntent showTaskPendingIntent = android.app.PendingIntent.getActivity(
                             context,
                             requestCode,

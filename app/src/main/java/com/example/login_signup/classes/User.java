@@ -1,5 +1,6 @@
 package com.example.login_signup.classes;
 
+// Lớp User đại diện cho thông tin người dùng
 public class User {
     private String avatarId;
     private String email;

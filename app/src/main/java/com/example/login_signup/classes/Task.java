@@ -5,6 +5,7 @@ import com.google.firebase.firestore.Exclude;
 import java.io.Serializable;
 import java.util.Date;
 
+// Lớp Task đại diện cho một công việc của người dùng
 public class Task implements Serializable {
 
     @Exclude private String id;
